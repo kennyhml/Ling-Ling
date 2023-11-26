@@ -18,7 +18,7 @@ namespace llpp::core
 		};
 
 		const std::chrono::system_clock::time_point GetLastCompletion() const;
-		const std::chrono::seconds GetCompletionInterval() const;
+		const std::chrono::minutes GetCompletionInterval() const;
 		const int GetTimesCompleted() const;
 		const std::string GetName() const;
 
@@ -27,12 +27,12 @@ namespace llpp::core
 		virtual const StationResult Complete() = 0;
 
 	protected:
-		LLPPBaseStation(const std::string name, std::chrono::seconds interval)
+		LLPPBaseStation(const std::string name, std::chrono::minutes interval)
 			: name(name), completionInterval(interval), timesCompleted(0),
 			  status(UNKNOWN){};
 
 		std::chrono::system_clock::time_point lastCompleted;
-		std::chrono::seconds completionInterval;
+		std::chrono::minutes completionInterval;
 
 		int timesCompleted;
 		const std::string name;

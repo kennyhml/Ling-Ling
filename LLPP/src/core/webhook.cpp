@@ -38,7 +38,6 @@ void llpp::core::discord::Send(const dpp::embed& embed)
 	cl->execute_webhook_sync(*webhook, msg);
 }
 
-
 void llpp::core::discord::InformStarted()
 {
 	auto startedEmbed =

@@ -4,11 +4,12 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/structures/simplebed.h>
+#include <dpp/colors.h>
 #include <memory>
 
 namespace llpp::bots::paste
 {
-	class PasteStation : public core::LLPPBaseStation
+	class PasteStation final : public core::LLPPBaseStation
 	{
 	public:
 		PasteStation(asa::structures::SimpleBed bed)
@@ -42,10 +43,14 @@ namespace llpp::bots::paste
 				}
 			}
 			this->DepositPasteIntoDedi();
+			this->SetCompleted();
 			auto duration = std::chrono::duration_cast<std::chrono::seconds>(
 				std::chrono::system_clock::now() - start);
 
-			return core::StationResult(true, duration, {}, nullptr);
+			core::StationResult resultData(true, duration, {}, nullptr);
+			auto embed = this->CreateResultEmbed(resultData);
+			resultData.discordEmbed = std::make_unique<dpp::embed>(embed);
+			return resultData;
 		}
 
 	private:
@@ -63,13 +68,35 @@ namespace llpp::bots::paste
 
 		void DepositPasteIntoDedi()
 		{
-			asa::entities::gLocalPlayer->TurnLeft(55);
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			asa::entities::gLocalPlayer->TurnLeft(
-				90, std::chrono ::milliseconds(1000));
+				145, std::chrono::milliseconds(300));
 
 			asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(nullptr);
 			asa::entities::gLocalPlayer->TurnUp(30);
 			asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(nullptr);
+		}
+
+		const dpp::embed CreateResultEmbed(const core::StationResult& result)
+		{
+			return dpp::embed()
+				.set_color(dpp::colors::gray)
+				.set_title(std::format(
+					"Paste Station '{}' has been completed.", this->bed.name))
+				.set_description(std::format(
+					"The station was completed successfully {} times!",
+					this->GetTimesCompleted()))
+				.set_thumbnail(
+					"https://static.wikia.nocookie.net/"
+					"arksurvivalevolved_gamepedia/images/0/03/"
+					"Cementing_Paste.png/revision/latest?cb=20180801020251")
+				.add_field("Time taken:",
+					std::to_string(result.timeTaken.count()) + " seconds", true)
+				.add_field("Paste obtained:", "300", true)
+				.add_field("Next completion:",
+					std::to_string(this->completionInterval.count()) +
+						" minutes",
+					true);
 		}
 	};
 }

@@ -8,7 +8,7 @@ LLPPBaseStation::GetLastCompletion() const
 	return this->lastCompleted;
 }
 
-const std::chrono::seconds LLPPBaseStation::GetCompletionInterval() const
+const std::chrono::minutes LLPPBaseStation::GetCompletionInterval() const
 {
 	return this->completionInterval;
 }
