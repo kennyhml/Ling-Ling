@@ -159,11 +159,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\common\webhook.cpp" />
+    <ClCompile Include="src\core\webhook.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\common\webhook.h" />
+    <ClInclude Include="src\core\station.h" />
+    <ClInclude Include="src\core\stationresult.h" />
+    <ClInclude Include="src\core\webhook.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
