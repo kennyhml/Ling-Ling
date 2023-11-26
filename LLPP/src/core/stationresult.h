@@ -15,9 +15,8 @@ namespace llpp::core
 			  obtainedItems(obtainedItems), discordEmbed(embed){};
 
 		bool success;
-		std::chrono::duration<std::chrono::seconds> timeTaken;
+		std::chrono::seconds timeTaken;
 		std::unordered_map<std::string, int> obtainedItems;
-		std::shared_ptr<dpp::embed> discordEmbed;
+		std::unique_ptr<dpp::embed> discordEmbed;
 	};
-
 }
