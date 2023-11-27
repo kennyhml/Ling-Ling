@@ -1,6 +1,6 @@
 
 #include "bots/paste/embeds.h"
-#include "bots/paste/pastestation.h"
+#include "bots/paste/pastestationmanager.h"
 #include "core/webhook.h"
 #include <asapp/game/globals.h>
 #include <asapp/game/settings.h>
@@ -38,24 +38,12 @@ int main()
 	asa::resources::Init();
 	asa::items::Init();
 
-	std::array<llpp::bots::paste::PasteStation*, 10> stations;
 
-
-	for (int i = 0; i < 10; i++) {
-
-		auto station = new llpp::bots::paste::PasteStation(
-			asa::structures::SimpleBed("PASTE0" + std::to_string(i + 1)));
-		stations[i] = station;
-	}
+	auto pasteManager = llpp::bots::paste::PasteStationManager("PASTE", 11);
 
 	while (true) {
-		for (auto station : stations) {
-			station->Complete();
-		}
-
-		Sleep(200000);
+		pasteManager.CompleteReadyStations();
 	}
-
 
 	return 0;
 }

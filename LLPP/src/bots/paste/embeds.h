@@ -10,4 +10,5 @@ namespace llpp::bots::paste
 		const std::string& stationName, asa::entities::DinoEnt* achatina);
 	void SendAchatinaNotProducing();
 	void SendDedisFull();
+	void SendPasteNotDeposited();
 }
