@@ -1,22 +1,24 @@
 #pragma once
 #include <chrono>
-#include <dpp/message.h>
 #include <memory>
 #include <unordered_map>
 
 namespace llpp::core
 {
+	class LLPPBaseStation;
+
 	struct StationResult
 	{
-		StationResult(bool succeeded, std::chrono::seconds timeTaken,
-			std::unordered_map<std::string, int> obtainedItems,
-			dpp::embed* embed = nullptr)
-			: success(succeeded), timeTaken(timeTaken),
-			  obtainedItems(obtainedItems), discordEmbed(embed){};
+		StationResult(LLPPBaseStation* station, bool succeeded, int completions,
+			std::chrono::seconds timeTaken,
+			std::unordered_map<std::string, int> obtainedItems)
+			: station(station), success(succeeded), completions(completions),
+			  timeTaken(timeTaken), obtainedItems(obtainedItems){};
 
-		bool success;
-		std::chrono::seconds timeTaken;
+		LLPPBaseStation* station;
+		const bool success;
+		const int completions;
+		const std::chrono::seconds timeTaken;
 		std::unordered_map<std::string, int> obtainedItems;
-		std::unique_ptr<dpp::embed> discordEmbed;
 	};
 }

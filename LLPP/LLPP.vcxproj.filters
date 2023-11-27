@@ -21,7 +21,16 @@
     <ClCompile Include="src\core\webhook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\station.cpp">
+    <ClCompile Include="src\core\basestation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bots\paste\pastestation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bots\paste\embeds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +38,7 @@
     <ClInclude Include="src\core\webhook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\station.h">
+    <ClInclude Include="src\core\basestation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\stationresult.h">
@@ -38,8 +47,15 @@
     <ClInclude Include="src\bots\paste\pastestation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\bots\paste\embeds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include="src\config.json" />
   </ItemGroup>
 </Project>

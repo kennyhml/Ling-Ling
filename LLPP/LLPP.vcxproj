@@ -159,18 +159,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\core\station.cpp" />
+    <ClCompile Include="src\bots\paste\embeds.cpp" />
+    <ClCompile Include="src\bots\paste\pastestation.cpp" />
+    <ClCompile Include="src\common\util.cpp" />
+    <ClCompile Include="src\core\basestation.cpp" />
     <ClCompile Include="src\core\webhook.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\bots\paste\embeds.h" />
     <ClInclude Include="src\bots\paste\pastestation.h" />
-    <ClInclude Include="src\core\station.h" />
+    <ClInclude Include="src\common\util.h" />
+    <ClInclude Include="src\core\basestation.h" />
     <ClInclude Include="src\core\stationresult.h" />
     <ClInclude Include="src\core\webhook.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include="src\config.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

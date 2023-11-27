@@ -25,16 +25,18 @@ bool llpp::core::discord::InitWebhook(const std::string& url)
 	return true;
 }
 
-void llpp::core::discord::Send(const std::string& message)
+void llpp::core::discord::Send(const std::string& msg)
 {
-	dpp::message msg(message);
-	cl->execute_webhook_sync(*webhook, msg);
+	Send(dpp::message(msg));
 }
 
 void llpp::core::discord::Send(const dpp::embed& embed)
 {
-	dpp::message msg = dpp::message();
-	msg.add_embed(embed);
+	Send(dpp::message().add_embed(embed));
+}
+
+void llpp::core::discord::Send(const dpp::message& msg)
+{
 	cl->execute_webhook_sync(*webhook, msg);
 }
 
