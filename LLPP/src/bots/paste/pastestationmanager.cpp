@@ -7,6 +7,11 @@ const bool llpp::bots::paste::PasteStationManager::CompleteReadyStations()
 		return false;
 	}
 
+	auto renderStationResult = this->renderStation.Complete();
+	if (!renderStationResult.success) {
+		throw std::runtime_error("Render station failed.");
+	}
+
 	for (const auto& station : this->stations) {
 		try {
 			station->Complete();
