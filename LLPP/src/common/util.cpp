@@ -1,6 +1,6 @@
 #include "util.h"
 
-bool util::Await(
+bool llpp::util::Await(
 	const std::function<bool()>& condition, std::chrono::milliseconds timeout)
 {
 	auto start_time = std::chrono::system_clock::now();
@@ -14,7 +14,7 @@ bool util::Await(
 	return true;
 }
 
-bool util::Timedout(const std::chrono::system_clock::time_point& start,
+bool llpp::util::Timedout(const std::chrono::system_clock::time_point& start,
 	const std::chrono::milliseconds timeout)
 {
 	auto now = std::chrono::system_clock::now();
@@ -23,9 +23,17 @@ bool util::Timedout(const std::chrono::system_clock::time_point& start,
 	return timePassed >= timeout;
 }
 
-bool util::Timedout(const std::chrono::system_clock::time_point& start,
+bool llpp::util::Timedout(const std::chrono::system_clock::time_point& start,
 	const std::chrono::seconds timeout)
 {
 	return Timedout(
 		start, std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
+}
+
+const std::string llpp::util::MatToStringBuffer(const cv::Mat& source)
+{
+	std::vector<uchar> imageBuffer;
+	cv::imencode(".png", source, imageBuffer);
+	std::string imageContent(imageBuffer.begin(), imageBuffer.end());
+	return imageContent;
 }

@@ -1,5 +1,5 @@
 #include "pastestationmanager.h"
-#include "xexceptions.h"
+#include "exceptions.h"
 
 const bool llpp::bots::paste::PasteStationManager::CompleteReadyStations()
 {
@@ -21,4 +21,19 @@ const bool llpp::bots::paste::PasteStationManager::CompleteReadyStations()
 const bool llpp::bots::paste::PasteStationManager::IsReadyToRun()
 {
 	return this->stations[0]->IsReady();
+}
+
+std::chrono::minutes
+llpp::bots::paste::PasteStationManager::GetTimeLeftUntilReady()
+{
+	PasteStation* firstStation = this->stations[0].get();
+
+	auto now = std::chrono::system_clock::now();
+	auto timePassed = now - firstStation->GetLastCompletion();
+
+	if (timePassed > firstStation->GetCompletionInterval()) {
+		return std::chrono::minutes(0);
+	}
+	return std::chrono::duration_cast<std::chrono::minutes>(
+		firstStation->GetCompletionInterval() - timePassed);
 }

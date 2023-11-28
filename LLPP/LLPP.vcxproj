@@ -162,6 +162,7 @@
     <ClCompile Include="src\bots\paste\embeds.cpp" />
     <ClCompile Include="src\bots\paste\pastestation.cpp" />
     <ClCompile Include="src\bots\paste\pastestationmanager.cpp" />
+    <ClCompile Include="src\bots\render\renderstation.cpp" />
     <ClCompile Include="src\common\util.cpp" />
     <ClCompile Include="src\core\basestation.cpp" />
     <ClCompile Include="src\core\basestationmanager.cpp" />
@@ -170,9 +171,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\bots\paste\embeds.h" />
-    <ClInclude Include="src\bots\paste\xexceptions.h" />
+    <ClInclude Include="src\bots\paste\exceptions.h" />
     <ClInclude Include="src\bots\paste\pastestation.h" />
     <ClInclude Include="src\bots\paste\pastestationmanager.h" />
+    <ClInclude Include="src\bots\render\renderstation.h" />
     <ClInclude Include="src\common\util.h" />
     <ClInclude Include="src\core\basestation.h" />
     <ClInclude Include="src\core\basestationmanager.h" />

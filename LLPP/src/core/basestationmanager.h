@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -10,6 +11,7 @@ namespace llpp::core
 	public:
 		virtual const bool CompleteReadyStations() = 0;
 		virtual const bool IsReadyToRun() = 0;
+		virtual std::chrono::minutes GetTimeLeftUntilReady() = 0;
 
 	protected:
 		BaseStationManager(std::string stationPrefix, int numberOfStations)

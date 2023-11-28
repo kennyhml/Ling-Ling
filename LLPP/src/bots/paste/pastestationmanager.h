@@ -19,6 +19,8 @@ namespace llpp::bots::paste
 
 		virtual const bool CompleteReadyStations() override;
 		virtual const bool IsReadyToRun() override;
+		virtual std::chrono::minutes GetTimeLeftUntilReady() override;
+
 
 	private:
 		std::vector<std::unique_ptr<PasteStation>> stations;

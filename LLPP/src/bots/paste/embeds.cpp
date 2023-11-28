@@ -1,4 +1,5 @@
 #include "embeds.h"
+#include "../../common/util.h"
 #include "../../core/basestation.h"
 #include "../../core/stationresult.h"
 #include "../../core/webhook.h"
@@ -22,7 +23,8 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 			std::format("{} seconds", data.timeTaken.count()), true)
 		.add_field("Paste obtained:", "300", true)
 		.add_field("Next completion:",
-			std::format("{} minutes", data.station->GetCompletionInterval()),
+			std::format(
+				"{} minutes", data.station->GetCompletionInterval().count()),
 			true);
 
 	core::discord::Send(embed);
@@ -43,13 +45,9 @@ void llpp::bots::paste::SendAchatinaNotAccessible(
 		.add_field("Achatina: ", achatina->GetName(), true)
 		.set_image("attachment://image.png");
 
-	cv::Mat screenshot = asa::window::Screenshot();
-	std::vector<uchar> imageBuffer;
-	cv::imencode(".png", screenshot, imageBuffer);
-	std::string imageContent(imageBuffer.begin(), imageBuffer.end());
-
+	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
 	dpp::message message = dpp::message();
-	message.add_file("image.png", imageContent, "image/png ").add_embed(embed);
+	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 
 	core::discord::Send(message);
 }

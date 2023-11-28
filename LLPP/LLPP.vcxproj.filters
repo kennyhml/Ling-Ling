@@ -39,6 +39,9 @@
     <ClCompile Include="src\bots\paste\pastestationmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\bots\render\renderstation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\webhook.h">
@@ -65,7 +68,10 @@
     <ClInclude Include="src\bots\paste\pastestationmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bots\paste\xexceptions.h">
+    <ClInclude Include="src\bots\paste\exceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bots\render\renderstation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
