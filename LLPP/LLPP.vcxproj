@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\bots\drops\cratemanager.cpp" />
     <ClCompile Include="src\bots\drops\lootcratestation.cpp" />
     <ClCompile Include="src\bots\drops\crateembeds.cpp" />
     <ClCompile Include="src\bots\paste\pasteembeds.cpp" />
@@ -172,6 +173,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\bots\drops\cratemanager.h" />
     <ClInclude Include="src\bots\drops\lootcratestation.h" />
     <ClInclude Include="src\bots\drops\crateembeds.h" />
     <ClInclude Include="src\bots\paste\pasteembeds.h" />

@@ -8,6 +8,7 @@
 #include <asapp/init.h>
 #include <asapp/structures/cavelootcrate.h>
 
+#include "bots/drops/cratemanager.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/actionwheel.h>
 #include <fstream>
@@ -25,16 +26,25 @@ int main()
 
 	llpp::core::discord::InitWebhooks(data["webhook"], data["dropWebhook"]);
 
+	Sleep(3000);
+
 	asa::window::GetHandle(60, true);
 	asa::window::SetForeground();
 
-	using CrateQuality = asa::structures::CaveLootCrate::Quality;
+	using Quality = asa::structures::CaveLootCrate::Quality;
 
-	auto crate = asa::structures::CaveLootCrate(CrateQuality::BLUE);
+	auto crate1 = asa::structures::CaveLootCrate(Quality::RED);
+	auto station1 = llpp::bots::drops::LootCrateStation(
+		"SWAMP::DROP01", crate1);
 
-	auto station = llpp::bots::drops::LootCrateStation("SWAMP::DROP06", crate);
 
-	auto actionwheel = asa::interfaces::ActionWheel();
-	auto result = station.Complete();
+	auto manager = llpp::bots::drops::CrateManager("SWAMP::DROP", 6,
+		{ { Quality::RED, Quality::RED },
+			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
+			{ Quality::BLUE } });
+
+
+	manager.CompleteReadyStations();
+
 	return 0;
 }

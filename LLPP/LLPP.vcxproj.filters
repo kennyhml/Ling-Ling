@@ -48,6 +48,9 @@
     <ClCompile Include="src\bots\drops\crateembeds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\bots\drops\cratemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\webhook.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\bots\drops\crateembeds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bots\drops\cratemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

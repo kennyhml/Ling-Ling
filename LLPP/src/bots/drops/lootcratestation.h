@@ -16,19 +16,16 @@ namespace llpp::bots::drops
 
 		virtual const core::StationResult Complete() override;
 
+		void SetCanDefaultTeleport(bool canDefaultTeleport);
+		void SetCooldown();
+
 	private:
 		void FindDropoffBed();
 		cv::Mat LootCrate();
 
+		bool canDefaultTeleport = false;
+
 		asa::structures::CaveLootCrate crate;
 		asa::structures::Teleporter teleporter;
 	};
-
-
-
-
-
-
-
-
 }

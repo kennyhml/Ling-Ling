@@ -35,11 +35,10 @@ void llpp::bots::drops::SendSuccessEmbed(const core::StationResult& data,
 
 	dpp::embed embed = dpp::embed();
 	embed.set_color(color)
-		.set_title(std::format(
-			"Crate Station '{}' has been completed.", data.station->GetName()))
-		.set_description(
-			std::format("The station was completed successfully {} times!",
-				data.completions))
+		.set_title(
+			std::format("Crate '{}' has been looted!", data.station->GetName()))
+		.set_description(std::format(
+			"This crate has been looted {} times!", data.completions))
 		.set_thumbnail(thumbnailUrl)
 		.add_field("Time taken:",
 			std::format("{} seconds", data.timeTaken.count()), true)

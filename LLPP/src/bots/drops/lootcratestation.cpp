@@ -7,7 +7,12 @@ const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
 
-	asa::entities::gLocalPlayer->TeleportTo(&this->teleporter, true);
+	asa::entities::gLocalPlayer->TeleportTo(
+		&this->teleporter, this->canDefaultTeleport);
+
+	if (!this->canDefaultTeleport) {
+		asa::entities::gLocalPlayer->TurnUp(60, std::chrono::milliseconds(500));
+	}
 
 	// crate wasnt up
 	if (!asa::entities::gLocalPlayer->CanAccess(&this->crate)) {
@@ -26,6 +31,17 @@ const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
 
 	SendSuccessEmbed(resultData, loot, quality);
 	return resultData;
+}
+
+void llpp::bots::drops::LootCrateStation::SetCanDefaultTeleport(
+	bool canDefaultTeleport)
+{
+	this->canDefaultTeleport = canDefaultTeleport;
+}
+
+void llpp::bots::drops::LootCrateStation::SetCooldown()
+{
+	this->lastCompleted = std::chrono::system_clock::now();
 }
 
 cv::Mat llpp::bots::drops::LootCrateStation::LootCrate()
