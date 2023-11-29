@@ -1,15 +1,17 @@
 #include "webhook.h"
 
 
-bool llpp::core::discord::InitWebhook(const std::string& url)
+bool llpp::core::discord::InitWebhooks(
+	const std::string& infoUrl, const std::string& dropUrl)
 {
-	std::cout << "[+] Creating webhook from url..." << std::endl;
-	if (url.empty()) {
+	std::cout << "[+] Creating webhooks from url..." << std::endl;
+	if (infoUrl.empty() || dropUrl.empty()) {
 		std::cerr << "\t[!] Failed to create webhook! No URL." << std::endl;
 		return false;
 	}
 	try {
-		webhook = new dpp::webhook(url);
+		webhook = new dpp::webhook(infoUrl);
+		dropWebhook = new dpp::webhook(dropUrl);
 	}
 	catch (dpp::logic_exception e) {
 		std::cerr << "\t[!] Failed to create webhook! " << e.what()
@@ -20,24 +22,26 @@ bool llpp::core::discord::InitWebhook(const std::string& url)
 	webhook->avatar =
 		"https://www.mediastorehouse.com/p/172/"
 		"dog-shiba-inu-wearing-oriental-bamboo-straw-24520100.jpg.webp";
+	dropWebhook->avatar = webhook->avatar;
 	webhook->name = "Ling Ling++";
-	std::cout << "[-] Webhook has been created successfully." << std::endl;
+	dropWebhook->name = webhook->name;
+	std::cout << "[-] Webhooks have been created successfully." << std::endl;
 	return true;
 }
 
-void llpp::core::discord::Send(const std::string& msg)
+void llpp::core::discord::Send(const std::string& msg, dpp::webhook* wh)
 {
-	Send(dpp::message(msg));
+	Send(dpp::message(msg), wh);
 }
 
-void llpp::core::discord::Send(const dpp::embed& embed)
+void llpp::core::discord::Send(const dpp::embed& embed, dpp::webhook* wh)
 {
-	Send(dpp::message().add_embed(embed));
+	Send(dpp::message().add_embed(embed), wh);
 }
 
-void llpp::core::discord::Send(const dpp::message& msg)
+void llpp::core::discord::Send(const dpp::message& msg, dpp::webhook* wh)
 {
-	cl->execute_webhook_sync(*webhook, msg);
+	cl->execute_webhook_sync(*wh, msg);
 }
 
 void llpp::core::discord::InformStarted()
@@ -59,5 +63,5 @@ void llpp::core::discord::InformStarted()
 						   "scale-to-width-down/228?cb=20160901213011")
 			.set_footer(
 				dpp::embed_footer("Ling Ling++ - please help - @kennyhml"));
-	Send(startedEmbed);
+	Send(startedEmbed, webhook);
 }

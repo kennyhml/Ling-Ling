@@ -1,4 +1,4 @@
-#include "embeds.h"
+#include "pasteembeds.h"
 #include "../../common/util.h"
 #include "../../core/basestation.h"
 #include "../../core/stationresult.h"
@@ -27,7 +27,7 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 				"{} minutes", data.station->GetCompletionInterval().count()),
 			true);
 
-	core::discord::Send(embed);
+	core::discord::Send(embed, core::discord::webhook);
 }
 
 void llpp::bots::paste::SendAchatinaNotAccessible(
@@ -49,5 +49,5 @@ void llpp::bots::paste::SendAchatinaNotAccessible(
 	dpp::message message = dpp::message();
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 
-	core::discord::Send(message);
+	core::discord::Send(message, core::discord::webhook);
 }

@@ -8,14 +8,16 @@
 
 namespace llpp::core::discord
 {
-	bool InitWebhook(const std::string& url);
+	bool InitWebhooks(const std::string& infoUrl, const std::string& dropUrl);
 
 	inline dpp::webhook* webhook;
+	inline dpp::webhook* dropWebhook;
+
 	inline dpp::cluster* cl = new dpp::cluster("");
 
-	void Send(const std::string& message);
-	void Send(const dpp::embed&);
-	void Send(const dpp::message&);
+	void Send(const std::string& message, dpp::webhook*);
+	void Send(const dpp::embed&, dpp::webhook*);
+	void Send(const dpp::message&, dpp::webhook*);
 
 	void InformStarted();
 }

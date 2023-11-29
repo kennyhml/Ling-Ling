@@ -1,6 +1,8 @@
 {
   "gameBaseDirectory": "F:\\SteamLibrary\\steamapps\\common\\ARK Survival Ascended",
   "webhook": "https://discord.com/api/webhooks/1178195420002922586/O2vfiRTSxDMsWJm2phzYuiGX8M16_2_yzs3OiFelmF6sK3d17yYR53byu7fpKaHM-Y3S",
+  "dropWebhook": "https://discord.com/api/webhooks/1178962835729027082/8TAo2QKX17dLCHyU5xSvLDkp01riZUuD8oDGRo44MUWIDC80OOMo7ZGDjykqrwaYnxzd",
   "assetsDir": "C:\\dev\\ASAPP\\ASAPP\\assets",
-  "itemData": "C:\\dev\\ASAPP\\ASAPP\\source\\itemdata.json"
+  "itemData": "C:\\dev\\ASAPP\\ASAPP\\source\\itemdata.json",
+  "tessdataPath": "C:\\dev\\LLPP\\LLPP\\tessdata"
 }
