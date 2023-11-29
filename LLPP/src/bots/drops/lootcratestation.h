@@ -9,9 +9,10 @@ namespace llpp::bots::drops
 	{
 
 	public:
-		LootCrateStation(
-			std::string name, asa ::structures::CaveLootCrate crate)
-			: LLPPBaseStation(name, std::chrono::minutes(5)), crate(crate),
+		LootCrateStation(std::string name,
+			asa ::structures::CaveLootCrate crate,
+			std::chrono::minutes interval)
+			: LLPPBaseStation(name, interval), crate(crate),
 			  teleporter(asa ::structures::Teleporter(name)){};
 
 		virtual const core::StationResult Complete() override;
@@ -20,7 +21,6 @@ namespace llpp::bots::drops
 		void SetCooldown();
 
 	private:
-		void FindDropoffBed();
 		cv::Mat LootCrate();
 
 		bool canDefaultTeleport = false;

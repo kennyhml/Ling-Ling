@@ -26,25 +26,25 @@ int main()
 
 	llpp::core::discord::InitWebhooks(data["webhook"], data["dropWebhook"]);
 
-	Sleep(3000);
-
 	asa::window::GetHandle(60, true);
 	asa::window::SetForeground();
 
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
-	auto crate1 = asa::structures::CaveLootCrate(Quality::RED);
-	auto station1 = llpp::bots::drops::LootCrateStation(
-		"SWAMP::DROP01", crate1);
-
-
-	auto manager = llpp::bots::drops::CrateManager("SWAMP::DROP", 6,
+	auto swamp = llpp::bots::drops::CrateManager("SWAMP::", 6,
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
-			{ Quality::BLUE } });
+			{ Quality::BLUE } },
+		std::chrono::minutes(10));
 
+	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::", 3,
+		{
+			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
+				Quality::YELLOW | Quality::RED },
+		},
+		std::chrono::minutes(15));
 
-	manager.CompleteReadyStations();
+	swamp.CompleteReadyStations();
 
 	return 0;
 }
