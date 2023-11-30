@@ -22,7 +22,7 @@ const std::string LLPPBaseStation::GetName() const { return this->name; }
 
 const bool LLPPBaseStation::IsReady() const
 {
-	return std::chrono::system_clock::now() - this->lastCompleted >
+	return (std::chrono::system_clock::now() - this->lastCompleted) >
 		   this->completionInterval;
 }
 

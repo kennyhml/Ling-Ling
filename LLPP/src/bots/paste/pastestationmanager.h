@@ -13,7 +13,7 @@ namespace llpp::bots::paste
 			: BaseStationManager(prefix, numOfStations)
 		{
 			for (int i = 0; i < numOfStations; i++) {
-				std::string name = this->CreateStationName(i + 1);
+				std::string name = this->CreateStationName(prefix, i + 1);
 				this->stations.push_back(std::make_unique<PasteStation>(name));
 			}
 		}

@@ -22,11 +22,11 @@ namespace llpp::core
 		int numberOfStations;
 
 
-		std::string CreateStationName(int number)
+		std::string CreateStationName(std::string prefix, int number)
 		{
 			std::ostringstream oss;
 			oss << std::setw(2) << std::setfill('0') << number;
-			return this->stationPrefix + oss.str();
+			return prefix + oss.str();
 		}
 	};
 

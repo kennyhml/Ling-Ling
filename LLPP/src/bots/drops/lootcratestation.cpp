@@ -13,7 +13,7 @@ const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
 	if (!this->canDefaultTeleport) {
 		asa::entities::gLocalPlayer->TurnUp(60, std::chrono::milliseconds(500));
 	}
-
+	this->SetCompleted();
 	if (!asa::entities::gLocalPlayer->CanAccess(&this->crate)) {
 		return core::StationResult(this, false, this->GetTimesCompleted(),
 			std::chrono::seconds(0), {});
@@ -21,7 +21,6 @@ const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
 
 	auto quality = this->crate.GetCrateQuality();
 	cv::Mat loot = this->LootCrate();
-	this->SetCompleted();
 
 	auto duration = std::chrono::duration_cast<std::chrono::seconds>(
 		std::chrono::system_clock::now() - start);
@@ -52,5 +51,7 @@ cv::Mat llpp::bots::drops::LootCrateStation::LootCrate()
 		this->crate.inventory->TransferAll();
 	} while (!util::Await([this]() { return !this->crate.inventory->IsOpen(); },
 		std::chrono::seconds(1)));
+
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	return loot;
 }

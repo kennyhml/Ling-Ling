@@ -40,6 +40,7 @@ bool PasteStation::EmptyAchatina(int index)
 		snail->inventory->TakeSlot(0);
 	}
 	snail->Exit();
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	return hasPaste;
 }
 

@@ -9,11 +9,11 @@
 #include <asapp/structures/cavelootcrate.h>
 
 #include "bots/drops/cratemanager.h"
+#include "bots/suicide/suicidestation.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/actionwheel.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
-
 using json = nlohmann::json;
 
 int main()
@@ -31,11 +31,16 @@ int main()
 
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
+	auto suicideStation = llpp::bots::suicide::SuicideStation(
+		"SUICIDE TEST DEATH", "SUICIDE TEST RESPAWN");
+
+	auto paste = llpp::bots::paste::PasteStationManager("PASTE", 11);
+
 	auto swamp = llpp::bots::drops::CrateManager("SWAMP::", 6,
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
-		std::chrono::minutes(10));
+		std::chrono::minutes(10), &suicideStation);
 
 	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::", 3,
 		{
@@ -44,7 +49,15 @@ int main()
 		},
 		std::chrono::minutes(15));
 
-	swamp.CompleteReadyStations();
+	while (true) {
+		if (swamp.CompleteReadyStations())
+			continue;
+		if (skylord.CompleteReadyStations())
+			continue;
+		if (paste.CompleteReadyStations())
+			continue;
+		std::cout << "No task ready...." << std::endl;
+	}
 
 	return 0;
 }
