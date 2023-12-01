@@ -32,7 +32,7 @@ int main()
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
 	auto suicideStation = llpp::bots::suicide::SuicideStation(
-		"SUICIDE TEST DEATH", "SUICIDE TEST RESPAWN");
+		"SUICIDE DEATH", "SUICIDE RESPAWN");
 
 	auto paste = llpp::bots::paste::PasteStationManager("PASTE", 11);
 
@@ -54,10 +54,7 @@ int main()
 			continue;
 		if (skylord.CompleteReadyStations())
 			continue;
-		if (paste.CompleteReadyStations())
-			continue;
 		std::cout << "No task ready...." << std::endl;
 	}
-
 	return 0;
 }

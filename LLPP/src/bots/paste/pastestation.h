@@ -10,7 +10,7 @@ namespace llpp::bots::paste
 	{
 	public:
 		PasteStation(std::string name)
-			: LLPPBaseStation(name, std::chrono::minutes(30)),
+			: LLPPBaseStation(name, std::chrono::minutes(100)),
 			  bed(asa::structures::SimpleBed(name))
 		{
 			for (int i = 0; i < 3; i++) {
