@@ -7,8 +7,8 @@ CrateManager::CrateManager(std::string prefix, int numberOfStations,
 	std::vector<std::vector<QualityFlags>> groupedCrates,
 	std::chrono::minutes interval, suicide::SuicideStation* suicide)
 	: BaseStationManager(prefix, numberOfStations), alignBed(prefix + "ALIGN"),
-	  dropoffTeleporter(prefix + "DROPOFF"), dropoffVault(prefix + "DROPOFF"),
-	  suicide(suicide)
+	  dropoffTeleporter(prefix + "DROPOFF"),
+	  dropoffVault(prefix + "DROPOFF", 350), suicide(suicide)
 {
 	crateGroups.resize(groupedCrates.size());
 	statisticsPerGroup.resize(groupedCrates.size());
@@ -110,7 +110,7 @@ void CrateManager::DropoffItems()
 	asa::entities::gLocalPlayer->TurnUp(50, std::chrono::milliseconds(500));
 	asa::entities::gLocalPlayer->TurnRight(90);
 
-	asa::entities::gLocalPlayer->Access(&this->dropoffVault);
+	asa::entities::gLocalPlayer->Access(this->dropoffVault);
 	asa::entities::gLocalPlayer->inventory->TransferAll();
 	this->dropoffVault.inventory->Close();
 	std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -118,7 +118,7 @@ void CrateManager::DropoffItems()
 
 void CrateManager::TeleportToDropoff()
 {
-	asa::entities::gLocalPlayer->TeleportTo(&this->dropoffTeleporter);
+	asa::entities::gLocalPlayer->TeleportTo(this->dropoffTeleporter);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 	asa::entities::gLocalPlayer->StandUp();
 }
@@ -126,12 +126,12 @@ void CrateManager::TeleportToDropoff()
 void CrateManager::AccessBedAbove()
 {
 	asa::entities::gLocalPlayer->LookAllTheWayUp();
-	asa::entities::gLocalPlayer->Access(&this->alignBed);
+	asa::entities::gLocalPlayer->Access(this->alignBed);
 }
 
 void CrateManager::SpawnOnAlignBed()
 {
-	asa::entities::gLocalPlayer->FastTravelTo(&this->alignBed);
+	asa::entities::gLocalPlayer->FastTravelTo(this->alignBed);
 	asa::entities::gLocalPlayer->Crouch();
 	asa::entities::gLocalPlayer->TurnDown(20);
 }

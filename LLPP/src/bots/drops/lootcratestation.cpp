@@ -8,13 +8,13 @@ const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
 	auto start = std::chrono::system_clock::now();
 
 	asa::entities::gLocalPlayer->TeleportTo(
-		&this->teleporter, this->canDefaultTeleport);
+		this->teleporter, this->canDefaultTeleport);
 
 	if (!this->canDefaultTeleport) {
 		asa::entities::gLocalPlayer->TurnUp(60, std::chrono::milliseconds(500));
 	}
 	this->SetCompleted();
-	if (!asa::entities::gLocalPlayer->CanAccess(&this->crate)) {
+	if (!asa::entities::gLocalPlayer->CanAccess(this->crate)) {
 		return core::StationResult(this, false, this->GetTimesCompleted(),
 			std::chrono::seconds(0), {});
 	}
@@ -44,7 +44,7 @@ void llpp::bots::drops::LootCrateStation::SetCooldown()
 
 cv::Mat llpp::bots::drops::LootCrateStation::LootCrate()
 {
-	asa::entities::gLocalPlayer->Access(&this->crate);
+	asa::entities::gLocalPlayer->Access(this->crate);
 	auto loot = asa::window::Screenshot({ 1193, 227, 574, 200 });
 
 	do {

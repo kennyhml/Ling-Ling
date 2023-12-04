@@ -9,7 +9,7 @@ const llpp::core::StationResult PasteStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
 
-	asa::entities::gLocalPlayer->FastTravelTo(&this->bed);
+	asa::entities::gLocalPlayer->FastTravelTo(this->bed);
 	this->EmptyAllAchatinas();
 	this->DepositPasteIntoDedi();
 	this->SetCompleted();
@@ -27,7 +27,7 @@ bool PasteStation::EmptyAchatina(int index)
 {
 	asa::entities::DinoEnt* snail = this->achatinas[index].get();
 	try {
-		asa::entities::gLocalPlayer->Access(snail);
+		asa::entities::gLocalPlayer->Access(*snail);
 	}
 	catch (asa::interfaces::exceptions::InterfaceNotOpenedError e) {
 		std::cerr << "Failed to open " << snail->GetName() << std::endl;

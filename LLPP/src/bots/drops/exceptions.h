@@ -3,11 +3,14 @@
 
 namespace llpp::bots::paste::exceptions
 {
-
-	class PasteNotDeposited : public std::exception
+	class CrateNotAccessed : public std::exception
 	{
+
 	public:
 		const char* what();
 	};
+
+
+
 
 }

@@ -99,6 +99,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\dev\ASAPP\ASAPP\include;C:\opencv\build\include</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\dev\ASAPP\ASAPP\include;C:\opencv\build\include</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +136,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\dev\ASAPP\ASAPP\include;C:\opencv\build\include</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,6 +154,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\dev\ASAPP\ASAPP\include;C:\opencv\build\include</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,8 +166,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\bots\drops\cratemanager.cpp" />
+    <ClCompile Include="src\bots\drops\exceptions.cpp" />
     <ClCompile Include="src\bots\drops\lootcratestation.cpp" />
     <ClCompile Include="src\bots\drops\crateembeds.cpp" />
+    <ClCompile Include="src\bots\paste\exceptions.cpp" />
     <ClCompile Include="src\bots\paste\pasteembeds.cpp" />
     <ClCompile Include="src\bots\paste\pastestation.cpp" />
     <ClCompile Include="src\bots\paste\pastestationmanager.cpp" />
@@ -173,11 +179,13 @@
     <ClCompile Include="src\common\util.cpp" />
     <ClCompile Include="src\core\basestation.cpp" />
     <ClCompile Include="src\core\basestationmanager.cpp" />
+    <ClCompile Include="src\core\recovery.cpp" />
     <ClCompile Include="src\core\webhook.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\bots\drops\cratemanager.h" />
+    <ClInclude Include="src\bots\drops\exceptions.h" />
     <ClInclude Include="src\bots\drops\lootcratestation.h" />
     <ClInclude Include="src\bots\drops\crateembeds.h" />
     <ClInclude Include="src\bots\paste\pasteembeds.h" />
@@ -190,6 +198,7 @@
     <ClInclude Include="src\common\util.h" />
     <ClInclude Include="src\core\basestation.h" />
     <ClInclude Include="src\core\basestationmanager.h" />
+    <ClInclude Include="src\core\recovery.h" />
     <ClInclude Include="src\core\stationresult.h" />
     <ClInclude Include="src\core\webhook.h" />
   </ItemGroup>

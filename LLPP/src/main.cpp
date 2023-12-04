@@ -1,19 +1,15 @@
 
+#include "bots/drops/cratemanager.h"
 #include "bots/drops/lootcratestation.h"
 #include "bots/paste/pastestationmanager.h"
-#include "core/webhook.h"
-#include <asapp/game/globals.h>
-#include <asapp/game/settings.h>
-#include <asapp/game/window.h>
-#include <asapp/init.h>
-#include <asapp/structures/cavelootcrate.h>
-
-#include "bots/drops/cratemanager.h"
 #include "bots/suicide/suicidestation.h"
-#include <asapp/entities/localplayer.h>
-#include <asapp/interfaces/actionwheel.h>
+#include "core/webhook.h"
+#include <asapp/core/init.h>
+#include <asapp/interfaces/serverselect.h>
 #include <fstream>
+
 #include <nlohmann/json.hpp>
+
 using json = nlohmann::json;
 
 int main()
@@ -48,6 +44,15 @@ int main()
 				Quality::YELLOW | Quality::RED },
 		},
 		std::chrono::minutes(15));
+
+	Sleep(3000);
+	auto select = asa::interfaces::ServerSelect();
+
+	while (true) {
+		std::cout << select.CanJoinLastPlayed() << std::endl;
+	}
+	exit(1);
+
 
 	while (true) {
 		if (swamp.CompleteReadyStations())
