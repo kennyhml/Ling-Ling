@@ -27,7 +27,7 @@
     <ClCompile Include="src\bots\paste\pastestation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\bots\paste\pasteembeds.cpp">
+    <ClCompile Include="src\bots\paste\embeds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\common\util.cpp">
@@ -45,7 +45,7 @@
     <ClCompile Include="src\bots\drops\lootcratestation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\bots\drops\crateembeds.cpp">
+    <ClCompile Include="src\bots\drops\embeds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\bots\drops\cratemanager.cpp">
@@ -80,7 +80,7 @@
     <ClInclude Include="src\bots\paste\pastestation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bots\paste\pasteembeds.h">
+    <ClInclude Include="src\bots\paste\embeds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\common\util.h">
@@ -101,7 +101,7 @@
     <ClInclude Include="src\bots\drops\lootcratestation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bots\drops\crateembeds.h">
+    <ClInclude Include="src\bots\drops\embeds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\bots\drops\cratemanager.h">

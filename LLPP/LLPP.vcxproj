@@ -168,9 +168,9 @@
     <ClCompile Include="src\bots\drops\cratemanager.cpp" />
     <ClCompile Include="src\bots\drops\exceptions.cpp" />
     <ClCompile Include="src\bots\drops\lootcratestation.cpp" />
-    <ClCompile Include="src\bots\drops\crateembeds.cpp" />
+    <ClCompile Include="src\bots\drops\embeds.cpp" />
     <ClCompile Include="src\bots\paste\exceptions.cpp" />
-    <ClCompile Include="src\bots\paste\pasteembeds.cpp" />
+    <ClCompile Include="src\bots\paste\embeds.cpp" />
     <ClCompile Include="src\bots\paste\pastestation.cpp" />
     <ClCompile Include="src\bots\paste\pastestationmanager.cpp" />
     <ClCompile Include="src\bots\render\renderstation.cpp" />
@@ -187,8 +187,8 @@
     <ClInclude Include="src\bots\drops\cratemanager.h" />
     <ClInclude Include="src\bots\drops\exceptions.h" />
     <ClInclude Include="src\bots\drops\lootcratestation.h" />
-    <ClInclude Include="src\bots\drops\crateembeds.h" />
-    <ClInclude Include="src\bots\paste\pasteembeds.h" />
+    <ClInclude Include="src\bots\drops\embeds.h" />
+    <ClInclude Include="src\bots\paste\embeds.h" />
     <ClInclude Include="src\bots\paste\exceptions.h" />
     <ClInclude Include="src\bots\paste\pastestation.h" />
     <ClInclude Include="src\bots\paste\pastestationmanager.h" />

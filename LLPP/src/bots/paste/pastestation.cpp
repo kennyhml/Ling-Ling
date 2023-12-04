@@ -1,5 +1,5 @@
 #include "pastestation.h"
-#include "pasteembeds.h"
+#include "embeds.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/exceptions.h>
 

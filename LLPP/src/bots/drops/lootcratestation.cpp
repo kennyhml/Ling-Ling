@@ -1,6 +1,6 @@
 #include "lootcratestation.h"
 #include "../../common/util.h"
-#include "crateembeds.h"
+#include "embeds.h"
 #include <asapp/entities/localplayer.h>
 
 const llpp::core::StationResult llpp::bots::drops::LootCrateStation::Complete()
