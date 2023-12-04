@@ -1,11 +1,17 @@
 #include "pastestation.h"
+#include "../../common/util.h"
 #include "embeds.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/exceptions.h>
 
 using namespace llpp::bots::paste;
 
-const llpp::core::StationResult PasteStation::Complete()
+PasteStation::PasteStation(std::string name)
+	: BaseStation(name, std::chrono::minutes(100)),
+	  bed(asa::structures::SimpleBed(name)){};
+
+
+llpp::core::StationResult PasteStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
 
@@ -13,11 +19,9 @@ const llpp::core::StationResult PasteStation::Complete()
 	this->EmptyAllAchatinas();
 	this->DepositPasteIntoDedi();
 	this->SetCompleted();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(
-		std::chrono::system_clock::now() - start);
 
-	core::StationResult resultData(
-		this, true, this->GetTimesCompleted(), duration, {});
+	auto duration = util::GetElapsed<std::chrono::seconds>(start);
+	core::StationResult resultData(this, true, duration, {});
 
 	SendSuccessEmbed(resultData);
 	return resultData;
@@ -25,21 +29,21 @@ const llpp::core::StationResult PasteStation::Complete()
 
 bool PasteStation::EmptyAchatina(int index)
 {
-	asa::entities::DinoEnt* snail = this->achatinas[index].get();
+	asa::entities::DinoEnt snail = this->achatinas[index];
 	try {
-		asa::entities::gLocalPlayer->Access(*snail);
+		asa::entities::gLocalPlayer->Access(snail);
 	}
 	catch (asa::interfaces::exceptions::InterfaceNotOpenedError e) {
-		std::cerr << "Failed to open " << snail->GetName() << std::endl;
+		std::cerr << "Failed to open " << snail.GetName() << std::endl;
 		SendAchatinaNotAccessible(this->name, snail);
 	}
 
-	auto slot = snail->inventory->slots[0];
+	auto& slot = snail.inventory->slots[0];
 	bool hasPaste = slot.HasItem(asa::items::resources::achatinaPaste);
 	if (hasPaste) {
-		snail->inventory->TakeSlot(0);
+		snail.inventory->TakeSlot(0);
 	}
-	snail->Exit();
+	snail.Exit();
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	return hasPaste;
 }

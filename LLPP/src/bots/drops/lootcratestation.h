@@ -5,25 +5,25 @@
 
 namespace llpp::bots::drops
 {
-	class LootCrateStation final : public core::LLPPBaseStation
+	class LootCrateStation final : public core::BaseStation
 	{
-
 	public:
-		LootCrateStation(std::string name,
-			asa ::structures::CaveLootCrate crate,
-			std::chrono::minutes interval)
-			: LLPPBaseStation(name, interval), crate(crate),
-			  teleporter(asa ::structures::Teleporter(name)){};
+		LootCrateStation(std::string name, asa::structures::CaveLootCrate crate,
+			std::chrono::minutes interval);
 
-		virtual const core::StationResult Complete() override;
+		core::StationResult Complete() override;
 
 		void SetCanDefaultTeleport(bool canDefaultTeleport);
 		void SetCooldown();
 
+		int GetTimesLooted() const;
+
 	private:
 		cv::Mat LootCrate();
+		void TeleportTo();
 
 		bool canDefaultTeleport = false;
+		int timesLooted = 0;
 
 		asa::structures::CaveLootCrate crate;
 		asa::structures::Teleporter teleporter;

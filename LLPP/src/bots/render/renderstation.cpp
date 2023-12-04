@@ -1,7 +1,14 @@
 #include "renderstation.h"
+#include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
 
-const llpp::core::StationResult llpp::bots::render::RenderStation::Complete()
+using namespace llpp::bots::render;
+
+RenderStation::RenderStation(std::string name, std::chrono::seconds loadFor)
+	: renderDuration(loadFor), BaseStation(name, std::chrono::minutes(5)),
+	  srcBed(asa::structures::SimpleBed(name)){};
+
+llpp::core::StationResult RenderStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
 
@@ -11,9 +18,6 @@ const llpp::core::StationResult llpp::bots::render::RenderStation::Complete()
 	asa::entities::gLocalPlayer->FastTravelTo(this->gatewayBed);
 	this->SetCompleted();
 
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(
-		std::chrono::system_clock::now() - start);
-
-	return core::StationResult(
-		this, true, this->GetTimesCompleted(), duration, {});
+	auto duration = util::GetElapsed<std::chrono::seconds>(start);
+	return core::StationResult(this, true, duration, {});
 }

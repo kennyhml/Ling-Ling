@@ -2,31 +2,28 @@
 
 using namespace llpp::core;
 
-const std::chrono::system_clock::time_point
-LLPPBaseStation::GetLastCompletion() const
+
+BaseStation::BaseStation(const std::string name, std::chrono::minutes interval)
+	: name(name), completionInterval(interval), timesCompleted(0),
+	  status(UNKNOWN){};
+
+std::chrono::system_clock::time_point BaseStation::GetLastCompletion() const
 {
 	return this->lastCompleted;
 }
 
-const std::chrono::minutes LLPPBaseStation::GetCompletionInterval() const
+std::chrono::minutes BaseStation::GetCompletionInterval() const
 {
 	return this->completionInterval;
 }
 
-const int LLPPBaseStation::GetTimesCompleted() const
-{
-	return this->timesCompleted;
-}
-
-const std::string LLPPBaseStation::GetName() const { return this->name; }
-
-const bool LLPPBaseStation::IsReady() const
+bool BaseStation::IsReady() const
 {
 	return (std::chrono::system_clock::now() - this->lastCompleted) >
 		   this->completionInterval;
 }
 
-void LLPPBaseStation::SetCompleted()
+void BaseStation::SetCompleted()
 {
 	this->timesCompleted++;
 	this->lastCompleted = std::chrono::system_clock::now();

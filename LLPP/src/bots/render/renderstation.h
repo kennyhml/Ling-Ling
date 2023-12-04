@@ -4,15 +4,12 @@
 
 namespace llpp::bots::render
 {
-	class RenderStation final : public core::LLPPBaseStation
+	class RenderStation final : public core::BaseStation
 	{
 	public:
-		RenderStation(std::string name, std::chrono::seconds loadFor)
-			: renderDuration(loadFor),
-			  LLPPBaseStation(name, std::chrono::minutes(5)),
-			  srcBed(asa::structures::SimpleBed(name)){};
+		RenderStation(std::string name, std::chrono::seconds loadFor);
 
-		virtual const core::StationResult Complete() override;
+		core::StationResult Complete() override;
 
 	private:
 		std::chrono::seconds renderDuration;

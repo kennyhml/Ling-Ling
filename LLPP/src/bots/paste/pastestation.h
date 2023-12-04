@@ -2,27 +2,22 @@
 #include "../../core/basestation.h"
 #include <asapp/entities/dinoent.h>
 #include <asapp/structures/simplebed.h>
-#include <memory>
 
 namespace llpp::bots::paste
 {
-	class PasteStation final : public core::LLPPBaseStation
+	class PasteStation final : public core::BaseStation
 	{
 	public:
-		PasteStation(std::string name)
-			: LLPPBaseStation(name, std::chrono::minutes(100)),
-			  bed(asa::structures::SimpleBed(name))
-		{
-			for (int i = 0; i < 3; i++) {
-				this->achatinas[i] = std::make_unique<asa::entities::DinoEnt>(
-					std::format("ACHATINA0{}", i + 1));
-			}
-		};
+		PasteStation(std::string name);
 
-		virtual const core::StationResult Complete() override;
+		core::StationResult Complete() override;
 
 	private:
-		std::array<std::unique_ptr<asa::entities::DinoEnt>, 3> achatinas;
+		std::array<asa::entities::DinoEnt, 3> achatinas{
+			asa::entities::DinoEnt("ACHATINA01"),
+			asa::entities::DinoEnt("ACHATINA02"),
+			asa::entities::DinoEnt("ACHATINA03"),
+		};
 		asa::structures::SimpleBed bed;
 
 		bool EmptyAchatina(int index);

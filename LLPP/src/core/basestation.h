@@ -5,7 +5,7 @@
 
 namespace llpp::core
 {
-	class LLPPBaseStation
+	class BaseStation
 	{
 	public:
 		enum Status
@@ -17,19 +17,17 @@ namespace llpp::core
 			DISABLED
 		};
 
-		const std::chrono::system_clock::time_point GetLastCompletion() const;
-		const std::chrono::minutes GetCompletionInterval() const;
-		const int GetTimesCompleted() const;
-		const std::string GetName() const;
+		std::string GetName() const { return this->name; }
+		int GetTimesCompleted() const { return this->timesCompleted; }
+		virtual bool IsReady() const;
 
-		virtual const bool IsReady() const;
+		std::chrono::system_clock::time_point GetLastCompletion() const;
+		std::chrono::minutes GetCompletionInterval() const;
 
-		virtual const StationResult Complete() = 0;
+		virtual StationResult Complete() = 0;
 
 	protected:
-		LLPPBaseStation(const std::string name, std::chrono::minutes interval)
-			: name(name), completionInterval(interval), timesCompleted(0),
-			  status(UNKNOWN){};
+		BaseStation(const std::string name, std::chrono::minutes interval);
 
 		std::chrono::system_clock::time_point lastCompleted;
 		std::chrono::minutes completionInterval;
