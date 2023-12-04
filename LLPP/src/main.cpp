@@ -23,7 +23,7 @@ int main()
 	llpp::core::discord::InitWebhooks(data["webhook"], data["dropWebhook"]);
 
 	asa::window::GetHandle(60, true);
-	asa::window::SetForeground();
+	// asa::window::SetForeground();
 
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
@@ -45,10 +45,9 @@ int main()
 		},
 		std::chrono::minutes(15));
 
-	Sleep(3000);
 	auto select = asa::interfaces::ServerSelect();
 
-	llpp::core::RestartGame();
+	llpp::core::ExitGame();
 	exit(1);
 
 

@@ -2,11 +2,9 @@
 #include <Windows.h>
 #include <asapp/game/window.h>
 
-inline const std::string restartLink = "steam://rungameid/2399830";
-
 void llpp::core::RestartGame()
 {
-	ShellExecuteA(NULL, "open", restartLink.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	int result = system("start steam://rungameid/2399830");
 }
 
 void llpp::core::ExitGame()
