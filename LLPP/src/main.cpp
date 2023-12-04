@@ -3,11 +3,11 @@
 #include "bots/drops/lootcratestation.h"
 #include "bots/paste/pastestationmanager.h"
 #include "bots/suicide/suicidestation.h"
+#include "core/recovery.h"
 #include "core/webhook.h"
 #include <asapp/core/init.h>
 #include <asapp/interfaces/serverselect.h>
 #include <fstream>
-
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -48,9 +48,7 @@ int main()
 	Sleep(3000);
 	auto select = asa::interfaces::ServerSelect();
 
-	while (true) {
-		std::cout << select.CanJoinLastPlayed() << std::endl;
-	}
+	llpp::core::RestartGame();
 	exit(1);
 
 
