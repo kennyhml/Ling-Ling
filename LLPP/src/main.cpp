@@ -5,7 +5,11 @@
 #include "bots/suicide/suicidestation.h"
 #include "core/recovery.h"
 #include "core/webhook.h"
+#include <asapp/core/exceptions.h>
+#include <asapp/entities/localplayer.h>
+
 #include <asapp/core/init.h>
+
 #include <asapp/interfaces/serverselect.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -23,7 +27,7 @@ int main()
 	llpp::core::discord::InitWebhooks(data["webhook"], data["dropWebhook"]);
 
 	asa::window::GetHandle(60, true);
-	// asa::window::SetForeground();
+	asa::window::SetForeground();
 
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
@@ -45,18 +49,18 @@ int main()
 		},
 		std::chrono::minutes(15));
 
-	auto select = asa::interfaces::ServerSelect();
-
-	llpp::core::ExitGame();
-	exit(1);
-
-
 	while (true) {
-		if (swamp.CompleteReadyStations())
-			continue;
-		if (skylord.CompleteReadyStations())
-			continue;
-		std::cout << "No task ready...." << std::endl;
+		try {
+			if (swamp.CompleteReadyStations())
+				continue;
+			if (skylord.CompleteReadyStations())
+				continue;
+			std::cout << "No task ready...." << std::endl;
+		}
+		catch (asa::exceptions::ShooterGameError& e) {
+			llpp::core::InformCrashDetected(e);
+			llpp::core::Recover();
+		}
 	}
 	return 0;
 }

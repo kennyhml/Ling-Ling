@@ -1,10 +1,86 @@
 #include "recovery.h"
-#include <Windows.h>
+#include "../common/util.h"
+#include "webhook.h"
+#include <asapp/entities/localplayer.h>
 #include <asapp/game/window.h>
+#include <asapp/interfaces/mainmenu.h>
+#include <asapp/interfaces/modeselect.h>
+#include <asapp/interfaces/serverselect.h>
+#include <asapp/interfaces/spawnmap.h>
+
+void llpp::core::Recover()
+{
+	auto start = std::chrono::system_clock::now();
+	asa::exceptions::SetCrashAware(true);
+	std::cout << "[+] Recovery sequence initiated, diagnosing cause of crash..."
+			  << std::endl;
+
+	bool needRestart = false;
+	bool needReconnect = false;
+
+	if (asa::window::HasCrashedPopup()) {
+		std::cout << "\t[-] The game has crashed..." << std::endl;
+		needRestart = true;
+		needReconnect = true;
+	}
+	else if (asa::interfaces::gMainMenu->IsOpen()) {
+		std::cout << "\t[-] Kicked to main menu..." << std::endl;
+		needReconnect = true;
+	}
+
+	InformRecoveryInitiated(needRestart, needReconnect);
+	if (needRestart) {
+		RestartGame();
+	}
+	ReconnectToServer();
+	InformRecoverySuccessful(util::GetElapsed<std::chrono::seconds>(start));
+	asa::exceptions::SetCrashAware(false);
+}
+
+void llpp::core::ReconnectToServer()
+{
+	std::string serverName = "NA-PVP-SmallTribes-TheIsland9236";
+
+	asa::interfaces::gMainMenu->AcceptPopup();
+	asa::interfaces::gMainMenu->Start();
+	Sleep(1000);
+	asa::interfaces::gModeSelect->JoinGame();
+	Sleep(1000);
+	asa::interfaces::gServerSelect->JoinServer(serverName);
+
+	auto start = std::chrono::system_clock::now();
+
+	while (true) {
+		if (asa ::entities::gLocalPlayer->IsAlive() ||
+			asa::interfaces::gSpawnMap->IsOpen()) {
+			break;
+		}
+
+		if (asa::interfaces::gMainMenu->IsOpen()) {
+			std::cerr << "[!] Joining failed, trying again" << std::endl;
+			return ReconnectToServer();
+		}
+	}
+
+	Sleep(5000);
+	std::cout << "[+] Reconnected successfully." << std::endl;
+}
 
 void llpp::core::RestartGame()
 {
+	ExitGame();
+	Sleep(5000);
 	int result = system("start steam://rungameid/2399830");
+	if (result == -1) {
+		throw std::runtime_error("Failed to restart the game");
+	}
+	asa::window::GetHandle(60, true);
+
+	while (!asa::interfaces::gMainMenu->IsOpen()) {
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+	}
+
+	std::cout << "[+] Game restarted." << std::endl;
 }
 
 void llpp::core::ExitGame()
@@ -18,4 +94,65 @@ void llpp::core::ExitGame()
 	}
 	TerminateProcess(hProcess, 0);
 	CloseHandle(hProcess);
+}
+
+void llpp::core::InformCrashDetected(asa::exceptions::ShooterGameError& e)
+{
+	dpp::embed embed = dpp::embed();
+	embed.set_color(0xB82E88)
+		.set_title("CRITICAL: The game or server has crashed.")
+		.set_description(e.what())
+		.set_thumbnail(
+			"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/"
+			"images/5/53/Mission_Area.png/revision/latest?cb=20200314145130")
+		.add_field("Assistance required:", "False")
+		.set_image("attachment://image.png")
+		.set_footer(dpp::embed_footer("Recovery should follow automatically."));
+
+	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
+	dpp::message message = dpp::message("<@&1181159721433051136>")
+							   .set_allowed_mentions(
+								   false, true, false, false, {}, {});
+	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+
+	core::discord::Send(message, core::discord::webhook);
+}
+
+void llpp::core::InformRecoveryInitiated(bool restart, bool reconnect)
+{
+	dpp::embed embed = dpp::embed();
+	embed.set_color(0x7F5D44)
+		.set_title("Recovery sequence was initiated!")
+		.set_description("Recovery attempt imminent. Required steps:")
+		.set_thumbnail(
+			"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/"
+			"images/2/24/Crafting_Light.png/revision/latest?cb=20181217123945")
+		.add_field("Restart required:", restart ? "Yes" : "No", true)
+		.add_field("Reconnect required:", reconnect ? "Yes" : "No", true);
+
+	if (reconnect) {
+		embed.add_field("Reconnecting to:", "9236", true);
+	}
+
+	dpp::message message = dpp::message().add_embed(embed);
+	core::discord::Send(message, core::discord::webhook);
+}
+
+void llpp::core::InformRecoverySuccessful(std::chrono::seconds timeTaken)
+{
+	dpp::embed embed = dpp::embed();
+	embed.set_color(dpp::colors::green)
+		.set_title("Recovery sequence was successful!")
+		.set_description("Ling Ling++ has successfully recovered itself.")
+		.set_thumbnail(
+			"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/"
+			"images/b/b5/Imprinted.png/revision/latest?cb=20181217131908")
+		.add_field("Time taken:", std::format("{} seconds", timeTaken.count()))
+		.set_image("attachment://image.png");
+
+
+	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
+	dpp::message message = dpp::message();
+	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+	core::discord::Send(message, core::discord::webhook);
 }

@@ -21,6 +21,10 @@ namespace llpp::util
 		return typeid(obj).name();
 	}
 
-
-
+	template <typename cast>
+	cast GetElapsed(std::chrono::system_clock::time_point start)
+	{
+		return std::chrono::duration_cast<cast>(
+			std::chrono::system_clock::now() - start);
+	}
 }
