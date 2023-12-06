@@ -12,12 +12,16 @@ namespace llpp::bots::paste
 
 		core::StationResult Complete() override;
 
-	private:
-		std::array<asa::entities::DinoEnt, 3> achatinas{
+		std::array<asa::entities::DinoEnt, 6> achatinas{
 			asa::entities::DinoEnt("ACHATINA01"),
 			asa::entities::DinoEnt("ACHATINA02"),
 			asa::entities::DinoEnt("ACHATINA03"),
+			asa::entities::DinoEnt("ACHATINA04"),
+			asa::entities::DinoEnt("ACHATINA05"),
+			asa::entities::DinoEnt("ACHATINA06"),
 		};
+
+	private:
 		asa::structures::SimpleBed bed;
 
 		bool EmptyAchatina(int index);

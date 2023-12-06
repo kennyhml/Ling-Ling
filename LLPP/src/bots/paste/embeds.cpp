@@ -14,7 +14,7 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 			"Paste Station '{}' has been completed.", data.station->GetName()))
 		.set_description(
 			std::format("The station was completed successfully {} times!",
-				data.completions))
+				data.station->GetTimesCompleted()))
 		.set_thumbnail("https://static.wikia.nocookie.net/"
 					   "arksurvivalevolved_gamepedia/images/0/03/"
 					   "Cementing_Paste.png/revision/latest?cb=20180801020251")

@@ -1,6 +1,7 @@
 #include "pastestation.h"
 #include "../../common/util.h"
 #include "embeds.h"
+#include <algorithm>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/exceptions.h>
 
@@ -9,7 +10,6 @@ using namespace llpp::bots::paste;
 PasteStation::PasteStation(std::string name)
 	: BaseStation(name, std::chrono::minutes(100)),
 	  bed(asa::structures::SimpleBed(name)){};
-
 
 llpp::core::StationResult PasteStation::Complete()
 {
@@ -29,7 +29,7 @@ llpp::core::StationResult PasteStation::Complete()
 
 bool PasteStation::EmptyAchatina(int index)
 {
-	asa::entities::DinoEnt snail = this->achatinas[index];
+	asa::entities::DinoEnt& snail = this->achatinas[index];
 	try {
 		asa::entities::gLocalPlayer->Access(snail);
 	}
@@ -51,20 +51,27 @@ bool PasteStation::EmptyAchatina(int index)
 void PasteStation::EmptyAllAchatinas()
 {
 	std::cout << "[+] Emptying the achatinas..." << std::endl;
+
+	this->EmptyAchatina(4);
+	do {
+		asa::entities::gLocalPlayer->TurnLeft(45);
+	} while (!this->EmptyAchatina(3));
+	do {
+		asa::entities::gLocalPlayer->TurnRight(90);
+	} while (!this->EmptyAchatina(5));
+
+
 	asa::entities::gLocalPlayer->Crouch();
 	asa::entities::gLocalPlayer->TurnDown(12, std::chrono::milliseconds(300));
 
-	this->EmptyAchatina(1);
-	std::cout << "\t[-] Achatina 1 - Done." << std::endl;
+	this->EmptyAchatina(2);
 	do {
-		asa::entities::gLocalPlayer->TurnRight(35);
-	} while (!this->EmptyAchatina(2));
-	std::cout << "\t[-] Achatina 2 - Done." << std::endl;
+		asa::entities::gLocalPlayer->TurnLeft(45);
+	} while (!this->EmptyAchatina(1));
 
 	do {
-		asa::entities::gLocalPlayer->TurnLeft(70);
+		asa::entities::gLocalPlayer->TurnLeft(45);
 	} while (!this->EmptyAchatina(0));
-	std::cout << "\t[-] Achatina 3 - Done." << std::endl;
 }
 
 void PasteStation::DepositPasteIntoDedi()

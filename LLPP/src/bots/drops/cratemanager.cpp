@@ -1,4 +1,5 @@
 #include "cratemanager.h"
+#include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
 
 using namespace llpp::bots::drops;
@@ -29,21 +30,20 @@ CrateManager::CrateManager(std::string prefix, int numberOfStations,
 
 void CrateManager::CrateGroupStatistics::AddLooted()
 {
-	auto currentTime = std::chrono::system_clock::now();
-	if (lastLooted != std::chrono::system_clock::time_point::min()) {
-		auto timeSinceLastLooted =
-			std::chrono::duration_cast<std::chrono::minutes>(
-				currentTime - lastLooted);
+	const auto now = std::chrono::system_clock::now();
+	std::chrono::seconds elapsedTime =
+		(lastLooted != UNDEFINED_TIME)
+			? util::GetElapsed<std::chrono::seconds>(lastLooted)
+			: std::chrono::minutes(30);
 
-		averageRespawnTime =
-			(averageRespawnTime * timesLooted + timeSinceLastLooted) /
-			static_cast<int>(timesLooted + 1);
-	}
+	avgRespawnTime = ((avgRespawnTime * timesLooted) + elapsedTime) /
+					 static_cast<int>(timesLooted + 1);
+
 	timesLooted++;
-	lastLooted = currentTime;
+	lastLooted = now;
 }
 
-const bool CrateManager::CompleteReadyStations()
+bool CrateManager::CompleteReadyStations()
 {
 	if (!this->crateGroups[0][0].IsReady()) {
 		return false;
@@ -71,7 +71,7 @@ void CrateManager::SetGroupCooldown(std::vector<LootCrateStation>& group)
 		station.SetCooldown();
 	}
 }
-const bool CrateManager::IsReadyToRun() { return false; }
+bool CrateManager::IsReadyToRun() { return false; }
 
 std::chrono::minutes llpp::bots::drops::CrateManager::GetTimeLeftUntilReady()
 {

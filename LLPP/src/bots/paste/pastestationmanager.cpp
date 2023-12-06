@@ -1,44 +1,69 @@
 #include "pastestationmanager.h"
-#include "exceptions.h"
+#include "../../common/util.h"
+#include <algorithm>
+#include <asapp/entities/exceptions.h>
 
-const bool llpp::bots::paste::PasteStationManager::CompleteReadyStations()
+
+using namespace llpp::bots::paste;
+
+PasteStationManager::PasteStationManager(std::string prefix, int numOfStations)
+	: BaseStationManager(prefix, numOfStations)
+{
+	for (int i = 1; i < numOfStations; i++) {
+		std::string name = this->CreateStationName(prefix, i + 1);
+		this->stations.push_back(std::make_unique<PasteStation>(name));
+	}
+};
+
+bool PasteStationManager::CompleteReadyStations()
 {
 	if (!this->IsReadyToRun()) {
 		return false;
 	}
 
-	auto renderStationResult = this->renderStation.Complete();
-	if (!renderStationResult.success) {
-		throw std::runtime_error("Render station failed.");
-	}
+	// auto renderStationResult = this->renderStation.Complete();
+	// if (!renderStationResult.success) {
+	// 	throw std::runtime_error("Render station failed.");
+	// }
 
-	for (const auto& station : this->stations) {
+	for (auto& station : this->stations) {
 		try {
 			station->Complete();
 		}
-		catch (exceptions::PasteNotDeposited e) {
+		catch (asa::entities::exceptions::EntityNotAccessed& e) {
 			std::cerr << "[!] Station not completed: " << e.what() << std::endl;
-			// TODO: send it to the webhook here
 		}
 	}
 }
 
-const bool llpp::bots::paste::PasteStationManager::IsReadyToRun()
+bool PasteStationManager::IsReadyToRun()
 {
 	return this->stations[0]->IsReady();
 }
 
-std::chrono::minutes
-llpp::bots::paste::PasteStationManager::GetTimeLeftUntilReady()
+std::chrono::minutes PasteStationManager::GetTimeLeftUntilReady()
 {
-	PasteStation* firstStation = this->stations[0].get();
+	const PasteStation* firstStation = this->stations[0].get();
 
 	auto now = std::chrono::system_clock::now();
-	auto timePassed = now - firstStation->GetLastCompletion();
+	auto timePassed = util::GetElapsed<std::chrono::minutes>(
+		firstStation->GetLastCompletion());
 
 	if (timePassed > firstStation->GetCompletionInterval()) {
 		return std::chrono::minutes(0);
 	}
+
 	return std::chrono::duration_cast<std::chrono::minutes>(
 		firstStation->GetCompletionInterval() - timePassed);
+}
+
+std::vector<PasteStation> PasteStationManager::CreateStations(
+	std::string prefix, int number)
+{
+	std::vector<PasteStation> result;
+	for (int i = 0; i < number; i++) {
+		std::string name = this->CreateStationName(prefix, i + 1);
+		result.push_back(name);
+	}
+	return result;
 }

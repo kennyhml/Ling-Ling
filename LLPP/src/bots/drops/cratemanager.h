@@ -4,6 +4,9 @@
 #include "lootcratestation.h"
 #include <asapp/structures/simplebed.h>
 
+
+#define UNDEFINED_TIME std::chrono::system_clock::time_point::min()
+
 namespace llpp::bots::drops
 {
 	using QualityFlags = int;
@@ -18,19 +21,24 @@ namespace llpp::bots::drops
 
 		struct CrateGroupStatistics
 		{
-			std::chrono::system_clock::time_point lastLooted =
-				std::chrono::system_clock::time_point::min();
-
-			int timesLooted = 0;
-			std::chrono::seconds averageRespawnTime = std::chrono::minutes(15);
+			std::chrono::system_clock::time_point lastLooted = UNDEFINED_TIME;
 
 			void AddLooted();
+
+			std::chrono::seconds GetAverageRespawnTime() const
+			{
+				return this->avgRespawnTime;
+			}
+
+		private:
+			int timesLooted = 0;
+			std::chrono::seconds avgRespawnTime;
 		};
 
-		virtual const bool CompleteReadyStations();
-		virtual const bool IsReadyToRun();
-		virtual std::chrono::minutes GetTimeLeftUntilReady();
+		bool CompleteReadyStations() override;
+		bool IsReadyToRun() override;
 
+		std::chrono::minutes GetTimeLeftUntilReady();
 		std::vector<CrateGroupStatistics> statisticsPerGroup;
 
 	private:

@@ -57,12 +57,6 @@
     <ClCompile Include="src\bots\suicide\suicideembed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\bots\paste\exceptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\bots\drops\exceptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\recovery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,9 +86,6 @@
     <ClInclude Include="src\bots\paste\pastestationmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bots\paste\exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\bots\render\renderstation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -111,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\bots\suicide\suicideembed.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\bots\drops\exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\recovery.h">

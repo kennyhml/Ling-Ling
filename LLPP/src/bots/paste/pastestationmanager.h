@@ -2,6 +2,7 @@
 #include "../../core/basestationmanager.h"
 #include "../render/renderstation.h"
 #include "pastestation.h"
+#include <memory>
 
 namespace llpp::bots::paste
 {
@@ -9,22 +10,17 @@ namespace llpp::bots::paste
 	class PasteStationManager final : public core::BaseStationManager
 	{
 	public:
-		PasteStationManager(std::string prefix, int numOfStations)
-			: BaseStationManager(prefix, numOfStations)
-		{
-			for (int i = 0; i < numOfStations; i++) {
-				std::string name = this->CreateStationName(prefix, i + 1);
-				this->stations.push_back(std::make_unique<PasteStation>(name));
-			}
-		}
+		PasteStationManager(std::string prefix, int numOfStations);
 
-		virtual const bool CompleteReadyStations() override;
-		virtual const bool IsReadyToRun() override;
-		virtual std::chrono::minutes GetTimeLeftUntilReady() override;
+		bool CompleteReadyStations() override;
+		bool IsReadyToRun() override;
+		std::chrono::minutes GetTimeLeftUntilReady() override;
 
+		std::vector<std::unique_ptr<PasteStation>> stations;
 
 	private:
-		std::vector<std::unique_ptr<PasteStation>> stations;
+		std::vector<PasteStation> CreateStations(
+			std::string prefix, int number);
 		render::RenderStation renderStation{ "PASTE::RENDER::SRC",
 			std::chrono::seconds(45) };
 	};

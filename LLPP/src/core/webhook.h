@@ -3,7 +3,7 @@
 #include <dpp/cluster.h>
 #include <dpp/colors.h>
 #include <dpp/message.h>
-
+#include <stdexcept>
 #include <string>
 
 namespace llpp::core::discord
@@ -20,4 +20,5 @@ namespace llpp::core::discord
 	void Send(const dpp::message&, dpp::webhook*);
 
 	void InformStarted();
+	void InformFatalError(const std::exception& error, const std::string& task);
 }

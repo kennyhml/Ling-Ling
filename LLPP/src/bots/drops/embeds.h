@@ -23,7 +23,6 @@ namespace llpp::bots::drops
 		"c/c5/Red_Crate.png/revision/latest?cb=20190116151200";
 
 	void SendSuccessEmbed(const core::StationResult&, cv::Mat lootScreenshot,
-		asa::structures::CaveLootCrate::Quality);
+		asa::structures::CaveLootCrate::Quality, int timesLooted);
 
-	void SendDropNotAccessible(const std::string& stationName);
 }

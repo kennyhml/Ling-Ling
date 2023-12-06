@@ -1,5 +1,6 @@
 #include "webhook.h"
-
+#include "../common/util.h"
+#include <asapp/game/window.h>
 
 bool llpp::core::discord::InitWebhooks(
 	const std::string& infoUrl, const std::string& dropUrl)
@@ -64,4 +65,28 @@ void llpp::core::discord::InformStarted()
 			.set_footer(
 				dpp::embed_footer("Ling Ling++ - please help - @kennyhml"));
 	Send(startedEmbed, webhook);
+}
+
+void llpp::core::discord::InformFatalError(
+	const std::exception& error, const std::string& task)
+{
+	auto embed =
+		dpp::embed()
+			.set_title("FATAL! Ling Ling++ has crashed!")
+			.set_description(
+				"Encountered an unexpected error - manual restart required.")
+			.set_color(dpp::colors::red)
+			.add_field("Error: ", error.what(), true)
+			.add_field("During Task: ", task, true)
+			.set_thumbnail("https://static.wikia.nocookie.net/"
+						   "arksurvivalevolved_gamepedia/images/1/1c/"
+						   "Repair_Icon.png/revision/latest?cb=20150731134649")
+			.set_image("attachment://image.png");
+
+	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
+	dpp::message message = dpp::message("<@&1181159721433051136>")
+							   .set_allowed_mentions(
+								   false, true, false, false, {}, {});
+	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+	Send(message, webhook);
 }

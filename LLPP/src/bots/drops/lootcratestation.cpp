@@ -14,7 +14,7 @@ LootCrateStation::LootCrateStation(std::string name,
 llpp::core::StationResult LootCrateStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
-	asa::structures::CaveLootCrate::Quality quality;
+	auto quality = asa::structures::CaveLootCrate::Quality::ANY;
 	cv::Mat loot;
 
 	this->TeleportTo();
@@ -30,7 +30,7 @@ llpp::core::StationResult LootCrateStation::Complete()
 	core::StationResult result(this, isDropUp, timePassed, {});
 
 	if (result.success) {
-		SendSuccessEmbed(result, loot, quality);
+		SendSuccessEmbed(result, loot, quality, ++timesLooted);
 	}
 	return result;
 }

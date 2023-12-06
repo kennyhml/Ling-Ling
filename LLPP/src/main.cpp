@@ -10,7 +10,9 @@
 
 #include <asapp/core/init.h>
 
+#include <asapp/entities/exceptions.h>
 #include <asapp/interfaces/serverselect.h>
+
 #include <fstream>
 #include <nlohmann/json.hpp>
 
@@ -34,20 +36,24 @@ int main()
 	auto suicideStation = llpp::bots::suicide::SuicideStation(
 		"SUICIDE DEATH", "SUICIDE RESPAWN");
 
-	auto paste = llpp::bots::paste::PasteStationManager("PASTE", 11);
-
+	auto st = llpp::bots::paste::PasteStation("meow");
 	auto swamp = llpp::bots::drops::CrateManager("SWAMP::", 6,
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
 		std::chrono::minutes(10), &suicideStation);
 
+	auto paste = llpp::bots::paste::PasteStationManager("PASTE", 6);
 	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::", 3,
 		{
 			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
 				Quality::YELLOW | Quality::RED },
 		},
 		std::chrono::minutes(15));
+
+	paste.CompleteReadyStations();
+	exit(1);
+
 
 	while (true) {
 		try {
@@ -60,6 +66,11 @@ int main()
 		catch (asa::exceptions::ShooterGameError& e) {
 			llpp::core::InformCrashDetected(e);
 			llpp::core::Recover();
+		}
+
+		catch (const std::exception& e) {
+			llpp::core::discord::InformFatalError(e, "Paste");
+			break;
 		}
 	}
 	return 0;
