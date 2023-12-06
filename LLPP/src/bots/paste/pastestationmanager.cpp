@@ -6,12 +6,14 @@
 
 using namespace llpp::bots::paste;
 
-PasteStationManager::PasteStationManager(std::string prefix, int numOfStations)
+PasteStationManager::PasteStationManager(
+	std::string prefix, int numOfStations, std::chrono::minutes interval)
 	: BaseStationManager(prefix, numOfStations)
 {
-	for (int i = 1; i < numOfStations; i++) {
+	for (int i = 0; i < numOfStations; i++) {
 		std::string name = this->CreateStationName(prefix, i + 1);
-		this->stations.push_back(std::make_unique<PasteStation>(name));
+		this->stations.push_back(
+			std::make_unique<PasteStation>(name, interval));
 	}
 };
 
@@ -21,10 +23,10 @@ bool PasteStationManager::CompleteReadyStations()
 		return false;
 	}
 
-	// auto renderStationResult = this->renderStation.Complete();
-	// if (!renderStationResult.success) {
-	// 	throw std::runtime_error("Render station failed.");
-	// }
+	auto renderStationResult = this->renderStation.Complete();
+	if (!renderStationResult.success) {
+		throw std::runtime_error("Render station failed.");
+	}
 
 	for (auto& station : this->stations) {
 		try {
@@ -55,15 +57,4 @@ std::chrono::minutes PasteStationManager::GetTimeLeftUntilReady()
 
 	return std::chrono::duration_cast<std::chrono::minutes>(
 		firstStation->GetCompletionInterval() - timePassed);
-}
-
-std::vector<PasteStation> PasteStationManager::CreateStations(
-	std::string prefix, int number)
-{
-	std::vector<PasteStation> result;
-	for (int i = 0; i < number; i++) {
-		std::string name = this->CreateStationName(prefix, i + 1);
-		result.push_back(name);
-	}
-	return result;
 }

@@ -8,10 +8,11 @@ namespace llpp::bots::paste
 	class PasteStation final : public core::BaseStation
 	{
 	public:
-		PasteStation(std::string name);
+		PasteStation(std::string name, std::chrono::minutes interval);
 
 		core::StationResult Complete() override;
 
+	private:
 		std::array<asa::entities::DinoEnt, 6> achatinas{
 			asa::entities::DinoEnt("ACHATINA01"),
 			asa::entities::DinoEnt("ACHATINA02"),
@@ -21,7 +22,6 @@ namespace llpp::bots::paste
 			asa::entities::DinoEnt("ACHATINA06"),
 		};
 
-	private:
 		asa::structures::SimpleBed bed;
 
 		bool EmptyAchatina(int index);

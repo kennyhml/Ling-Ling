@@ -83,12 +83,18 @@ void CrateManager::RunAllStations(bool& anyLooted)
 {
 	anyLooted = false;
 	bool canDefaultTeleport = true;
+	bool idled = false;
+
 
 	int i = 0;
 	for (auto& group : this->crateGroups) {
 		for (auto& station : group) {
 			station.SetCanDefaultTeleport(canDefaultTeleport);
 			auto result = station.Complete();
+			if (!idled) {
+				std::this_thread::sleep_for(std::chrono::seconds(3));
+				idled = true;
+			}
 
 			if (result.success) {
 				anyLooted = true;

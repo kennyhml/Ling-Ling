@@ -35,6 +35,11 @@ void llpp::core::Recover()
 	ReconnectToServer();
 	InformRecoverySuccessful(util::GetElapsed<std::chrono::seconds>(start));
 	asa::exceptions::SetCrashAware(false);
+
+	if (asa::interfaces::gSpawnMap->IsOpen()) {
+		asa::interfaces::gSpawnMap->SpawnAt("RESET BED");
+		std::this_thread::sleep_for(std::chrono::seconds(15));
+	}
 }
 
 void llpp::core::ReconnectToServer()

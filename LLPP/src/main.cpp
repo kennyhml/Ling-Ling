@@ -36,14 +36,14 @@ int main()
 	auto suicideStation = llpp::bots::suicide::SuicideStation(
 		"SUICIDE DEATH", "SUICIDE RESPAWN");
 
-	auto st = llpp::bots::paste::PasteStation("meow");
 	auto swamp = llpp::bots::drops::CrateManager("SWAMP::", 6,
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
 		std::chrono::minutes(10), &suicideStation);
 
-	auto paste = llpp::bots::paste::PasteStationManager("PASTE", 6);
+	auto paste = llpp::bots::paste::PasteStationManager(
+		"PASTE", 6, std::chrono::minutes(50));
 	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::", 3,
 		{
 			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
@@ -51,25 +51,24 @@ int main()
 		},
 		std::chrono::minutes(15));
 
-	paste.CompleteReadyStations();
-	exit(1);
-
-
 	while (true) {
 		try {
 			if (swamp.CompleteReadyStations())
 				continue;
 			if (skylord.CompleteReadyStations())
 				continue;
+
+			if (paste.CompleteReadyStations())
+				continue;
+
 			std::cout << "No task ready...." << std::endl;
 		}
 		catch (asa::exceptions::ShooterGameError& e) {
 			llpp::core::InformCrashDetected(e);
 			llpp::core::Recover();
 		}
-
 		catch (const std::exception& e) {
-			llpp::core::discord::InformFatalError(e, "Paste");
+			llpp::core::discord::InformFatalError(e, "???");
 			break;
 		}
 	}

@@ -7,9 +7,8 @@
 
 using namespace llpp::bots::paste;
 
-PasteStation::PasteStation(std::string name)
-	: BaseStation(name, std::chrono::minutes(100)),
-	  bed(asa::structures::SimpleBed(name)){};
+PasteStation::PasteStation(std::string name, std::chrono::minutes interval)
+	: BaseStation(name, interval), bed(asa::structures::SimpleBed(name)){};
 
 llpp::core::StationResult PasteStation::Complete()
 {
@@ -51,7 +50,6 @@ bool PasteStation::EmptyAchatina(int index)
 void PasteStation::EmptyAllAchatinas()
 {
 	std::cout << "[+] Emptying the achatinas..." << std::endl;
-
 	this->EmptyAchatina(4);
 	do {
 		asa::entities::gLocalPlayer->TurnLeft(45);
@@ -59,7 +57,6 @@ void PasteStation::EmptyAllAchatinas()
 	do {
 		asa::entities::gLocalPlayer->TurnRight(90);
 	} while (!this->EmptyAchatina(5));
-
 
 	asa::entities::gLocalPlayer->Crouch();
 	asa::entities::gLocalPlayer->TurnDown(12, std::chrono::milliseconds(300));
@@ -77,7 +74,7 @@ void PasteStation::EmptyAllAchatinas()
 void PasteStation::DepositPasteIntoDedi()
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	asa::entities::gLocalPlayer->TurnLeft(145, std::chrono::milliseconds(300));
+	asa::entities::gLocalPlayer->TurnLeft(135, std::chrono::milliseconds(300));
 
 	asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(nullptr);
 }
