@@ -8,6 +8,11 @@
 
 void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 {
+
+	auto nextCompletion = std::chrono::system_clock::to_time_t(
+		std::chrono::system_clock::now() +
+		data.station->GetCompletionInterval());
+
 	dpp::embed embed = dpp::embed();
 	embed.set_color(dpp::colors::gray)
 		.set_title(std::format(
@@ -20,11 +25,10 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 					   "Cementing_Paste.png/revision/latest?cb=20180801020251")
 		.add_field("Time taken:",
 			std::format("{} seconds", data.timeTaken.count()), true)
-		.add_field("Paste obtained:", "300", true)
-		.add_field("Next completion:",
-			std::format(
-				"{} minutes", data.station->GetCompletionInterval().count()),
-			true);
+		.add_field("Paste obtained:",
+			std::to_string(data.obtainedItems.at("Achatina Paste")), true)
+		.add_field(
+			"Next completion:", std::format("<t:{}:R>", nextCompletion), true);
 
 	core::discord::Send(embed, core::discord::webhook);
 }

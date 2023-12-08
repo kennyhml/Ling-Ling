@@ -18,6 +18,24 @@
 
 using json = nlohmann::json;
 
+
+void resizeImage(const std::string& inputPath, const std::string& outputPath,
+	int newWidth, int newHeight)
+{
+	// Read the input image
+	cv::Mat image = cv::imread(inputPath);
+
+	if (image.empty()) {
+		std::cerr << "Error: Could not read the image." << std::endl;
+		return;
+	}
+
+	// Resize the image to the specified width and height
+
+	// Save the resized image
+	cv::imwrite(outputPath, image);
+}
+
 int main()
 {
 	asa::Init(std::filesystem::path("src/config.json"));
@@ -53,12 +71,12 @@ int main()
 
 	while (true) {
 		try {
+			if (paste.CompleteReadyStations())
+				continue;
+
 			if (swamp.CompleteReadyStations())
 				continue;
 			if (skylord.CompleteReadyStations())
-				continue;
-
-			if (paste.CompleteReadyStations())
 				continue;
 
 			std::cout << "No task ready...." << std::endl;

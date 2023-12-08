@@ -14,13 +14,14 @@ llpp::core::StationResult PasteStation::Complete()
 {
 	auto start = std::chrono::system_clock::now();
 
-	asa::entities::gLocalPlayer->FastTravelTo(this->bed);
-	this->EmptyAllAchatinas();
-	this->DepositPasteIntoDedi();
-	this->SetCompleted();
+	asa::entities::gLocalPlayer->FastTravelTo(bed);
+	EmptyAllAchatinas();
+	int pasteObtained = DepositPasteIntoDedi();
+	SetCompleted();
 
 	auto duration = util::GetElapsed<std::chrono::seconds>(start);
-	core::StationResult resultData(this, true, duration, {});
+	core::StationResult resultData(
+		this, true, duration, { { "Achatina Paste", pasteObtained } });
 
 	SendSuccessEmbed(resultData);
 	return resultData;
@@ -71,10 +72,13 @@ void PasteStation::EmptyAllAchatinas()
 	} while (!this->EmptyAchatina(0));
 }
 
-void PasteStation::DepositPasteIntoDedi()
+int PasteStation::DepositPasteIntoDedi()
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	asa::entities::gLocalPlayer->TurnLeft(135, std::chrono::milliseconds(300));
 
-	asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(nullptr);
+	int amount = 0;
+	asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(
+		asa::items::resources::achatinaPaste, &amount);
+	return amount;
 }

@@ -26,6 +26,6 @@ namespace llpp::bots::paste
 
 		bool EmptyAchatina(int index);
 		void EmptyAllAchatinas();
-		void DepositPasteIntoDedi();
+		int DepositPasteIntoDedi();
 	};
 }
