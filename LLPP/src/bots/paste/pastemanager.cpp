@@ -11,32 +11,31 @@ PasteManager::PasteManager(
 {
 	for (int i = 0; i < numStations; i++) {
 		std::string name = util::AddNumberToPrefix(prefix, i + 1);
-		this->stations.push_back(
-			std::make_unique<PasteStation>(name, interval));
+		stations.push_back(std::make_unique<PasteStation>(name, interval));
 	}
 };
 
 bool PasteManager::Run()
 {
-	if (!this->IsReadyToRun()) {
+	if (!IsReadyToRun()) {
 		return false;
 	}
 
-	auto renderStationResult = this->renderStation.Complete();
+	auto renderStationResult = renderStation.Complete();
 	if (!renderStationResult.success) {
 		throw std::runtime_error("Render station failed.");
 	}
 
-	for (auto& station : this->stations) {
+	for (auto& station : stations) {
 		station->Complete();
 	}
 }
 
-bool PasteManager::IsReadyToRun() { return this->stations[0]->IsReady(); }
+bool PasteManager::IsReadyToRun() { return stations[0]->IsReady(); }
 
 std::chrono::minutes PasteManager::GetTimeLeftUntilReady()
 {
-	const PasteStation* firstStation = this->stations[0].get();
+	const PasteStation* firstStation = stations[0].get();
 
 	auto now = std::chrono::system_clock::now();
 	auto timePassed = util::GetElapsed<std::chrono::minutes>(
@@ -48,4 +47,12 @@ std::chrono::minutes PasteManager::GetTimeLeftUntilReady()
 
 	return std::chrono::duration_cast<std::chrono::minutes>(
 		firstStation->GetCompletionInterval() - timePassed);
+}
+
+const PasteStation* PasteManager::PeekStation(int index) const
+{
+	if (index > 0 && index < stations.size()) {
+		return stations[index].get();
+	}
+	return nullptr;
 }
