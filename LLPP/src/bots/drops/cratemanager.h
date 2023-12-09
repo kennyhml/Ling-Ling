@@ -1,9 +1,8 @@
 #pragma once
-#include "../../core/basestationmanager.h"
+#include "../../core/istationmanager.h"
 #include "../suicide/suicidestation.h"
 #include "lootcratestation.h"
 #include <asapp/structures/simplebed.h>
-
 
 #define UNDEFINED_TIME std::chrono::system_clock::time_point::min()
 
@@ -11,10 +10,10 @@ namespace llpp::bots::drops
 {
 	using QualityFlags = int;
 
-	class CrateManager : public core::BaseStationManager
+	class CrateManager : public core::IStationManager
 	{
 	public:
-		CrateManager(std::string prefix, int numberOfStations,
+		CrateManager(std::string prefix,
 			std::vector<std::vector<QualityFlags>> groupedCrates,
 			std::chrono::minutes interval,
 			suicide::SuicideStation* suicide = nullptr);
@@ -35,7 +34,7 @@ namespace llpp::bots::drops
 			std::chrono::seconds avgRespawnTime;
 		};
 
-		bool CompleteReadyStations() override;
+		bool Run() override;
 		bool IsReadyToRun() override;
 
 		std::chrono::minutes GetTimeLeftUntilReady();
@@ -47,9 +46,9 @@ namespace llpp::bots::drops
 		void RunAllStations(bool& wasAnyLootedOut);
 		void AccessBedAbove();
 		void SpawnOnAlignBed();
-
-		int dropoffRightTurnAmount = -1;
-		int dropoffDownTurnAmount = -1;
+		void PopulateGroups(
+			const std::vector<std::vector<QualityFlags>>& groups,
+			const std::string& prefix, std::chrono::minutes stationInterval);
 
 		asa::structures::SimpleBed alignBed;
 		asa::structures::Teleporter dropoffTeleporter;

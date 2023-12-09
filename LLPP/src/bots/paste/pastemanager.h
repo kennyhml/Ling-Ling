@@ -1,5 +1,5 @@
 #pragma once
-#include "../../core/basestationmanager.h"
+#include "../../core/istationmanager.h"
 #include "../render/renderstation.h"
 #include "pastestation.h"
 #include <memory>
@@ -7,13 +7,13 @@
 namespace llpp::bots::paste
 {
 
-	class PasteStationManager final : public core::BaseStationManager
+	class PasteManager final : public core::IStationManager
 	{
 	public:
-		PasteStationManager(std::string prefix, int numOfStations,
+		PasteManager(std::string prefix, int numOfStations,
 			std::chrono::minutes interval);
 
-		bool CompleteReadyStations() override;
+		bool Run() override;
 		bool IsReadyToRun() override;
 		std::chrono::minutes GetTimeLeftUntilReady() override;
 

@@ -2,6 +2,7 @@
 #include "../../common/util.h"
 #include "embeds.h"
 #include <algorithm>
+#include <asapp/entities/exceptions.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/exceptions.h>
 
@@ -33,9 +34,9 @@ bool PasteStation::EmptyAchatina(int index)
 	try {
 		asa::entities::gLocalPlayer->Access(snail);
 	}
-	catch (asa::interfaces::exceptions::InterfaceNotOpenedError e) {
-		std::cerr << "Failed to open " << snail.GetName() << std::endl;
-		SendAchatinaNotAccessible(this->name, snail);
+	catch (const asa::entities::exceptions::EntityNotAccessed& e) {
+		SendAchatinaNotAccessible(name, e.GetEntity()->GetName());
+		return true;
 	}
 
 	auto& slot = snail.inventory->slots[0];

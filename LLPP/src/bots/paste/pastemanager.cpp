@@ -1,23 +1,22 @@
-#include "pastestationmanager.h"
+#include "pastemanager.h"
 #include "../../common/util.h"
+#include "embeds.h"
 #include <algorithm>
 #include <asapp/entities/exceptions.h>
 
-
 using namespace llpp::bots::paste;
 
-PasteStationManager::PasteStationManager(
-	std::string prefix, int numOfStations, std::chrono::minutes interval)
-	: BaseStationManager(prefix, numOfStations)
+PasteManager::PasteManager(
+	std::string prefix, int numStations, std::chrono::minutes interval)
 {
-	for (int i = 0; i < numOfStations; i++) {
-		std::string name = this->CreateStationName(prefix, i + 1);
+	for (int i = 0; i < numStations; i++) {
+		std::string name = util::AddNumberToPrefix(prefix, i + 1);
 		this->stations.push_back(
 			std::make_unique<PasteStation>(name, interval));
 	}
 };
 
-bool PasteStationManager::CompleteReadyStations()
+bool PasteManager::Run()
 {
 	if (!this->IsReadyToRun()) {
 		return false;
@@ -29,21 +28,13 @@ bool PasteStationManager::CompleteReadyStations()
 	}
 
 	for (auto& station : this->stations) {
-		try {
-			station->Complete();
-		}
-		catch (asa::entities::exceptions::EntityNotAccessed& e) {
-			std::cerr << "[!] Station not completed: " << e.what() << std::endl;
-		}
+		station->Complete();
 	}
 }
 
-bool PasteStationManager::IsReadyToRun()
-{
-	return this->stations[0]->IsReady();
-}
+bool PasteManager::IsReadyToRun() { return this->stations[0]->IsReady(); }
 
-std::chrono::minutes PasteStationManager::GetTimeLeftUntilReady()
+std::chrono::minutes PasteManager::GetTimeLeftUntilReady()
 {
 	const PasteStation* firstStation = this->stations[0].get();
 

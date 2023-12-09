@@ -1,4 +1,7 @@
 #include "util.h"
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 bool llpp::util::Await(
 	const std::function<bool()>& condition, std::chrono::milliseconds timeout)
@@ -36,4 +39,12 @@ const std::string llpp::util::MatToStringBuffer(const cv::Mat& source)
 	cv::imencode(".png", source, imageBuffer);
 	std::string imageContent(imageBuffer.begin(), imageBuffer.end());
 	return imageContent;
+}
+
+std::string llpp::util::AddNumberToPrefix(
+	const std::string& prefix, int number, int fillZeros)
+{
+	std::ostringstream oss;
+	oss << std::setw(fillZeros) << std::setfill('0') << number;
+	return prefix + oss.str();
 }

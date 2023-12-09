@@ -34,22 +34,25 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 }
 
 void llpp::bots::paste::SendAchatinaNotAccessible(
-	const std::string& stationName, const asa::entities::DinoEnt& achatina)
+	const std::string& stationName, const std::string& achatinaName)
 {
 	dpp::embed embed = dpp::embed();
-	embed.set_color(dpp::colors::brown_bear)
-		.set_title(std::format("Problem with Achatina at '{}'", stationName))
+	embed.set_color(0xf6c330)
+		.set_title(std::format("Problem with Achatina at '{}'!", stationName))
 		.set_description(std::format(
-			"Failed to access '{}', please check.", achatina.GetName()))
+			"An achatina may be inaccessible, manual check required.",
+			achatinaName))
 		.set_thumbnail(
 			"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/"
-			"images/2/24/Crafting_Light.png/revision/latest?cb=20181217123945")
+			"images/f/f6/Radiation.png/revision/latest?cb=20171216191751")
 		.add_field("Station:", stationName, true)
-		.add_field("Achatina: ", achatina.GetName(), true)
+		.add_field("Achatina: ", achatinaName, true)
 		.set_image("attachment://image.png");
 
 	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
-	dpp::message message = dpp::message();
+	dpp::message message = dpp::message("<@&1181159721433051136>")
+							   .set_allowed_mentions(
+								   false, true, false, false, {}, {});
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 
 	core::discord::Send(message, core::discord::webhook);

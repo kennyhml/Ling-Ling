@@ -33,10 +33,7 @@
     <ClCompile Include="src\common\util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\basestationmanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\bots\paste\pastestationmanager.cpp">
+    <ClCompile Include="src\bots\paste\pastemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\bots\render\renderstation.cpp">
@@ -80,10 +77,10 @@
     <ClInclude Include="src\common\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\basestationmanager.h">
+    <ClInclude Include="src\core\istationmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\bots\paste\pastestationmanager.h">
+    <ClInclude Include="src\bots\paste\pastemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\bots\render\renderstation.h">

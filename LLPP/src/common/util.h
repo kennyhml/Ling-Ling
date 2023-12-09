@@ -3,6 +3,8 @@
 #include <functional>
 #include <opencv2/imgcodecs.hpp>
 
+
+
 namespace llpp::util
 {
 	bool Await(const std::function<bool()>& condition,
@@ -27,4 +29,7 @@ namespace llpp::util
 		return std::chrono::duration_cast<cast>(
 			std::chrono::system_clock::now() - start);
 	}
+
+	std::string AddNumberToPrefix(
+		const std::string& prefix, int number, int fillZeros = 2);
 }

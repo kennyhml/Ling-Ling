@@ -4,28 +4,13 @@
 
 using namespace llpp::bots::drops;
 
-CrateManager::CrateManager(std::string prefix, int numberOfStations,
+CrateManager::CrateManager(std::string prefix,
 	std::vector<std::vector<QualityFlags>> groupedCrates,
 	std::chrono::minutes interval, suicide::SuicideStation* suicide)
-	: BaseStationManager(prefix, numberOfStations), alignBed(prefix + "ALIGN"),
-	  dropoffTeleporter(prefix + "DROPOFF"),
+	: alignBed(prefix + "ALIGN"), dropoffTeleporter(prefix + "DROPOFF"),
 	  dropoffVault(prefix + "DROPOFF", 350), suicide(suicide)
 {
-	crateGroups.resize(groupedCrates.size());
-	statisticsPerGroup.resize(groupedCrates.size());
-	int stationNumber = 0;
-
-	for (size_t i = 0; i < groupedCrates.size(); i++) {
-		for (QualityFlags crateQualities : groupedCrates[i]) {
-			auto crate = asa::structures::CaveLootCrate(crateQualities);
-			std::string name = CreateStationName(
-				prefix + "DROP", stationNumber + 1);
-			auto station = LootCrateStation(name, crate, interval);
-
-			this->crateGroups[i].push_back(station);
-			stationNumber += 1;
-		}
-	}
+	PopulateGroups(groupedCrates, prefix, interval);
 }
 
 void CrateManager::CrateGroupStatistics::AddLooted()
@@ -43,7 +28,7 @@ void CrateManager::CrateGroupStatistics::AddLooted()
 	lastLooted = now;
 }
 
-bool CrateManager::CompleteReadyStations()
+bool CrateManager::Run()
 {
 	if (!this->crateGroups[0][0].IsReady()) {
 		return false;
@@ -83,18 +68,12 @@ void CrateManager::RunAllStations(bool& anyLooted)
 {
 	anyLooted = false;
 	bool canDefaultTeleport = true;
-	bool idled = false;
-
 
 	int i = 0;
 	for (auto& group : this->crateGroups) {
 		for (auto& station : group) {
 			station.SetCanDefaultTeleport(canDefaultTeleport);
 			auto result = station.Complete();
-			if (!idled) {
-				std::this_thread::sleep_for(std::chrono::seconds(3));
-				idled = true;
-			}
 
 			if (result.success) {
 				anyLooted = true;
@@ -140,4 +119,21 @@ void CrateManager::SpawnOnAlignBed()
 	asa::entities::gLocalPlayer->FastTravelTo(this->alignBed);
 	asa::entities::gLocalPlayer->Crouch();
 	asa::entities::gLocalPlayer->TurnDown(20);
+}
+
+void CrateManager::PopulateGroups(
+	const std::vector<std::vector<QualityFlags>>& groups,
+	const std::string& prefix, std::chrono::minutes interval)
+{
+	crateGroups.resize(groups.size());
+	statisticsPerGroup.resize(groups.size());
+	int n = 0;
+
+	for (size_t i = 0; i < groups.size(); i++) {
+		for (QualityFlags crateQualities : groups[i]) {
+			std::string name = util::AddNumberToPrefix(prefix + "DROP", ++n);
+			auto station = LootCrateStation(name, crateQualities, interval);
+			crateGroups[i].push_back(station);
+		}
+	}
 }

@@ -1,7 +1,7 @@
 
 #include "bots/drops/cratemanager.h"
 #include "bots/drops/lootcratestation.h"
-#include "bots/paste/pastestationmanager.h"
+#include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
 #include "core/recovery.h"
 #include "core/webhook.h"
@@ -17,24 +17,6 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-
-
-void resizeImage(const std::string& inputPath, const std::string& outputPath,
-	int newWidth, int newHeight)
-{
-	// Read the input image
-	cv::Mat image = cv::imread(inputPath);
-
-	if (image.empty()) {
-		std::cerr << "Error: Could not read the image." << std::endl;
-		return;
-	}
-
-	// Resize the image to the specified width and height
-
-	// Save the resized image
-	cv::imwrite(outputPath, image);
-}
 
 int main()
 {
@@ -54,15 +36,15 @@ int main()
 	auto suicideStation = llpp::bots::suicide::SuicideStation(
 		"SUICIDE DEATH", "SUICIDE RESPAWN");
 
-	auto swamp = llpp::bots::drops::CrateManager("SWAMP::", 6,
+	auto swamp = llpp::bots::drops::CrateManager("SWAMP::",
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
 		std::chrono::minutes(10), &suicideStation);
 
-	auto paste = llpp::bots::paste::PasteStationManager(
+	auto paste = llpp::bots::paste::PasteManager(
 		"PASTE", 6, std::chrono::minutes(50));
-	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::", 3,
+	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::",
 		{
 			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
 				Quality::YELLOW | Quality::RED },
@@ -71,12 +53,12 @@ int main()
 
 	while (true) {
 		try {
-			if (paste.CompleteReadyStations())
+			if (paste.Run())
 				continue;
 
-			if (swamp.CompleteReadyStations())
+			if (swamp.Run())
 				continue;
-			if (skylord.CompleteReadyStations())
+			if (skylord.Run())
 				continue;
 
 			std::cout << "No task ready...." << std::endl;
