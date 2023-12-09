@@ -81,7 +81,7 @@ void llpp::bots::drops::SendSummaryEmbed(const std::string& name,
 			stats[i].GetAverageRespawnTime());
 
 		embed.add_field("",
-			std::format(">>> **__Group {}:__** \nAvg. respawn: {} "
+			std::format(">>> **__Group {}:__** \nRespawn: ~{} "
 						"\nTimes looted: {}",
 				i + 1, respawnTime, stats[i].GetTimesLooted()),
 			true);

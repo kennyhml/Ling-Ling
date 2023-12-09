@@ -105,6 +105,7 @@ void CrateManager::DropoffItems(float& filledLevelOut)
 
 	asa::entities::gLocalPlayer->Access(this->dropoffVault);
 	asa::entities::gLocalPlayer->inventory->TransferAll();
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	filledLevelOut = dropoffVault.GetSlotCount() / 350.f;
 
 	this->dropoffVault.inventory->Close();
