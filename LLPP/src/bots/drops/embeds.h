@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/stationresult.h"
+#include "cratemanager.h"
 #include <asapp/structures/cavelootcrate.h>
 #include <format>
 
@@ -25,4 +26,7 @@ namespace llpp::bots::drops
 	void SendSuccessEmbed(const core::StationResult&, cv::Mat lootScreenshot,
 		asa::structures::CaveLootCrate::Quality, int timesLooted);
 
+	void SendSummaryEmbed(const std::string& name,
+		std::chrono::seconds timeTaken,
+		std::vector<CrateManager::CrateGroupStatistics> stats);
 }

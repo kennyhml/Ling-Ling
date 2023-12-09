@@ -1,5 +1,6 @@
 #include "cratemanager.h"
 #include "../../common/util.h"
+#include "embeds.h"
 #include <asapp/entities/localplayer.h>
 
 using namespace llpp::bots::drops;
@@ -7,10 +8,11 @@ using namespace llpp::bots::drops;
 CrateManager::CrateManager(std::string prefix,
 	std::vector<std::vector<QualityFlags>> groupedCrates,
 	std::chrono::minutes interval, suicide::SuicideStation* suicide)
-	: alignBed(prefix + "ALIGN"), dropoffTeleporter(prefix + "DROPOFF"),
+	: prefix(prefix), alignBed(prefix + "ALIGN"),
+	  dropoffTeleporter(prefix + "DROPOFF"),
 	  dropoffVault(prefix + "DROPOFF", 350), suicide(suicide)
 {
-	PopulateGroups(groupedCrates, prefix, interval);
+	PopulateGroups(groupedCrates, interval);
 }
 
 void CrateManager::CrateGroupStatistics::AddLooted()
@@ -33,6 +35,7 @@ bool CrateManager::Run()
 	if (!this->crateGroups[0][0].IsReady()) {
 		return false;
 	}
+	auto start = std::chrono::system_clock::now();
 	this->SpawnOnAlignBed();
 
 	bool wasAnyLooted = false;
@@ -46,6 +49,9 @@ bool CrateManager::Run()
 	if (this->suicide != nullptr) {
 		this->suicide->Complete();
 	}
+
+	SendSummaryEmbed(prefix, util::GetElapsed<std::chrono::seconds>(start),
+		statisticsPerGroup);
 	return true;
 }
 
@@ -62,7 +68,6 @@ std::chrono::minutes llpp::bots::drops::CrateManager::GetTimeLeftUntilReady()
 {
 	return std::chrono::minutes(0);
 }
-
 
 void CrateManager::RunAllStations(bool& anyLooted)
 {
@@ -123,7 +128,7 @@ void CrateManager::SpawnOnAlignBed()
 
 void CrateManager::PopulateGroups(
 	const std::vector<std::vector<QualityFlags>>& groups,
-	const std::string& prefix, std::chrono::minutes interval)
+	std::chrono::minutes interval)
 {
 	crateGroups.resize(groups.size());
 	statisticsPerGroup.resize(groups.size());

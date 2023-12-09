@@ -24,9 +24,10 @@ namespace llpp::bots::drops
 
 			void AddLooted();
 
+			int GetTimesLooted() const { return timesLooted; }
 			std::chrono::seconds GetAverageRespawnTime() const
 			{
-				return this->avgRespawnTime;
+				return avgRespawnTime;
 			}
 
 		private:
@@ -48,7 +49,7 @@ namespace llpp::bots::drops
 		void SpawnOnAlignBed();
 		void PopulateGroups(
 			const std::vector<std::vector<QualityFlags>>& groups,
-			const std::string& prefix, std::chrono::minutes stationInterval);
+			std::chrono::minutes stationInterval);
 
 		asa::structures::SimpleBed alignBed;
 		asa::structures::Teleporter dropoffTeleporter;
@@ -56,7 +57,7 @@ namespace llpp::bots::drops
 
 		void SetGroupCooldown(std::vector<LootCrateStation>& group);
 		std::vector<std::vector<LootCrateStation>> crateGroups;
-
+		std::string prefix;
 		suicide::SuicideStation* suicide;
 	};
 }

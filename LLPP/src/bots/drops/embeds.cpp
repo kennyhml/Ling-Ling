@@ -56,3 +56,31 @@ void llpp::bots::drops::SendSuccessEmbed(const core::StationResult& data,
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 	core::discord::Send(message, core::discord::dropWebhook);
 }
+
+void llpp::bots::drops::SendSummaryEmbed(const std::string& name,
+	std::chrono::seconds timeTaken,
+	std::vector<CrateManager::CrateGroupStatistics> stats)
+{
+	dpp::embed embed = dpp::embed();
+	embed.set_color(dpp::colors::yellow)
+		.set_title(std::format("Crate Manager '{}' has been completed!", name))
+		.set_description("Here is a summary of this crate managers data:")
+		.set_thumbnail(RED_CRATE_THUMBNAIL)
+		.add_field(
+			"Time taken:", std::format("{} seconds", timeTaken.count()), true)
+		.set_image("attachment://image.png");
+
+
+	for (int i = 0; i < stats.size(); i++) {
+		auto respawnTime = std::chrono::duration_cast<std::chrono::minutes>(
+			stats[i].GetAverageRespawnTime());
+
+		embed.add_field(std::format(">>> **__Group {}:__**", i),
+			std::format("Avg. respawn: {} minutes\nTotal times looted: {}",
+				respawnTime, stats[i].GetTimesLooted()),
+			true);
+	}
+
+	dpp::message message = dpp::message().add_embed(embed);
+	core::discord::Send(message, core::discord::dropWebhook);
+}
