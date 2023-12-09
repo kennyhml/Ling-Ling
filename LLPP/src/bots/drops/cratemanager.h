@@ -42,7 +42,7 @@ namespace llpp::bots::drops
 		std::vector<CrateGroupStatistics> statisticsPerGroup;
 
 	private:
-		void DropoffItems();
+		void DropoffItems(float& filledLevelOut);
 		void TeleportToDropoff();
 		void RunAllStations(bool& wasAnyLootedOut);
 		void AccessBedAbove();
@@ -57,7 +57,9 @@ namespace llpp::bots::drops
 
 		void SetGroupCooldown(std::vector<LootCrateStation>& group);
 		std::vector<std::vector<LootCrateStation>> crateGroups;
+
 		std::string prefix;
+		float lastKnownVaultFillLevel = 0.f;
 		suicide::SuicideStation* suicide;
 	};
 }

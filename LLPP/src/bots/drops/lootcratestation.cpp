@@ -21,6 +21,7 @@ llpp::core::StationResult LootCrateStation::Complete()
 	bool isDropUp = asa::entities::gLocalPlayer->CanAccess(this->crate);
 
 	if (isDropUp) {
+		std::cout << "[+] Crate found, looting..." << std::endl;
 		quality = this->crate.GetCrateQuality();
 		loot = this->LootCrate();
 	}
@@ -49,12 +50,12 @@ cv::Mat LootCrateStation::LootCrate()
 {
 	asa::entities::gLocalPlayer->Access(this->crate);
 	auto loot = asa::window::Screenshot({ 1193, 227, 574, 200 });
-
+	std::cout << "\t[-] Loot screenshot has been taken." << std::endl;
 	do {
 		this->crate.inventory->TransferAll();
 	} while (!util::Await([this]() { return !this->crate.inventory->IsOpen(); },
 		std::chrono::seconds(6)));
-
+	std::cout << "\t[-] The crate has been looted successfully." << std::endl;
 	return loot;
 }
 

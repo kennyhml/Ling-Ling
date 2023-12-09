@@ -28,5 +28,7 @@ namespace llpp::bots::drops
 
 	void SendSummaryEmbed(const std::string& name,
 		std::chrono::seconds timeTaken,
-		std::vector<CrateManager::CrateGroupStatistics> stats);
+		std::vector<CrateManager::CrateGroupStatistics> stats,
+		int dropoffFilled,
+		std::chrono::system_clock::time_point nextCompletion);
 }

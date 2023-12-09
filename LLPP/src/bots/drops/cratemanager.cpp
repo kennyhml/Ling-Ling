@@ -43,15 +43,18 @@ bool CrateManager::Run()
 
 	this->TeleportToDropoff();
 	if (wasAnyLooted) {
-		this->DropoffItems();
+		this->DropoffItems(lastKnownVaultFillLevel);
 	}
+
 	this->AccessBedAbove();
 	if (this->suicide != nullptr) {
 		this->suicide->Complete();
 	}
 
 	SendSummaryEmbed(prefix, util::GetElapsed<std::chrono::seconds>(start),
-		statisticsPerGroup);
+		statisticsPerGroup, lastKnownVaultFillLevel * 100,
+		std::chrono::system_clock::now() +
+			crateGroups[0][0].GetCompletionInterval());
 	return true;
 }
 
@@ -95,13 +98,15 @@ void CrateManager::RunAllStations(bool& anyLooted)
 	}
 }
 
-void CrateManager::DropoffItems()
+void CrateManager::DropoffItems(float& filledLevelOut)
 {
 	asa::entities::gLocalPlayer->TurnUp(50, std::chrono::milliseconds(500));
 	asa::entities::gLocalPlayer->TurnRight(90);
 
 	asa::entities::gLocalPlayer->Access(this->dropoffVault);
 	asa::entities::gLocalPlayer->inventory->TransferAll();
+	filledLevelOut = dropoffVault.GetSlotCount() / 350.f;
+
 	this->dropoffVault.inventory->Close();
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
@@ -109,7 +114,7 @@ void CrateManager::DropoffItems()
 void CrateManager::TeleportToDropoff()
 {
 	asa::entities::gLocalPlayer->TeleportTo(this->dropoffTeleporter);
-	std::this_thread::sleep_for(std::chrono::seconds(10));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	asa::entities::gLocalPlayer->StandUp();
 }
 

@@ -53,13 +53,13 @@ int main()
 
 	while (true) {
 		try {
-			if (paste.Run())
-				continue;
-
 			if (swamp.Run())
 				continue;
 			if (skylord.Run())
 				continue;
+			if (paste.Run())
+				continue;
+
 
 			std::cout << "No task ready...." << std::endl;
 		}
