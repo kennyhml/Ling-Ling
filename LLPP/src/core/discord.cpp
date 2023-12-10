@@ -1,53 +1,39 @@
-#include "webhook.h"
+#include "discord.h"
 #include "../common/util.h"
 #include <asapp/game/window.h>
 
-bool llpp::core::discord::InitWebhooks(
-	const std::string& infoUrl, const std::string& dropUrl)
+bool llpp::core::discord::Init(const std::string& token, int infoChannelId)
 {
-	std::cout << "[+] Creating webhooks from url..." << std::endl;
-	if (infoUrl.empty() || dropUrl.empty()) {
-		std::cerr << "\t[!] Failed to create webhook! No URL." << std::endl;
-		return false;
-	}
-	try {
-		webhook = new dpp::webhook(infoUrl);
-		dropWebhook = new dpp::webhook(dropUrl);
-	}
-	catch (dpp::logic_exception e) {
-		std::cerr << "\t[!] Failed to create webhook! " << e.what()
-				  << std::endl;
+	std::cout << "[+] Initializing Ling Ling++ discord bot..." << std::endl;
+
+	infoChannelID = infoChannelID;
+
+	if (token.empty()) {
+		std::cerr << "\t[!] Empty token passed!" << std::endl;
 		return false;
 	}
 
-	webhook->avatar =
-		"https://www.mediastorehouse.com/p/172/"
-		"dog-shiba-inu-wearing-oriental-bamboo-straw-24520100.jpg.webp";
-	dropWebhook->avatar = webhook->avatar;
-	webhook->name = "Ling Ling++";
-	dropWebhook->name = webhook->name;
-	std::cout << "[-] Webhooks have been created successfully." << std::endl;
+	std::cout << "\t[-] Creating bot from token... ";
+	bot = std::make_unique<dpp::cluster>(token, dpp::i_all_intents);
+	std::cout << " Done" << std::endl;
+
+	bot->on_ready([](const dpp::ready_t& event) {
+		if (dpp::run_once<struct register_bot_commands>()) {
+			std::cout << "\t[-] Registering slash commands... ";
+			bot->global_command_create(
+				dpp::slashcommand("ping", "Nigga nig pong!", bot->me.id));
+
+			std::cout << "Done." << std::endl;
+		}
+	});
+
+	std::cout << "\t[-] Discord bot created successfully." << std::endl;
 	return true;
-}
-
-void llpp::core::discord::Send(const std::string& msg, dpp::webhook* wh)
-{
-	Send(dpp::message(msg), wh);
-}
-
-void llpp::core::discord::Send(const dpp::embed& embed, dpp::webhook* wh)
-{
-	Send(dpp::message().add_embed(embed), wh);
-}
-
-void llpp::core::discord::Send(const dpp::message& msg, dpp::webhook* wh)
-{
-	cl->execute_webhook_sync(*wh, msg);
 }
 
 void llpp::core::discord::InformStarted()
 {
-	auto startedEmbed =
+	dpp::embed startedEmbed =
 		dpp::embed()
 			.set_title("Ling Ling++ is starting...")
 			.set_description(
@@ -64,13 +50,15 @@ void llpp::core::discord::InformStarted()
 						   "scale-to-width-down/228?cb=20160901213011")
 			.set_footer(
 				dpp::embed_footer("Ling Ling++ - please help - @kennyhml"));
-	Send(startedEmbed, webhook);
+
+	bot->message_create(
+		dpp::message(dpp::snowflake(infoChannelID), startedEmbed));
 }
 
 void llpp::core::discord::InformFatalError(
 	const std::exception& error, const std::string& task)
 {
-	auto embed =
+	dpp::embed embed =
 		dpp::embed()
 			.set_title("FATAL! Ling Ling++ has crashed!")
 			.set_description(
@@ -84,9 +72,10 @@ void llpp::core::discord::InformFatalError(
 			.set_image("attachment://image.png");
 
 	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
-	dpp::message message = dpp::message("<@&1181159721433051136>")
-							   .set_allowed_mentions(
-								   false, true, false, false, {}, {});
+	dpp::message message =
+		dpp::message(dpp::snowflake(infoChannelID), "<@&1181159721433051136>")
+			.set_allowed_mentions(false, true, false, false, {}, {});
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
-	Send(message, webhook);
+
+	bot->message_create(message);
 }

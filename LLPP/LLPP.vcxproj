@@ -177,7 +177,7 @@
     <ClCompile Include="src\common\util.cpp" />
     <ClCompile Include="src\core\basestation.cpp" />
     <ClCompile Include="src\core\recovery.cpp" />
-    <ClCompile Include="src\core\webhook.cpp" />
+    <ClCompile Include="src\core\discord.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,7 +195,7 @@
     <ClInclude Include="src\core\istationmanager.h" />
     <ClInclude Include="src\core\recovery.h" />
     <ClInclude Include="src\core\stationresult.h" />
-    <ClInclude Include="src\core\webhook.h" />
+    <ClInclude Include="src\core\discord.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />

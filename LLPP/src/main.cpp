@@ -9,9 +9,9 @@
 #include <asapp/entities/localplayer.h>
 
 #include <asapp/core/init.h>
-
 #include <asapp/entities/exceptions.h>
 #include <asapp/interfaces/serverselect.h>
+#include <dpp/dpp.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -26,7 +26,36 @@ int main()
 	json data = json::parse(f);
 	f.close();
 
-	llpp::core::discord::InitWebhooks(data["webhook"], data["dropWebhook"]);
+
+	dpp::cluster bot(
+		data["bot"], dpp::i_default_intents | dpp::i_message_content);
+
+
+	bot.on_message_create([&bot](const dpp::message_create_t& event) {
+		std::cout << event.msg.content << std::endl;
+	});
+
+
+	bot.on_slashcommand([](const dpp::slashcommand_t& event) {
+		if (event.command.get_command_name() == "ping") {
+			event.reply("Nigga!");
+		}
+	});
+
+	bot.on_ready([&bot](const dpp::ready_t& event) {
+		if (dpp::run_once<struct register_bot_commands>()) {
+			bot.global_command_create(
+				dpp::slashcommand("ping", "Nigga nig pong!", bot.me.id));
+		}
+	});
+
+
+	bot.message_create(
+		dpp::message(dpp::snowflake(1178195307482325072), "Test"));
+
+	bot.start(dpp::st_wait);
+
+	std::cout << "Still running" << std::endl;
 
 	asa::window::GetHandle(60, true);
 	asa::window::SetForeground();
@@ -40,7 +69,7 @@ int main()
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
-		std::chrono::minutes(10), &suicideStation);
+		std::chrono::minutes(5), &suicideStation);
 
 	auto paste = llpp::bots::paste::PasteManager(
 		"PASTE", 6, std::chrono::minutes(50));
@@ -49,7 +78,7 @@ int main()
 			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
 				Quality::YELLOW | Quality::RED },
 		},
-		std::chrono::minutes(15));
+		std::chrono::minutes(5));
 
 	while (true) {
 		try {

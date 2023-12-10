@@ -18,7 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\webhook.cpp">
+    <ClCompile Include="src\core\discord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\basestation.cpp">
@@ -59,7 +59,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\core\webhook.h">
+    <ClInclude Include="src\core\discord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\basestation.h">
