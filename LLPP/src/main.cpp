@@ -3,8 +3,8 @@
 #include "bots/drops/lootcratestation.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
+#include "core/discord.h"
 #include "core/recovery.h"
-#include "core/webhook.h"
 #include <asapp/core/exceptions.h>
 #include <asapp/entities/localplayer.h>
 
@@ -26,36 +26,7 @@ int main()
 	json data = json::parse(f);
 	f.close();
 
-
-	dpp::cluster bot(
-		data["bot"], dpp::i_default_intents | dpp::i_message_content);
-
-
-	bot.on_message_create([&bot](const dpp::message_create_t& event) {
-		std::cout << event.msg.content << std::endl;
-	});
-
-
-	bot.on_slashcommand([](const dpp::slashcommand_t& event) {
-		if (event.command.get_command_name() == "ping") {
-			event.reply("Nigga!");
-		}
-	});
-
-	bot.on_ready([&bot](const dpp::ready_t& event) {
-		if (dpp::run_once<struct register_bot_commands>()) {
-			bot.global_command_create(
-				dpp::slashcommand("ping", "Nigga nig pong!", bot.me.id));
-		}
-	});
-
-
-	bot.message_create(
-		dpp::message(dpp::snowflake(1178195307482325072), "Test"));
-
-	bot.start(dpp::st_wait);
-
-	std::cout << "Still running" << std::endl;
+	llpp::core::discord::Init(data["bot"]);
 
 	asa::window::GetHandle(60, true);
 	asa::window::SetForeground();
