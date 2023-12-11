@@ -10,6 +10,7 @@ namespace llpp::core::discord
 	using EventCallback = std::function<void(const dpp::slashcommand_t&)>;
 
 	inline std::unique_ptr<dpp::cluster> bot;
+	inline int infoChannelID = 1178195307482325072;
 
 	bool Init(const std::string& token);
 

@@ -1,8 +1,8 @@
 #include "cratemanager.h"
 #include "../../common/util.h"
+#include "../../core/discord.h"
 #include "embeds.h"
 #include <asapp/entities/localplayer.h>
-
 using namespace llpp::bots::drops;
 
 CrateManager::CrateManager(std::string prefix,
@@ -13,6 +13,7 @@ CrateManager::CrateManager(std::string prefix,
 	  dropoffVault(prefix + "DROPOFF", 350), suicide(suicide)
 {
 	PopulateGroups(groupedCrates, interval);
+	RegisterSlashEvents();
 }
 
 void CrateManager::CrateGroupStatistics::AddLooted()
@@ -147,4 +148,24 @@ void CrateManager::PopulateGroups(
 			crateGroups[i].push_back(station);
 		}
 	}
+}
+
+void CrateManager::RegisterSlashEvents()
+{
+	dpp::slashcommand toggleCompletion(
+		"toggle", "Toggle a station on or off", 0);
+
+	toggleCompletion.add_option(
+		dpp::command_option(dpp::co_string, "toggle",
+			"Whether to enable/disable this station", true)
+			.add_choice(dpp::command_option_choice(
+				"Paste", std::string("station_paste")))
+			.add_choice(dpp::command_option_choice(
+				"Crate", std::string("station_crate"))));
+
+	llpp::core::discord::RegisterSlashCommand(
+		toggleCompletion, [](const dpp::slashcommand_t& event) {
+			auto toggle = std::get<bool>(event.get_parameter("toggle"));
+			std::cout << toggle << std::endl;
+		});
 }

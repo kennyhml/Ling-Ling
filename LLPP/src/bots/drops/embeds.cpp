@@ -1,7 +1,7 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../core/basestation.h"
-#include "../../core/webhook.h"
+#include "../../core/discord.h"
 #include <format>
 
 void llpp::bots::drops::SendSuccessEmbed(const core::StationResult& data,
@@ -52,9 +52,11 @@ void llpp::bots::drops::SendSuccessEmbed(const core::StationResult& data,
 		.set_image("attachment://image.png");
 
 	auto fileData = util::MatToStringBuffer(lootScreenshot);
-	dpp::message message = dpp::message();
-	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
-	core::discord::Send(message, core::discord::dropWebhook);
+	dpp::message message = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+	message.add_file("image.png", fileData, "image/png ");
+
+	core::discord::bot->message_create(message);
 }
 
 void llpp::bots::drops::SendSummaryEmbed(const std::string& name,
@@ -87,6 +89,7 @@ void llpp::bots::drops::SendSummaryEmbed(const std::string& name,
 			true);
 	}
 
-	dpp::message message = dpp::message().add_embed(embed);
-	core::discord::Send(message, core::discord::webhook);
+	dpp::message message = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+	core::discord::bot->message_create(message);
 }

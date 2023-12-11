@@ -7,8 +7,31 @@ namespace llpp::core::discord
 	std::unordered_map<std::string, EventCallback> eventCallbacks;
 	std::vector<dpp::slashcommand> commands;
 
-	int infoChannelID = 1178195307482325072;
 	bool isInitiliazed = false;
+
+	void OnReadyCallback(const dpp::ready_t& event)
+	{
+		if (dpp::run_once<struct register_bot_commands>()) {
+			std::cout << "[+] Registering discord slash commands... ";
+
+
+			for (auto& cmd : commands) {
+				cmd.application_id = bot->me.id;
+			}
+
+
+			bot->guild_bulk_command_create_sync(commands, 1093755908951117905);
+			std::cout << "Done." << std::endl;
+		}
+
+		isInitiliazed = true;
+	}
+
+	void OnSlashCommandCallback(const dpp::slashcommand_t& event)
+	{
+		auto& fn = eventCallbacks.at(event.command.get_command_name());
+		fn(event);
+	}
 
 	bool Init(const std::string& token)
 	{
@@ -28,6 +51,7 @@ namespace llpp::core::discord
 		std::cout << "\t[-] Registering static callbacks... ";
 		bot->on_slashcommand(OnSlashCommandCallback);
 		bot->on_ready(OnReadyCallback);
+		bot->on_log(dpp::utility::cout_logger());
 		std::cout << "Done" << std::endl;
 
 		std::cout << "\t[-] Discord bot created successfully." << std::endl;
@@ -40,24 +64,6 @@ namespace llpp::core::discord
 		commands.push_back(cmd);
 		eventCallbacks[cmd.name] = callback;
 		std::cout << " Done" << std::endl;
-	}
-
-	void OnReadyCallback(const dpp::ready_t& event)
-	{
-		if (dpp::run_once<struct register_bot_commands>()) {
-			std::cout << "[+] Registering discord slash commands... ";
-
-			bot->global_bulk_command_create(commands);
-			std::cout << "Done." << std::endl;
-		}
-
-		isInitiliazed = true;
-	}
-
-	void OnSlashCommandCallback(const dpp::slashcommand_t& event)
-	{
-		auto& fn = eventCallbacks.at(event.command.get_command_name());
-		fn(event);
 	}
 
 	void InformStarted()

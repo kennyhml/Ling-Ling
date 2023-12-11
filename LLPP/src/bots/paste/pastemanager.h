@@ -6,7 +6,6 @@
 
 namespace llpp::bots::paste
 {
-
 	class PasteManager final : public core::IStationManager
 	{
 	public:
@@ -23,6 +22,7 @@ namespace llpp::bots::paste
 		std::vector<std::unique_ptr<PasteStation>> stations;
 		render::RenderStation renderStation{ "PASTE::RENDER::SRC",
 			std::chrono::seconds(10) };
-	};
 
+		void RegisterSlashEvents();
+	};
 }

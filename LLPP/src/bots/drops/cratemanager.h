@@ -47,6 +47,7 @@ namespace llpp::bots::drops
 		void RunAllStations(bool& wasAnyLootedOut);
 		void AccessBedAbove();
 		void SpawnOnAlignBed();
+		void RegisterSlashEvents();
 		void PopulateGroups(
 			const std::vector<std::vector<QualityFlags>>& groups,
 			std::chrono::minutes stationInterval);

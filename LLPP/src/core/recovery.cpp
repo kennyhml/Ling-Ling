@@ -1,6 +1,6 @@
 #include "recovery.h"
 #include "../common/util.h"
-#include "webhook.h"
+#include "discord.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/game/window.h>
 #include <asapp/interfaces/mainmenu.h>
@@ -115,12 +115,13 @@ void llpp::core::InformCrashDetected(asa::exceptions::ShooterGameError& e)
 		.set_footer(dpp::embed_footer("Recovery should follow automatically."));
 
 	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
-	dpp::message message = dpp::message("<@&1181159721433051136>")
-							   .set_allowed_mentions(
-								   false, true, false, false, {}, {});
+	dpp::message message =
+		dpp::message(dpp::snowflake(llpp::core::discord::infoChannelID),
+			"<@&1181159721433051136>")
+			.set_allowed_mentions(false, true, false, false, {}, {});
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 
-	core::discord::Send(message, core::discord::webhook);
+	core::discord::bot->message_create(message);
 }
 
 void llpp::core::InformRecoveryInitiated(bool restart, bool reconnect)
@@ -139,8 +140,9 @@ void llpp::core::InformRecoveryInitiated(bool restart, bool reconnect)
 		embed.add_field("Reconnecting to:", "9236", true);
 	}
 
-	dpp::message message = dpp::message().add_embed(embed);
-	core::discord::Send(message, core::discord::webhook);
+	dpp::message message = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+	core::discord::bot->message_create(message);
 }
 
 void llpp::core::InformRecoverySuccessful(std::chrono::seconds timeTaken)
@@ -157,7 +159,9 @@ void llpp::core::InformRecoverySuccessful(std::chrono::seconds timeTaken)
 
 
 	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
-	dpp::message message = dpp::message();
-	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
-	core::discord::Send(message, core::discord::webhook);
+	dpp::message message = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+	message.add_file("image.png", fileData, "image/png ");
+
+	core::discord::bot->message_create(message);
 }

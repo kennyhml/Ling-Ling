@@ -1,6 +1,6 @@
 #include "suicideembed.h"
 #include "../../core/basestation.h"
-#include "../../core/webhook.h"
+#include "../../core/discord.h"
 #include <format>
 
 void llpp::bots::suicide::SendSuicided(const core::StationResult& data,
@@ -19,5 +19,7 @@ void llpp::bots::suicide::SendSuicided(const core::StationResult& data,
 			std::format("{} seconds", data.timeTaken.count()), true)
 		.add_field("Respawning at:", respawningAt, true);
 
-	core::discord::Send(embed, core::discord::webhook);
+	dpp::message message = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+	core::discord::bot->message_create(message);
 }

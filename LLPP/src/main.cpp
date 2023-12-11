@@ -36,7 +36,7 @@ int main()
 	auto suicideStation = llpp::bots::suicide::SuicideStation(
 		"SUICIDE DEATH", "SUICIDE RESPAWN");
 
-	auto swamp = llpp::bots::drops::CrateManager("SWAMP::",
+	auto swamp = llpp::bots::drops::CrateManager("SWAMP",
 		{ { Quality::RED, Quality::RED },
 			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
 			{ Quality::BLUE } },
@@ -44,22 +44,24 @@ int main()
 
 	auto paste = llpp::bots::paste::PasteManager(
 		"PASTE", 6, std::chrono::minutes(50));
-	auto skylord = llpp::bots::drops::CrateManager("SKYLORD::",
-		{
-			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
-				Quality::YELLOW | Quality::RED },
-		},
-		std::chrono::minutes(5));
+	// auto skylord = llpp::bots::drops::CrateManager("SKYLORD",
+	// 	{
+	// 		{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
+	// 			Quality::YELLOW | Quality::RED },
+	// 	},
+	// 	std::chrono::minutes(5));
+
+	llpp::core::discord::bot->start(dpp::st_wait);
 
 	while (true) {
+
+		continue;
+
 		try {
 			if (swamp.Run())
 				continue;
-			if (skylord.Run())
-				continue;
 			if (paste.Run())
 				continue;
-
 
 			std::cout << "No task ready...." << std::endl;
 		}

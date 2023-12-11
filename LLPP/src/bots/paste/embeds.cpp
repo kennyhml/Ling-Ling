@@ -1,14 +1,13 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../core/basestation.h"
+#include "../../core/discord.h"
 #include "../../core/stationresult.h"
-#include "../../core/webhook.h"
 #include <asapp/game/window.h>
 #include <format>
 
 void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 {
-
 	auto nextCompletion = std::chrono::system_clock::to_time_t(
 		std::chrono::system_clock::now() +
 		data.station->GetCompletionInterval());
@@ -30,7 +29,11 @@ void llpp::bots::paste::SendSuccessEmbed(const core::StationResult& data)
 		.add_field(
 			"Next completion:", std::format("<t:{}:R>", nextCompletion), true);
 
-	core::discord::Send(embed, core::discord::webhook);
+
+	dpp::message msg = dpp::message(
+		dpp::snowflake(llpp::core::discord::infoChannelID), embed);
+
+	llpp::core::discord::bot->message_create(msg);
 }
 
 void llpp::bots::paste::SendAchatinaNotAccessible(
@@ -50,10 +53,12 @@ void llpp::bots::paste::SendAchatinaNotAccessible(
 		.set_image("attachment://image.png");
 
 	auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
-	dpp::message message = dpp::message("<@&1181159721433051136>")
-							   .set_allowed_mentions(
-								   false, true, false, false, {}, {});
+	dpp::message message =
+		dpp::message(dpp::snowflake(llpp::core::discord::infoChannelID),
+			"<@&1181159721433051136>")
+			.set_allowed_mentions(false, true, false, false, {}, {});
 	message.add_file("image.png", fileData, "image/png ").add_embed(embed);
 
-	core::discord::Send(message, core::discord::webhook);
+
+	llpp::core::discord::bot->message_create(message);
 }
