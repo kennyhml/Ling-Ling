@@ -20,6 +20,7 @@ namespace llpp::bots::drops
 
 		struct CrateGroupStatistics
 		{
+		public:
 			std::chrono::system_clock::time_point lastLooted = UNDEFINED_TIME;
 
 			void AddLooted();
@@ -36,9 +37,9 @@ namespace llpp::bots::drops
 		};
 
 		bool Run() override;
-		bool IsReadyToRun() override;
+		bool IsReadyToRun() const override;
+		std::chrono::minutes GetTimeLeftUntilReady() const;
 
-		std::chrono::minutes GetTimeLeftUntilReady();
 		std::vector<CrateGroupStatistics> statisticsPerGroup;
 
 	private:

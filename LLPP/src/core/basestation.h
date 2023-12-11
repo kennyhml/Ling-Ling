@@ -22,6 +22,7 @@ namespace llpp::core
 		virtual bool IsReady() const;
 
 		std::chrono::system_clock::time_point GetLastCompletion() const;
+		std::chrono::system_clock::time_point GetNextCompletion() const;
 		std::chrono::minutes GetCompletionInterval() const;
 
 		virtual StationResult Complete() = 0;

@@ -13,8 +13,8 @@ namespace llpp::bots::paste
 			std::chrono::minutes interval);
 
 		bool Run() override;
-		bool IsReadyToRun() override;
-		std::chrono::minutes GetTimeLeftUntilReady() override;
+		bool IsReadyToRun() const override;
+		std::chrono::minutes GetTimeLeftUntilReady() const override;
 
 		const PasteStation* PeekStation(int index) const;
 

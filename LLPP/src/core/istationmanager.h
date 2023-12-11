@@ -7,7 +7,7 @@ namespace llpp::core
 	{
 	public:
 		virtual bool Run() = 0;
-		virtual bool IsReadyToRun() = 0;
-		virtual std::chrono::minutes GetTimeLeftUntilReady() = 0;
+		virtual bool IsReadyToRun() const = 0;
+		virtual std::chrono::minutes GetTimeLeftUntilReady() const = 0;
 	};
 }

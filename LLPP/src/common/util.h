@@ -30,6 +30,13 @@ namespace llpp::util
 			std::chrono::system_clock::now() - start);
 	}
 
+	template <typename cast>
+	cast GetTimeLeftUntil(std::chrono::system_clock::time_point timePoint)
+	{
+		return std::chrono::duration_cast<cast>(
+			timePoint - std::chrono::system_clock::now());
+	}
+
 	std::string AddNumberToPrefix(
 		const std::string& prefix, int number, int fillZeros = 2);
 }

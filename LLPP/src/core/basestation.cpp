@@ -12,6 +12,11 @@ std::chrono::system_clock::time_point BaseStation::GetLastCompletion() const
 	return this->lastCompleted;
 }
 
+std::chrono::system_clock::time_point BaseStation::GetLastCompletion() const
+{
+	return this->lastCompleted + completionInterval;
+}
+
 std::chrono::minutes BaseStation::GetCompletionInterval() const
 {
 	return this->completionInterval;
