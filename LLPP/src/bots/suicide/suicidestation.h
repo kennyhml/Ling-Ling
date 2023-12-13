@@ -7,13 +7,13 @@ namespace llpp::bots::suicide
 	class SuicideStation : public core::BaseStation
 	{
 	public:
-		SuicideStation(std::string bedName, std::string respawnBedName);
+		SuicideStation(std::string bed, std::string respawn_bed);
 
-		core::StationResult Complete() override;
+		core::StationResult complete() override;
 
 	private:
-		asa::structures::SimpleBed deathBed;
-		asa::structures::SimpleBed respawnBed;
+		asa::structures::SimpleBed death_bed;
+		asa::structures::SimpleBed respawn_bed;
 	};
 
 }

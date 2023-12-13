@@ -4,6 +4,6 @@
 
 namespace llpp::bots::suicide
 {
-	void SendSuicided(const core::StationResult&, const std::string& atBed,
-		const std::string& respawningAt);
+	void send_suicided_embed(const core::StationResult&,
+		const std::string& at_bed, const std::string& respawning_at);
 }

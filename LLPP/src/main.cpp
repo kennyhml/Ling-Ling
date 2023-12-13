@@ -16,20 +16,37 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "core/data/database.h"
+#include "core/data/managedvar.h"
+
+
 using json = nlohmann::json;
+
 
 int main()
 {
-	asa::Init(std::filesystem::path("src/config.json"));
+	llpp::core::data::init("test.db");
+
+	auto var = llpp::core::data::ManagedVar<bool>("some bool4", false);
+
+
+	std::cout << var.get() << std::endl;
+}
+
+
+
+int main2()
+{
+	asa::core::init(std::filesystem::path("src/config.json"));
 
 	std::ifstream f("src/config.json");
 	json data = json::parse(f);
 	f.close();
 
-	llpp::core::discord::Init(data["bot"]);
+	llpp::core::discord::init(data["bot"]);
 
-	asa::window::GetHandle(60, true);
-	asa::window::SetForeground();
+	asa::window::get_handle(60, true);
+	asa::window::set_foreground();
 
 	using Quality = asa::structures::CaveLootCrate::Quality;
 
@@ -51,26 +68,25 @@ int main()
 	// 	},
 	// 	std::chrono::minutes(5));
 
-	llpp::core::discord::bot->start(dpp::st_wait);
+	llpp::core::discord::bot->start(dpp::st_return);
 
 	while (true) {
 
-		continue;
-
 		try {
-			if (swamp.Run())
+			if (paste.run())
 				continue;
-			if (paste.Run())
+
+			if (swamp.run())
 				continue;
 
 			std::cout << "No task ready...." << std::endl;
 		}
-		catch (asa::exceptions::ShooterGameError& e) {
-			llpp::core::InformCrashDetected(e);
-			llpp::core::Recover();
+		catch (asa::core::ShooterGameError& e) {
+			llpp::core::inform_crash_detected(e);
+			llpp::core::reconnect_to_server();
 		}
 		catch (const std::exception& e) {
-			llpp::core::discord::InformFatalError(e, "???");
+			llpp::core::discord::inform_fatal_error(e, "???");
 			break;
 		}
 	}

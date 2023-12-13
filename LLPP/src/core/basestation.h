@@ -17,26 +17,27 @@ namespace llpp::core
 			DISABLED
 		};
 
-		std::string GetName() const { return this->name; }
-		int GetTimesCompleted() const { return this->timesCompleted; }
-		virtual bool IsReady() const;
+		std::string get_name() const { return name; }
+		int get_times_completed() const { return times_completed; }
+		virtual bool is_ready() const;
 
-		std::chrono::system_clock::time_point GetLastCompletion() const;
-		std::chrono::system_clock::time_point GetNextCompletion() const;
-		std::chrono::minutes GetCompletionInterval() const;
+		std::chrono::system_clock::time_point get_last_completion() const;
+		std::chrono::system_clock::time_point get_next_completion() const;
+		std::chrono::minutes get_completion_interval() const;
 
-		virtual StationResult Complete() = 0;
+		virtual StationResult complete() = 0;
 
 	protected:
 		BaseStation(const std::string name, std::chrono::minutes interval);
 
-		std::chrono::system_clock::time_point lastCompleted;
-		std::chrono::minutes completionInterval;
+		std::chrono::system_clock::time_point last_completed;
+		std::chrono::minutes completion_interval;
 
-		int timesCompleted;
+		int times_completed;
 		const std::string name;
+
 		Status status;
 
-		void SetCompleted();
+		void set_completed();
 	};
 }

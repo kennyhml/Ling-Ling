@@ -5,13 +5,13 @@
 
 namespace llpp::core
 {
-	void Recover();
+	void recover();
 
-	void ReconnectToServer();
-	void RestartGame();
-	void ExitGame();
+	void reconnect_to_server();
+	void restart_game();
+	void exit_game();
 
-	void InformCrashDetected(asa::exceptions::ShooterGameError&);
-	void InformRecoveryInitiated(bool restart, bool reconnect);
-	void InformRecoverySuccessful(std::chrono::seconds timeTaken);
+	void inform_crash_detected(asa::core::ShooterGameError&);
+	void inform_recovery_initiated(bool restart, bool reconnect);
+	void inform_recovery_successful(std::chrono::seconds timeTaken);
 }

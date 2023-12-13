@@ -10,7 +10,7 @@ namespace llpp::bots::paste
 	public:
 		PasteStation(std::string name, std::chrono::minutes interval);
 
-		core::StationResult Complete() override;
+		core::StationResult complete() override;
 
 	private:
 		std::array<asa::entities::DinoEnt, 6> achatinas{
@@ -24,8 +24,8 @@ namespace llpp::bots::paste
 
 		asa::structures::SimpleBed bed;
 
-		bool EmptyAchatina(int index);
-		void EmptyAllAchatinas();
-		int DepositPasteIntoDedi();
+		bool empty(asa::entities::DinoEnt& achatina);
+		void empty_all();
+		int deposit_paste();
 	};
 }

@@ -7,14 +7,14 @@ namespace llpp::bots::render
 	class RenderStation final : public core::BaseStation
 	{
 	public:
-		RenderStation(std::string name, std::chrono::seconds loadFor);
+		RenderStation(std::string name, std::chrono::seconds load_for);
 
-		core::StationResult Complete() override;
+		core::StationResult complete() override;
 
 	private:
-		std::chrono::seconds renderDuration;
-		asa::structures::SimpleBed srcBed;
-		inline static asa::structures::SimpleBed gatewayBed{
+		std::chrono::seconds render_duration;
+		asa::structures::SimpleBed src_bed;
+		inline static asa::structures::SimpleBed gateway_bed{
 			"RENDER::GATEWAY"
 		};
 	};

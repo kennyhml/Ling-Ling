@@ -3,48 +3,52 @@
 #include <sstream>
 #include <string>
 
-bool llpp::util::Await(
-	const std::function<bool()>& condition, std::chrono::milliseconds timeout)
+namespace llpp::util
 {
-	auto start_time = std::chrono::system_clock::now();
-	while (!condition()) {
-		auto current_time = std::chrono::system_clock::now();
-		if (Timedout(start_time, timeout)) {
-			return false;
+	bool await(const std::function<bool()>& condition,
+		std::chrono::milliseconds timeout)
+	{
+		auto start_time = std::chrono::system_clock::now();
+		while (!condition()) {
+			auto current_time = std::chrono::system_clock::now();
+			if (timedout(start_time, timeout)) {
+				return false;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		return true;
 	}
-	return true;
-}
 
-bool llpp::util::Timedout(const std::chrono::system_clock::time_point& start,
-	const std::chrono::milliseconds timeout)
-{
-	auto now = std::chrono::system_clock::now();
-	auto timePassed = now - start;
+	bool timedout(const std::chrono::system_clock::time_point& start,
+		const std::chrono::milliseconds timeout)
+	{
+		auto now = std::chrono::system_clock::now();
+		auto time_passed = now - start;
 
-	return timePassed >= timeout;
-}
+		return time_passed >= timeout;
+	}
 
-bool llpp::util::Timedout(const std::chrono::system_clock::time_point& start,
-	const std::chrono::seconds timeout)
-{
-	return Timedout(
-		start, std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
-}
+	bool timedout(const std::chrono::system_clock::time_point& start,
+		const std::chrono::seconds timeout)
+	{
+		return timedout(start,
+			std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
+	}
 
-const std::string llpp::util::MatToStringBuffer(const cv::Mat& source)
-{
-	std::vector<uchar> imageBuffer;
-	cv::imencode(".png", source, imageBuffer);
-	std::string imageContent(imageBuffer.begin(), imageBuffer.end());
-	return imageContent;
-}
+	const std::string mat_to_strbuffer(const cv::Mat& source)
+	{
+		std::vector<uchar> img_buffer;
+		cv::imencode(".png", source, img_buffer);
+		std::string img_content(img_buffer.begin(), img_buffer.end());
+		return img_content;
+	}
 
-std::string llpp::util::AddNumberToPrefix(
-	const std::string& prefix, int number, int fillZeros)
-{
-	std::ostringstream oss;
-	oss << std::setw(fillZeros) << std::setfill('0') << number;
-	return prefix + oss.str();
+	std::string add_num_to_prefix(
+		const std::string& prefix, int number, int fill_zeros)
+	{
+		std::ostringstream oss;
+		oss << std::setw(fill_zeros) << std::setfill('0') << number;
+		return prefix + oss.str();
+	}
+
 }

@@ -11,19 +11,19 @@ namespace llpp::bots::drops
 		LootCrateStation(std::string name, asa::structures::CaveLootCrate crate,
 			std::chrono::minutes interval);
 
-		core::StationResult Complete() override;
+		core::StationResult complete() override;
 
-		void SetCanDefaultTeleport(bool canDefaultTeleport);
-		void SetCooldown();
+		void set_can_default_teleport(bool can_default_teleport);
+		void set_cooldown();
 
-		int GetTimesLooted() const;
+		int get_times_looted() const { return times_looted; }
 
 	private:
-		cv::Mat LootCrate();
-		void TeleportTo();
+		cv::Mat loot_crate();
+		void teleport_to();
 
-		bool canDefaultTeleport = false;
-		int timesLooted = 0;
+		bool can_default_teleport = false;
+		int times_looted = 0;
 
 		asa::structures::CaveLootCrate crate;
 		asa::structures::Teleporter teleporter;

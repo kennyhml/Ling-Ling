@@ -13,55 +13,51 @@ namespace llpp::bots::drops
 	class CrateManager : public core::IStationManager
 	{
 	public:
-		CrateManager(std::string prefix,
-			std::vector<std::vector<QualityFlags>> groupedCrates,
-			std::chrono::minutes interval,
-			suicide::SuicideStation* suicide = nullptr);
+		CrateManager(std::string t_prefix,
+			std::vector<std::vector<QualityFlags>> t_grouped_crates,
+			std::chrono::minutes t_interval,
+			suicide::SuicideStation* t_suicide = nullptr);
 
 		struct CrateGroupStatistics
 		{
 		public:
-			std::chrono::system_clock::time_point lastLooted = UNDEFINED_TIME;
+			std::chrono::system_clock::time_point last_looted = UNDEFINED_TIME;
 
-			void AddLooted();
+			void add_looted();
 
-			int GetTimesLooted() const { return timesLooted; }
-			std::chrono::seconds GetAverageRespawnTime() const
-			{
-				return avgRespawnTime;
-			}
+			int get_times_looted() const { return times_looted; }
+			std::chrono::seconds get_avg_respawn() const { return avg_respawn; }
 
 		private:
-			int timesLooted = 0;
-			std::chrono::seconds avgRespawnTime;
+			int times_looted = 0;
+			std::chrono::seconds avg_respawn;
 		};
 
-		bool Run() override;
-		bool IsReadyToRun() const override;
-		std::chrono::minutes GetTimeLeftUntilReady() const;
+		bool run() override;
+		bool is_ready_to_run() const override;
+		std::chrono::minutes get_time_left_until_ready() const;
 
-		std::vector<CrateGroupStatistics> statisticsPerGroup;
+		std::vector<CrateGroupStatistics> stats_per_group;
 
 	private:
-		void DropoffItems(float& filledLevelOut);
-		void TeleportToDropoff();
-		void RunAllStations(bool& wasAnyLootedOut);
-		void AccessBedAbove();
-		void SpawnOnAlignBed();
-		void RegisterSlashEvents();
-		void PopulateGroups(
+		void dropoff_items(float& filledLevelOut);
+		void teleport_to_dropoff();
+		void run_all_stations(bool& wasAnyLootedOut);
+		void access_bed_above();
+		void spawn_on_align_bed();
+		void populate_groups(
 			const std::vector<std::vector<QualityFlags>>& groups,
-			std::chrono::minutes stationInterval);
+			std::chrono::minutes interval);
 
-		asa::structures::SimpleBed alignBed;
-		asa::structures::Teleporter dropoffTeleporter;
-		asa::structures::Container dropoffVault;
+		asa::structures::SimpleBed align_bed;
+		asa::structures::Teleporter dropoff_tp;
+		asa::structures::Container dropoff_vault;
 
-		void SetGroupCooldown(std::vector<LootCrateStation>& group);
-		std::vector<std::vector<LootCrateStation>> crateGroups;
+		void set_group_cooldown(std::vector<LootCrateStation>& group);
+		std::vector<std::vector<LootCrateStation>> crates;
 
 		std::string prefix;
-		float lastKnownVaultFillLevel = 0.f;
+		float last_known_vault_fill_level = 0.f;
 		suicide::SuicideStation* suicide;
 	};
 }

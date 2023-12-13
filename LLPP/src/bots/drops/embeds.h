@@ -23,12 +23,11 @@ namespace llpp::bots::drops
 		"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
 		"c/c5/Red_Crate.png/revision/latest?cb=20190116151200";
 
-	void SendSuccessEmbed(const core::StationResult&, cv::Mat lootScreenshot,
-		asa::structures::CaveLootCrate::Quality, int timesLooted);
+	void send_success_embed(const core::StationResult&, cv::Mat loot,
+		asa::structures::CaveLootCrate::Quality, int times_looted);
 
-	void SendSummaryEmbed(const std::string& name,
-		std::chrono::seconds timeTaken,
-		std::vector<CrateManager::CrateGroupStatistics> stats,
-		int dropoffFilled,
-		std::chrono::system_clock::time_point nextCompletion);
+	void send_summary_embed(const std::string& name,
+		std::chrono::seconds time_taken,
+		std::vector<CrateManager::CrateGroupStatistics> stats, int vault_slots,
+		std::chrono::system_clock::time_point next_completion);
 }

@@ -9,20 +9,18 @@ namespace llpp::bots::paste
 	class PasteManager final : public core::IStationManager
 	{
 	public:
-		PasteManager(std::string prefix, int numOfStations,
-			std::chrono::minutes interval);
+		PasteManager(std::string t_prefix, int t_num_stations,
+			std::chrono::minutes t_interval);
 
-		bool Run() override;
-		bool IsReadyToRun() const override;
-		std::chrono::minutes GetTimeLeftUntilReady() const override;
+		bool run() override;
+		bool is_ready_to_run() const override;
+		std::chrono::minutes get_time_left_until_ready() const override;
 
-		const PasteStation* PeekStation(int index) const;
+		const PasteStation* peek_station(int index) const;
 
 	private:
 		std::vector<std::unique_ptr<PasteStation>> stations;
-		render::RenderStation renderStation{ "PASTE::RENDER::SRC",
+		render::RenderStation render_station{ "PASTE::RENDER::SRC",
 			std::chrono::seconds(10) };
-
-		void RegisterSlashEvents();
 	};
 }

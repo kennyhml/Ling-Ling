@@ -4,12 +4,12 @@
 
 namespace llpp::core::discord
 {
-	std::unordered_map<std::string, EventCallback> eventCallbacks;
+	std::unordered_map<std::string, event_callback_t> event_callbacks;
 	std::vector<dpp::slashcommand> commands;
 
-	bool isInitiliazed = false;
+	bool is_initialized = false;
 
-	void OnReadyCallback(const dpp::ready_t& event)
+	void ready_callback(const dpp::ready_t& event)
 	{
 		if (dpp::run_once<struct register_bot_commands>()) {
 			std::cout << "[+] Registering discord slash commands... ";
@@ -19,21 +19,20 @@ namespace llpp::core::discord
 				cmd.application_id = bot->me.id;
 			}
 
-
 			bot->guild_bulk_command_create_sync(commands, 1093755908951117905);
 			std::cout << "Done." << std::endl;
 		}
 
-		isInitiliazed = true;
+		is_initialized = true;
 	}
 
-	void OnSlashCommandCallback(const dpp::slashcommand_t& event)
+	void slashcommand_callback(const dpp::slashcommand_t& event)
 	{
-		auto& fn = eventCallbacks.at(event.command.get_command_name());
+		auto& fn = event_callbacks.at(event.command.get_command_name());
 		fn(event);
 	}
 
-	bool Init(const std::string& token)
+	bool init(const std::string& token)
 	{
 		std::cout << "[+] Initializing Ling Ling++ discord bot..." << std::endl;
 
@@ -49,8 +48,8 @@ namespace llpp::core::discord
 		std::cout << "Done" << std::endl;
 
 		std::cout << "\t[-] Registering static callbacks... ";
-		bot->on_slashcommand(OnSlashCommandCallback);
-		bot->on_ready(OnReadyCallback);
+		bot->on_slashcommand(slashcommand_callback);
+		bot->on_ready(ready_callback);
 		bot->on_log(dpp::utility::cout_logger());
 		std::cout << "Done" << std::endl;
 
@@ -58,15 +57,16 @@ namespace llpp::core::discord
 		return true;
 	}
 
-	void RegisterSlashCommand(dpp::slashcommand cmd, EventCallback callback)
+	void register_slash_command(
+		dpp::slashcommand cmd, event_callback_t callback)
 	{
 		std::cout << "[+] Registering slash command: " << cmd.name << "... ";
 		commands.push_back(cmd);
-		eventCallbacks[cmd.name] = callback;
+		event_callbacks[cmd.name] = callback;
 		std::cout << " Done" << std::endl;
 	}
 
-	void InformStarted()
+	void inform_started()
 	{
 		dpp::embed startedEmbed =
 			dpp::embed()
@@ -90,7 +90,8 @@ namespace llpp::core::discord
 			dpp::message(dpp::snowflake(infoChannelID), startedEmbed));
 	}
 
-	void InformFatalError(const std::exception& error, const std::string& task)
+	void inform_fatal_error(
+		const std::exception& error, const std::string& task)
 	{
 		dpp::embed embed =
 			dpp::embed()
@@ -106,7 +107,7 @@ namespace llpp::core::discord
 					"Repair_Icon.png/revision/latest?cb=20150731134649")
 				.set_image("attachment://image.png");
 
-		auto fileData = util::MatToStringBuffer(asa::window::Screenshot());
+		auto fileData = util::mat_to_strbuffer(asa::window::screenshot());
 		dpp::message message = dpp::message(
 			dpp::snowflake(infoChannelID), "<@&1181159721433051136>")
 								   .set_allowed_mentions(
@@ -115,7 +116,4 @@ namespace llpp::core::discord
 
 		bot->message_create(message);
 	}
-
-
-
 }

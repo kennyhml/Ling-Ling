@@ -5,8 +5,8 @@
 
 namespace llpp::bots::paste
 {
-	void SendSuccessEmbed(const core::StationResult& data);
-	void SendAchatinaNotAccessible(
+	void send_success_embed(const core::StationResult& data);
+	void send_achatina_not_accessible(
 		const std::string& stationName, const std::string& achatina);
 
 	void SendAchatinaNotProducing();

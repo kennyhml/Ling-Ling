@@ -6,8 +6,8 @@ namespace llpp::core
 	class IStationManager
 	{
 	public:
-		virtual bool Run() = 0;
-		virtual bool IsReadyToRun() const = 0;
-		virtual std::chrono::minutes GetTimeLeftUntilReady() const = 0;
+		virtual bool run() = 0;
+		virtual bool is_ready_to_run() const = 0;
+		virtual std::chrono::minutes get_time_left_until_ready() const = 0;
 	};
 }

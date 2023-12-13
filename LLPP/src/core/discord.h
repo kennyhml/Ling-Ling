@@ -7,15 +7,16 @@
 
 namespace llpp::core::discord
 {
-	using EventCallback = std::function<void(const dpp::slashcommand_t&)>;
+	using event_callback_t = std::function<void(const dpp::slashcommand_t&)>;
 
 	inline std::unique_ptr<dpp::cluster> bot;
 	inline int infoChannelID = 1178195307482325072;
 
-	bool Init(const std::string& token);
+	bool init(const std::string& token);
 
-	void RegisterSlashCommand(dpp::slashcommand command, EventCallback);
+	void register_slash_command(dpp::slashcommand command, event_callback_t);
 
-	void InformStarted();
-	void InformFatalError(const std::exception& error, const std::string& task);
+	void inform_started();
+	void inform_fatal_error(
+		const std::exception& error, const std::string& task);
 }

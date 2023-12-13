@@ -4,98 +4,97 @@
 #include "embeds.h"
 #include <asapp/entities/localplayer.h>
 
-
 namespace llpp::bots::drops
 {
-	CrateManager::CrateManager(std::string prefix,
-		std::vector<std::vector<QualityFlags>> groupedCrates,
-		std::chrono::minutes interval, suicide::SuicideStation* suicide)
-		: prefix(prefix), alignBed(prefix + "ALIGN"),
-		  dropoffTeleporter(prefix + "DROPOFF"),
-		  dropoffVault(prefix + "DROPOFF", 350), suicide(suicide)
+	CrateManager::CrateManager(std::string t_prefix,
+		std::vector<std::vector<QualityFlags>> t_grouped_crates,
+		std::chrono::minutes t_interval, suicide::SuicideStation* t_suicide)
+		: prefix(t_prefix), align_bed(t_prefix + "ALIGN"),
+		  dropoff_tp(t_prefix + "DROPOFF"),
+		  dropoff_vault(t_prefix + "DROPOFF", 350), suicide(t_suicide)
 	{
-		PopulateGroups(groupedCrates, interval);
-		RegisterSlashEvents();
+		populate_groups(t_grouped_crates, t_interval);
 	}
 
-	void CrateManager::CrateGroupStatistics::AddLooted()
+	void CrateManager::CrateGroupStatistics::add_looted()
 	{
 		const auto now = std::chrono::system_clock::now();
 		std::chrono::seconds elapsedTime =
-			(lastLooted != UNDEFINED_TIME)
-				? util::GetElapsed<std::chrono::seconds>(lastLooted)
+			(last_looted != UNDEFINED_TIME)
+				? util::get_elapsed<std::chrono::seconds>(last_looted)
 				: std::chrono::minutes(30);
 
-		avgRespawnTime = ((avgRespawnTime * timesLooted) + elapsedTime) /
-						 static_cast<int>(timesLooted + 1);
+		avg_respawn = ((avg_respawn * times_looted) + elapsedTime) /
+					  static_cast<int>(times_looted + 1);
 
-		timesLooted++;
-		lastLooted = now;
+		times_looted++;
+		last_looted = now;
 	}
 
-	bool CrateManager::Run()
+	bool CrateManager::run()
 	{
-		if (!IsReadyToRun()) {
+		if (!is_ready_to_run()) {
 			return false;
 		}
 
 		auto start = std::chrono::system_clock::now();
-		SpawnOnAlignBed();
+		spawn_on_align_bed();
 
 		bool wasAnyLooted = false;
-		RunAllStations(wasAnyLooted);
+		run_all_stations(wasAnyLooted);
 
-		TeleportToDropoff();
+		teleport_to_dropoff();
 		if (wasAnyLooted) {
-			DropoffItems(lastKnownVaultFillLevel);
+			dropoff_items(last_known_vault_fill_level);
 		}
 
-		AccessBedAbove();
+		access_bed_above();
 		if (suicide) {
-			suicide->Complete();
+			suicide->complete();
 		}
 
-		SendSummaryEmbed(prefix, util::GetElapsed<std::chrono::seconds>(start),
-			statisticsPerGroup, lastKnownVaultFillLevel * 100,
+		send_summary_embed(prefix,
+			util::get_elapsed<std::chrono::seconds>(start), stats_per_group,
+			last_known_vault_fill_level * 100,
 			std::chrono::system_clock::now() +
-				crateGroups[0][0].GetCompletionInterval());
+				crates[0][0].get_completion_interval());
 		return true;
 	}
 
-	void CrateManager::SetGroupCooldown(std::vector<LootCrateStation>& group)
+	void CrateManager::set_group_cooldown(std::vector<LootCrateStation>& group)
 	{
 		for (auto& station : group) {
-			station.SetCanDefaultTeleport(false);
-			station.SetCooldown();
+			station.set_can_default_teleport(false);
+			station.set_cooldown();
 		}
 	}
 
-	bool CrateManager::IsReadyToRun() const
+	bool CrateManager::is_ready_to_run() const
 	{
-		return crateGroups[0][0].IsReady();
+		return crates[0][0].is_ready();
 	}
 
-	std::chrono::minutes CrateManager::GetTimeLeftUntilReady() const
+	std::chrono::minutes CrateManager::get_time_left_until_ready() const
 	{
-		return util::GetTimeLeftUntil<std::chrono::minutes>(
-			crateGroups[0][0].GetNextCompletion());
+		return util::get_time_left_until<std::chrono::minutes>(
+			crates[0][0].get_next_completion());
 	}
 
-	void CrateManager::RunAllStations(bool& anyLooted)
+	void CrateManager::run_all_stations(bool& anyLooted)
 	{
 		anyLooted = false;
 		bool canDefaultTeleport = true;
 
 		int i = 0;
-		for (auto& group : this->crateGroups) {
+		for (auto& group : crates) {
 			for (auto& station : group) {
-				station.SetCanDefaultTeleport(canDefaultTeleport);
-				auto result = station.Complete();
+				station.set_can_default_teleport(canDefaultTeleport);
+				auto result = station.complete();
 
 				if (result.success) {
 					anyLooted = true;
-					this->statisticsPerGroup[i].AddLooted();
-					this->SetGroupCooldown(group);
+					stats_per_group[i].add_looted();
+					set_group_cooldown(group);
 					canDefaultTeleport = (&station == &group.back());
 					break;
 				}
@@ -107,77 +106,57 @@ namespace llpp::bots::drops
 		}
 	}
 
-	void CrateManager::DropoffItems(float& filledLevelOut)
+	void CrateManager::dropoff_items(float& filledLevelOut)
 	{
-		asa::entities::gLocalPlayer->TurnUp(50, std::chrono::milliseconds(500));
-		asa::entities::gLocalPlayer->TurnRight(90);
+		asa::entities::local_player->turn_up(
+			50, std::chrono::milliseconds(500));
+		asa::entities::local_player->turn_right(90);
 
-		asa::entities::gLocalPlayer->Access(this->dropoffVault);
-		asa::entities::gLocalPlayer->inventory->TransferAll();
+		asa::entities::local_player->access(this->dropoff_vault);
+		asa::entities::local_player->get_inventory()->transfer_all();
 		std::this_thread::sleep_for(std::chrono::seconds(3));
-		filledLevelOut = dropoffVault.GetSlotCount() / 350.f;
+		filledLevelOut = dropoff_vault.get_slot_count() /
+						 dropoff_vault.get_max_slots();
 
-		this->dropoffVault.inventory->Close();
+		this->dropoff_vault.inventory->close();
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 
-	void CrateManager::TeleportToDropoff()
+	void CrateManager::teleport_to_dropoff()
 	{
-		asa::entities::gLocalPlayer->TeleportTo(this->dropoffTeleporter);
+		asa::entities::local_player->teleport_to(dropoff_tp);
 		std::this_thread::sleep_for(std::chrono::seconds(2));
-		asa::entities::gLocalPlayer->StandUp();
+		asa::entities::local_player->stand_up();
 	}
 
-	void CrateManager::AccessBedAbove()
+	void CrateManager::access_bed_above()
 	{
-		asa::entities::gLocalPlayer->LookAllTheWayUp();
-		asa::entities::gLocalPlayer->Access(this->alignBed);
+		asa::entities::local_player->look_fully_up();
+		asa::entities::local_player->access(align_bed);
 	}
 
-	void CrateManager::SpawnOnAlignBed()
+	void CrateManager::spawn_on_align_bed()
 	{
-		asa::entities::gLocalPlayer->FastTravelTo(this->alignBed);
-		asa::entities::gLocalPlayer->Crouch();
-		asa::entities::gLocalPlayer->TurnDown(20);
+		asa::entities::local_player->fast_travel_to(align_bed);
+		asa::entities::local_player->crouch();
+		asa::entities::local_player->turn_down(20);
 	}
 
-	void CrateManager::PopulateGroups(
+	void CrateManager::populate_groups(
 		const std::vector<std::vector<QualityFlags>>& groups,
 		std::chrono::minutes interval)
 	{
-		crateGroups.resize(groups.size());
-		statisticsPerGroup.resize(groups.size());
+		crates.resize(groups.size());
+		stats_per_group.resize(groups.size());
 		int n = 0;
 
 		for (size_t i = 0; i < groups.size(); i++) {
-			for (QualityFlags crateQualities : groups[i]) {
-				std::string name = util::AddNumberToPrefix(
+			for (QualityFlags qualities : groups[i]) {
+				std::string name = util::add_num_to_prefix(
 					prefix + "DROP", ++n);
-				auto station = LootCrateStation(name, crateQualities, interval);
-				crateGroups[i].push_back(station);
+				auto station = LootCrateStation(name, qualities, interval);
+				crates[i].push_back(station);
 			}
 		}
 	}
-
-	void CrateManager::RegisterSlashEvents()
-	{
-		dpp::slashcommand toggleCompletion(
-			"toggle", "Toggle a station on or off", 0);
-
-		toggleCompletion.add_option(
-			dpp::command_option(dpp::co_string, "toggle",
-				"Whether to enable/disable this station", true)
-				.add_choice(dpp::command_option_choice(
-					"Paste", std::string("station_paste")))
-				.add_choice(dpp::command_option_choice(
-					"Crate", std::string("station_crate"))));
-
-		llpp::core::discord::RegisterSlashCommand(
-			toggleCompletion, [](const dpp::slashcommand_t& event) {
-				auto toggle = std::get<bool>(event.get_parameter("toggle"));
-				std::cout << toggle << std::endl;
-			});
-	}
-
-
 }

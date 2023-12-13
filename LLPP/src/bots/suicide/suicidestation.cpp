@@ -6,24 +6,26 @@
 #include <asapp/interfaces/spawnmap.h>
 #include <asapp/structures/simplebed.h>
 
-using namespace llpp::bots::suicide;
-
-SuicideStation::SuicideStation(std::string bedName, std::string respawnBedName)
-	: BaseStation(bedName, std::chrono::minutes(5)), deathBed(bedName),
-	  respawnBed(respawnBedName){};
-
-llpp::core::StationResult SuicideStation::Complete()
+namespace llpp::bots::suicide
 {
-	auto start = std::chrono::system_clock::now();
-	asa::entities::gLocalPlayer->FastTravelTo(this->deathBed);
-	asa::entities::gLocalPlayer->Suicide();
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-	asa::interfaces::gSpawnMap->SpawnAt(this->respawnBed.name);
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	this->SetCompleted();
+	SuicideStation::SuicideStation(
+		std::string t_bed_name, std::string t_respawn_bed)
+		: BaseStation(t_bed_name, std::chrono::minutes(5)),
+		  death_bed(t_bed_name), respawn_bed(t_respawn_bed){};
 
-	auto timeTaken = util::GetElapsed<std::chrono::seconds>(start);
-	auto data = core::StationResult(this, true, timeTaken, {});
-	SendSuicided(data, this->deathBed.name, this->respawnBed.name);
-	return data;
+	core::StationResult SuicideStation::complete()
+	{
+		auto start = std::chrono::system_clock::now();
+		asa::entities::local_player->fast_travel_to(death_bed);
+		asa::entities::local_player->suicide();
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		asa::interfaces::spawn_map->spawn_at(respawn_bed.name);
+		std::this_thread::sleep_for(std::chrono::seconds(10));
+		set_completed();
+
+		auto timeTaken = util::get_elapsed<std::chrono::seconds>(start);
+		auto data = core::StationResult(this, true, timeTaken, {});
+		send_suicided_embed(data, death_bed.name, respawn_bed.name);
+		return data;
+	}
 }

@@ -3,40 +3,34 @@
 #include <functional>
 #include <opencv2/imgcodecs.hpp>
 
-
-
 namespace llpp::util
 {
-	bool Await(const std::function<bool()>& condition,
+	bool await(const std::function<bool()>& condition,
 		std::chrono::milliseconds timeout);
 
-	bool Timedout(const std::chrono::system_clock::time_point& start,
+	bool timedout(const std::chrono::system_clock::time_point& start,
 		const std::chrono::milliseconds timeout);
 
-	bool Timedout(const std::chrono::system_clock::time_point& start,
+	bool timedout(const std::chrono::system_clock::time_point& start,
 		const std::chrono::seconds timeout);
 
-	const std::string MatToStringBuffer(const cv::Mat& source);
+	const std::string mat_to_strbuffer(const cv::Mat& source);
 
-	template <typename Type> const char* GetName(const Type& obj)
-	{
-		return typeid(obj).name();
-	}
 
 	template <typename cast>
-	cast GetElapsed(std::chrono::system_clock::time_point start)
+	cast get_elapsed(std::chrono::system_clock::time_point start)
 	{
 		return std::chrono::duration_cast<cast>(
 			std::chrono::system_clock::now() - start);
 	}
 
 	template <typename cast>
-	cast GetTimeLeftUntil(std::chrono::system_clock::time_point timePoint)
+	cast get_time_left_until(std::chrono::system_clock::time_point timePoint)
 	{
 		return std::chrono::duration_cast<cast>(
 			timePoint - std::chrono::system_clock::now());
 	}
 
-	std::string AddNumberToPrefix(
+	std::string add_num_to_prefix(
 		const std::string& prefix, int number, int fillZeros = 2);
 }

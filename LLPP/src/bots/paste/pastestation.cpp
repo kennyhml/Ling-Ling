@@ -1,85 +1,86 @@
 #include "pastestation.h"
 #include "../../common/util.h"
 #include "embeds.h"
-#include <algorithm>
 #include <asapp/entities/exceptions.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/exceptions.h>
 
-using namespace llpp::bots::paste;
-
-PasteStation::PasteStation(std::string name, std::chrono::minutes interval)
-	: BaseStation(name, interval), bed(asa::structures::SimpleBed(name)){};
-
-llpp::core::StationResult PasteStation::Complete()
+namespace llpp::bots::paste
 {
-	auto start = std::chrono::system_clock::now();
+	PasteStation::PasteStation(std::string name, std::chrono::minutes interval)
+		: BaseStation(name, interval), bed(asa::structures::SimpleBed(name)){};
 
-	asa::entities::gLocalPlayer->FastTravelTo(bed);
-	EmptyAllAchatinas();
-	int pasteObtained = DepositPasteIntoDedi();
-	SetCompleted();
+	core::StationResult PasteStation::complete()
+	{
+		auto start = std::chrono::system_clock::now();
 
-	auto duration = util::GetElapsed<std::chrono::seconds>(start);
-	core::StationResult resultData(
-		this, true, duration, { { "Achatina Paste", pasteObtained } });
+		asa::entities::local_player->fast_travel_to(bed);
+		empty_all();
+		int pasteObtained = deposit_paste();
+		set_completed();
 
-	SendSuccessEmbed(resultData);
-	return resultData;
-}
+		auto duration = util::get_elapsed<std::chrono::seconds>(start);
+		core::StationResult resultData(
+			this, true, duration, { { "Achatina Paste", pasteObtained } });
 
-bool PasteStation::EmptyAchatina(int index)
-{
-	asa::entities::DinoEnt& snail = this->achatinas[index];
-	try {
-		asa::entities::gLocalPlayer->Access(snail);
-	}
-	catch (const asa::entities::exceptions::EntityNotAccessed& e) {
-		SendAchatinaNotAccessible(name, e.GetEntity()->GetName());
-		return true;
+		send_success_embed(resultData);
+		return resultData;
 	}
 
-	auto& slot = snail.inventory->slots[0];
-	bool hasPaste = slot.HasItem(asa::items::resources::achatinaPaste);
-	if (hasPaste) {
-		snail.inventory->TakeSlot(0);
+	bool PasteStation::empty(asa::entities::DinoEnt& achatina)
+	{
+		try {
+			asa::entities::local_player->access(achatina);
+		}
+		catch (const asa::entities::EntityNotAccessed& e) {
+			send_achatina_not_accessible(name, e.get_entity()->get_name());
+			return true;
+		}
+
+		auto& slot = achatina.get_inventory()->slots[0];
+		bool hasPaste = slot.has_item(asa::items::resources::achatina_paste);
+		if (hasPaste) {
+			achatina.get_inventory()->take_slot(0);
+		}
+		achatina.exit();
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		return hasPaste;
 	}
-	snail.Exit();
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	return hasPaste;
-}
 
-void PasteStation::EmptyAllAchatinas()
-{
-	std::cout << "[+] Emptying the achatinas..." << std::endl;
-	this->EmptyAchatina(4);
-	do {
-		asa::entities::gLocalPlayer->TurnLeft(45);
-	} while (!this->EmptyAchatina(3));
-	do {
-		asa::entities::gLocalPlayer->TurnRight(90);
-	} while (!this->EmptyAchatina(5));
+	void PasteStation::empty_all()
+	{
+		std::cout << "[+] Emptying the achatinas..." << std::endl;
+		empty(achatinas[4]);
+		do {
+			asa::entities::local_player->turn_left(45);
+		} while (!empty(achatinas[3]));
+		do {
+			asa::entities::local_player->turn_right(90);
+		} while (!empty(achatinas[5]));
 
-	asa::entities::gLocalPlayer->Crouch();
-	asa::entities::gLocalPlayer->TurnDown(12, std::chrono::milliseconds(300));
+		asa::entities::local_player->crouch();
+		asa::entities::local_player->turn_down(
+			12, std::chrono::milliseconds(300));
 
-	this->EmptyAchatina(2);
-	do {
-		asa::entities::gLocalPlayer->TurnLeft(45);
-	} while (!this->EmptyAchatina(1));
+		empty(achatinas[2]);
+		do {
+			asa::entities::local_player->turn_left(45);
+		} while (!empty(achatinas[1]));
 
-	do {
-		asa::entities::gLocalPlayer->TurnLeft(45);
-	} while (!this->EmptyAchatina(0));
-}
+		do {
+			asa::entities::local_player->turn_left(45);
+		} while (!empty(achatinas[0]));
+	}
 
-int PasteStation::DepositPasteIntoDedi()
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	asa::entities::gLocalPlayer->TurnLeft(135, std::chrono::milliseconds(300));
+	int PasteStation::deposit_paste()
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		asa::entities::local_player->turn_left(
+			135, std::chrono::milliseconds(300));
 
-	int amount = 0;
-	asa::entities::gLocalPlayer->DepositIntoDedicatedStorage(
-		asa::items::resources::achatinaPaste, &amount);
-	return amount;
+		int amount = 0;
+		asa::entities::local_player->deposit_into_dedi(
+			asa::items::resources::achatina_paste, &amount);
+		return amount;
+	}
 }

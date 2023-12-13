@@ -6,60 +6,48 @@
 
 namespace llpp::bots::paste
 {
-	PasteManager::PasteManager(
-		std::string prefix, int numStations, std::chrono::minutes interval)
+	PasteManager::PasteManager(std::string t_prefix, int t_num_stations,
+		std::chrono::minutes t_interval)
 	{
-		for (int i = 0; i < numStations; i++) {
-			std::string name = util::AddNumberToPrefix(prefix, i + 1);
-			stations.push_back(std::make_unique<PasteStation>(name, interval));
+		for (int i = 0; i < t_num_stations; i++) {
+			std::string name = util::add_num_to_prefix(t_prefix, i + 1);
+			stations.push_back(
+				std::make_unique<PasteStation>(name, t_interval));
 		}
-		RegisterSlashEvents();
 	};
 
-	bool PasteManager::Run()
+	bool PasteManager::run()
 	{
-		if (!IsReadyToRun()) {
+		if (!is_ready_to_run()) {
 			return false;
 		}
 
-		auto renderStationResult = renderStation.Complete();
+		auto renderStationResult = render_station.complete();
 		if (!renderStationResult.success) {
 			throw std::runtime_error("Render station failed.");
 		}
 
 		for (auto& station : stations) {
-			station->Complete();
+			station->complete();
 		}
 	}
 
-	bool PasteManager::IsReadyToRun() const { return stations[0]->IsReady(); }
-
-	std::chrono::minutes PasteManager::GetTimeLeftUntilReady() const
+	bool PasteManager::is_ready_to_run() const
 	{
-		return util::GetTimeLeftUntil<std::chrono::minutes>(
-			stations[0]->GetNextCompletion());
+		return stations[0]->is_ready();
 	}
 
-	const PasteStation* PasteManager::PeekStation(int index) const
+	std::chrono::minutes PasteManager::get_time_left_until_ready() const
+	{
+		return util::get_time_left_until<std::chrono::minutes>(
+			stations[0]->get_next_completion());
+	}
+
+	const PasteStation* PasteManager::peek_station(int index) const
 	{
 		if (index > 0 && index < stations.size()) {
 			return stations[index].get();
 		}
 		return nullptr;
-	}
-
-	void PasteManager::RegisterSlashEvents()
-	{
-		dpp::slashcommand toggleCompletion("toggle-paste-completion",
-			"Toggle paste manager on or off", llpp::core::discord::bot->me.id);
-
-		toggleCompletion.add_option(dpp::command_option(dpp::co_boolean,
-			"toggle", "Whether to enable/disable this station"));
-
-		llpp::core::discord::RegisterSlashCommand(
-			toggleCompletion, [](const dpp::slashcommand_t& event) {
-				auto toggle = std::get<bool>(event.get_parameter("toggle"));
-				std::cout << toggle << std::endl;
-			});
 	}
 }
