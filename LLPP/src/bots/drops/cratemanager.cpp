@@ -2,6 +2,7 @@
 #include "../../common/util.h"
 #include "../../core/discord.h"
 #include "embeds.h"
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
 namespace llpp::bots::drops
@@ -9,11 +10,12 @@ namespace llpp::bots::drops
 	CrateManager::CrateManager(std::string t_prefix,
 		std::vector<std::vector<QualityFlags>> t_grouped_crates,
 		std::chrono::minutes t_interval, suicide::SuicideStation* t_suicide)
-		: prefix(t_prefix), align_bed(t_prefix + "ALIGN"),
-		  dropoff_tp(t_prefix + "DROPOFF"),
-		  dropoff_vault(t_prefix + "DROPOFF", 350), suicide(t_suicide)
+		: prefix(t_prefix), align_bed(t_prefix + "::ALIGN"),
+		  dropoff_tp(t_prefix + "::DROPOFF"),
+		  dropoff_vault(t_prefix + "::DROPOFF", 350), suicide(t_suicide)
 	{
 		populate_groups(t_grouped_crates, t_interval);
+		register_slash_commands();
 	}
 
 	void CrateManager::CrateGroupStatistics::add_looted()
@@ -80,16 +82,30 @@ namespace llpp::bots::drops
 			crates[0][0].get_next_completion());
 	}
 
+	core::data::ManagedVar<bool> CrateManager::get_reroll_mode()
+	{
+		static auto reroll_mode = core::data::ManagedVar<bool>(
+			"reroll_mode", false);
+		return reroll_mode;
+	}
+
 	void CrateManager::run_all_stations(bool& anyLooted)
 	{
 		anyLooted = false;
 		bool canDefaultTeleport = true;
+		bool let_teleporters_render = false;
 
 		int i = 0;
 		for (auto& group : crates) {
 			for (auto& station : group) {
 				station.set_can_default_teleport(canDefaultTeleport);
+				station.set_fully_loot(!get_reroll_mode().get());
 				auto result = station.complete();
+
+				if (!let_teleporters_render) {
+					asa::core::sleep_for(std::chrono::seconds(3));
+					let_teleporters_render = true;
+				}
 
 				if (result.success) {
 					anyLooted = true;
@@ -153,10 +169,49 @@ namespace llpp::bots::drops
 		for (size_t i = 0; i < groups.size(); i++) {
 			for (QualityFlags qualities : groups[i]) {
 				std::string name = util::add_num_to_prefix(
-					prefix + "DROP", ++n);
+					prefix + "::DROP", ++n);
 				auto station = LootCrateStation(name, qualities, interval);
 				crates[i].push_back(station);
 			}
 		}
 	}
+
+	void CrateManager::register_slash_commands()
+	{
+		dpp::slashcommand crates("crates", "Controls all crate managers.", 0);
+
+		if (!has_registered_reroll_command) {
+
+			dpp::command_option reroll_field(
+				dpp::co_sub_command, "reroll", "Manage reroll mode test");
+
+			reroll_field.add_option(dpp::command_option(dpp::co_boolean,
+				"toggle", "Whether to use reroll mode.", true));
+
+			crates.add_option(reroll_field);
+
+			has_registered_reroll_command = true;
+
+			core::discord::register_slash_command(crates, reroll_mode_callback);
+		}
+	}
+
+	void CrateManager::reroll_mode_callback(const dpp::slashcommand_t& event)
+	{
+		auto cmd_data = event.command.get_command_interaction();
+
+		auto& subcommand = cmd_data.options[0];
+		bool enable = subcommand.get_value<bool>(0);
+		std::string as_string = enable ? "true" : "false";
+
+		if (get_reroll_mode() == enable) {
+			return event.reply(
+				std::format("`reroll mode` is already `{}`", as_string));
+		}
+		get_reroll_mode().set(enable);
+		event.reply(
+			std::format("`reroll mode` has been changed to `{}`", as_string));
+	}
+
+
 }

@@ -14,7 +14,6 @@ namespace llpp::core::discord
 		if (dpp::run_once<struct register_bot_commands>()) {
 			std::cout << "[+] Registering discord slash commands... ";
 
-
 			for (auto& cmd : commands) {
 				cmd.application_id = bot->me.id;
 			}

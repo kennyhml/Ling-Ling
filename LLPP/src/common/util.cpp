@@ -35,6 +35,13 @@ namespace llpp::util
 			std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
 	}
 
+	bool timedout(const std::chrono::system_clock::time_point& start,
+		const std::chrono::minutes timeout)
+	{
+		return timedout(start,
+			std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
+	}
+
 	const std::string mat_to_strbuffer(const cv::Mat& source)
 	{
 		std::vector<uchar> img_buffer;

@@ -14,6 +14,9 @@ namespace llpp::util
 	bool timedout(const std::chrono::system_clock::time_point& start,
 		const std::chrono::seconds timeout);
 
+	bool timedout(const std::chrono::system_clock::time_point& start,
+		const std::chrono::minutes timeout);
+
 	const std::string mat_to_strbuffer(const cv::Mat& source);
 
 

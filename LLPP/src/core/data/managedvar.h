@@ -14,6 +14,8 @@ namespace llpp::core::data
 
 		~ManagedVar();
 
+		bool operator==(T other) const { return value == other; }
+
 		T get();
 		void set(const T& value);
 

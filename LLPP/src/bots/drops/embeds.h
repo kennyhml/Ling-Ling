@@ -26,8 +26,15 @@ namespace llpp::bots::drops
 	void send_success_embed(const core::StationResult&, cv::Mat loot,
 		asa::structures::CaveLootCrate::Quality, int times_looted);
 
+	void request_reroll(const core::StationResult&, cv::Mat loot,
+		asa::structures::CaveLootCrate::Quality,
+		std::chrono::system_clock::time_point expires);
+
 	void send_summary_embed(const std::string& name,
 		std::chrono::seconds time_taken,
 		std::vector<CrateManager::CrateGroupStatistics> stats, int vault_slots,
 		std::chrono::system_clock::time_point next_completion);
+
+
+
 }

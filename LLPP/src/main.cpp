@@ -16,27 +16,16 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "bots/drops/embeds.h"
 #include "core/data/database.h"
 #include "core/data/managedvar.h"
 
-
 using json = nlohmann::json;
-
 
 int main()
 {
 	llpp::core::data::init("test.db");
 
-	auto var = llpp::core::data::ManagedVar<bool>("some bool4", false);
-
-
-	std::cout << var.get() << std::endl;
-}
-
-
-
-int main2()
-{
 	asa::core::init(std::filesystem::path("src/config.json"));
 
 	std::ifstream f("src/config.json");
@@ -61,22 +50,22 @@ int main2()
 
 	auto paste = llpp::bots::paste::PasteManager(
 		"PASTE", 6, std::chrono::minutes(50));
-	// auto skylord = llpp::bots::drops::CrateManager("SKYLORD",
-	// 	{
-	// 		{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
-	// 			Quality::YELLOW | Quality::RED },
-	// 	},
-	// 	std::chrono::minutes(5));
+	auto skylord = llpp::bots::drops::CrateManager("SKYLORD",
+		{
+			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
+				Quality::YELLOW | Quality::RED },
+		},
+		std::chrono::minutes(5));
 
 	llpp::core::discord::bot->start(dpp::st_return);
 
 	while (true) {
-
 		try {
+			if (swamp.run())
+				continue;
 			if (paste.run())
 				continue;
-
-			if (swamp.run())
+			if (skylord.run())
 				continue;
 
 			std::cout << "No task ready...." << std::endl;
