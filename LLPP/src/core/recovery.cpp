@@ -12,22 +12,21 @@ namespace llpp::core
 {
 	void recover()
 	{
-		auto start = std::chrono::system_clock::now();
+		const auto start = std::chrono::system_clock::now();
 		asa::core::set_crash_aware(true);
 		std::cout
-			<< "[+] Recovery sequence initiated, diagnosing cause of crash..."
-			<< std::endl;
+			<< "[+] Recovery sequence initiated, diagnosing cause of crash...\n";
 
 		bool need_restart = false;
 		bool need_reconnect = false;
 
 		if (asa::window::has_crashed_popup()) {
-			std::cout << "\t[-] The game has crashed..." << std::endl;
+			std::cout << "\t[-] The game has crashed...\n";
 			need_restart = true;
 			need_reconnect = true;
 		}
 		else if (asa::interfaces::main_menu->is_open()) {
-			std::cout << "\t[-] Kicked to main menu..." << std::endl;
+			std::cout << "\t[-] Kicked to main menu...\n";
 			need_reconnect = true;
 		}
 
@@ -48,7 +47,7 @@ namespace llpp::core
 
 	void reconnect_to_server()
 	{
-		std::string server_name = "NA-PVP-SmallTribes-TheIsland9236";
+		const std::string server_name = "NA-PVP-SmallTribes-TheIsland9236";
 
 		asa::interfaces::main_menu->accept_popup();
 		asa::interfaces::main_menu->start();
@@ -66,21 +65,20 @@ namespace llpp::core
 			}
 
 			if (asa::interfaces::main_menu->is_open()) {
-				std::cerr << "[!] Joining failed, trying again" << std::endl;
+				std::cerr << "[!] Joining failed, trying again\n";
 				return reconnect_to_server();
 			}
 		}
 
 		Sleep(5000);
-		std::cout << "[+] Reconnected successfully." << std::endl;
+		std::cout << "[+] Reconnected successfully.\n";
 	}
 
 	void restart_game()
 	{
 		exit_game();
 		Sleep(5000);
-		int result = system("start steam://rungameid/2399830");
-		if (result == -1) {
+		if (system("start steam://rungameid/2399830") == -1) {
 			throw std::runtime_error("Failed to restart the game");
 		}
 		asa::window::get_handle(60, true);
@@ -89,7 +87,7 @@ namespace llpp::core
 			std::this_thread::sleep_for(std::chrono::seconds(3));
 		}
 
-		std::cout << "[+] Game restarted." << std::endl;
+		std::cout << "[+] Game restarted.\n";
 	}
 
 	void exit_game()
@@ -97,17 +95,17 @@ namespace llpp::core
 		DWORD pid;
 
 		GetWindowThreadProcessId(asa::window::hWnd, &pid);
-		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
-		if (!hProcess) {
+		const HANDLE hprocess = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+		if (!hprocess) {
 			throw std::runtime_error("Process handle not acquired");
 		}
-		TerminateProcess(hProcess, 0);
-		CloseHandle(hProcess);
+		TerminateProcess(hprocess, 0);
+		CloseHandle(hprocess);
 	}
 
 	void inform_crash_detected(asa::core::ShooterGameError& e)
 	{
-		dpp::embed embed = dpp::embed();
+		auto embed = dpp::embed();
 		embed.set_color(0xB82E88)
 			.set_title("CRITICAL: The game or server has crashed.")
 			.set_description(e.what())
@@ -120,19 +118,19 @@ namespace llpp::core
 			.set_footer(
 				dpp::embed_footer("Recovery should follow automatically."));
 
-		auto fileData = util::mat_to_strbuffer(asa::window::screenshot());
+		const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
 		dpp::message message = dpp::message(
-			dpp::snowflake(discord::infoChannelID), "<@&1181159721433051136>")
+			dpp::snowflake(discord::info_channel_id), "<@&1181159721433051136>")
 								   .set_allowed_mentions(
 									   false, true, false, false, {}, {});
-		message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+		message.add_file("image.png", file_data, "image/png ").add_embed(embed);
 
 		core::discord::bot->message_create(message);
 	}
 
-	void inform_recovery_initiated(bool restart, bool reconnect)
+	void inform_recovery_initiated(const bool restart, const bool reconnect)
 	{
-		dpp::embed embed = dpp::embed();
+		auto embed = dpp::embed();
 		embed.set_color(0x7F5D44)
 			.set_title("Recovery sequence was initiated!")
 			.set_description("Recovery attempt imminent. Required steps:")
@@ -147,13 +145,13 @@ namespace llpp::core
 			embed.add_field("Reconnecting to:", "9236", true);
 		}
 
-		dpp::message message = dpp::message(discord::infoChannelID, embed);
+		const auto message = dpp::message(discord::info_channel_id, embed);
 		discord::bot->message_create(message);
 	}
 
-	void inform_recovery_successful(std::chrono::seconds timeTaken)
+	void inform_recovery_successful(const std::chrono::seconds time_taken)
 	{
-		dpp::embed embed = dpp::embed();
+		auto embed = dpp::embed();
 		embed.set_color(dpp::colors::green)
 			.set_title("Recovery sequence was successful!")
 			.set_description("Ling Ling++ has successfully recovered itself.")
@@ -162,13 +160,13 @@ namespace llpp::core
 				"arksurvivalevolved_gamepedia/"
 				"images/b/b5/Imprinted.png/revision/latest?cb=20181217131908")
 			.add_field(
-				"Time taken:", std::format("{} seconds", timeTaken.count()))
+				"Time taken:", std::format("{} seconds", time_taken.count()))
 			.set_image("attachment://image.png");
 
 
-		auto fileData = util::mat_to_strbuffer(asa::window::screenshot());
-		dpp::message message = dpp::message(discord::infoChannelID, embed);
-		message.add_file("image.png", fileData, "image/png ");
+		const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
+		auto message = dpp::message(discord::info_channel_id, embed);
+		message.add_file("image.png", file_data, "image/png ");
 
 		discord::bot->message_create(message);
 	}

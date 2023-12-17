@@ -1,6 +1,4 @@
-
 #include "bots/drops/cratemanager.h"
-#include "bots/drops/lootcratestation.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
 #include "core/discord.h"
@@ -9,8 +7,6 @@
 #include <asapp/entities/localplayer.h>
 
 #include <asapp/core/init.h>
-#include <asapp/entities/exceptions.h>
-#include <asapp/interfaces/serverselect.h>
 #include <dpp/dpp.h>
 
 #include <fstream>
@@ -18,66 +14,86 @@
 
 #include "bots/drops/embeds.h"
 #include "core/data/database.h"
-#include "core/data/managedvar.h"
+#include "bots/kitchen/cropstation.h"
 
 using json = nlohmann::json;
 
 int main()
 {
-	llpp::core::data::init("test.db");
+    llpp::core::data::init("test.db");
 
-	asa::core::init(std::filesystem::path("src/config.json"));
+    if (!asa::core::init(std::filesystem::path("src/config.json"))) {
+        std::cerr << "[!] Failed to initialize ASAPP\n";
+        return 0;
+    }
+    asa::window::get_handle(60, true);
+    asa::window::set_foreground();
 
-	std::ifstream f("src/config.json");
-	json data = json::parse(f);
-	f.close();
+    auto station = llpp::bots::kitchen::CropStation("LONGRASS01", true,
+                                                    asa::items::consumables::longrass,
+                                                    std::chrono::minutes(30));
 
-	llpp::core::discord::init(data["bot"]);
+    station.complete();
 
-	asa::window::get_handle(60, true);
-	asa::window::set_foreground();
+    return 0;
 
-	using Quality = asa::structures::CaveLootCrate::Quality;
+    std::ifstream f("src/config.json");
+    json data = json::parse(f);
+    f.close();
 
-	auto suicideStation = llpp::bots::suicide::SuicideStation(
-		"SUICIDE DEATH", "SUICIDE RESPAWN");
+    llpp::core::discord::init(data["bot"]);
 
-	auto swamp = llpp::bots::drops::CrateManager("SWAMP",
-		{ { Quality::RED, Quality::RED },
-			{ Quality::YELLOW, Quality::YELLOW, Quality::ANY },
-			{ Quality::BLUE } },
-		std::chrono::minutes(5), &suicideStation);
 
-	auto paste = llpp::bots::paste::PasteManager(
-		"PASTE", 6, std::chrono::minutes(50));
-	auto skylord = llpp::bots::drops::CrateManager("SKYLORD",
-		{
-			{ Quality::YELLOW | Quality::RED, Quality::YELLOW | Quality::RED,
-				Quality::YELLOW | Quality::RED },
-		},
-		std::chrono::minutes(5));
+    using quality = asa::structures::CaveLootCrate::Quality;
 
-	llpp::core::discord::bot->start(dpp::st_return);
+    auto suicide_station = llpp::bots::suicide::SuicideStation(
+        "SUICIDE DEATH", "SUICIDE RESPAWN");
 
-	while (true) {
-		try {
-			if (swamp.run())
-				continue;
-			if (paste.run())
-				continue;
-			if (skylord.run())
-				continue;
+    auto swamp = llpp::bots::drops::CrateManager("SWAMP",
+                                                 {
+                                                     {quality::RED, quality::RED},
+                                                     {
+                                                         quality::YELLOW, quality::YELLOW,
+                                                         quality::ANY
+                                                     },
+                                                     {quality::BLUE}
+                                                 },
+                                                 std::chrono::minutes(5),
+                                                 &suicide_station);
 
-			std::cout << "No task ready...." << std::endl;
-		}
-		catch (asa::core::ShooterGameError& e) {
-			llpp::core::inform_crash_detected(e);
-			llpp::core::reconnect_to_server();
-		}
-		catch (const std::exception& e) {
-			llpp::core::discord::inform_fatal_error(e, "???");
-			break;
-		}
-	}
-	return 0;
+    auto paste = llpp::bots::paste::PasteManager(
+        "PASTE", 6, std::chrono::minutes(50));
+    auto skylord = llpp::bots::drops::CrateManager("SKYLORD",
+                                                   {
+                                                       {
+                                                           quality::YELLOW | quality::RED,
+                                                           quality::YELLOW | quality::RED,
+                                                           quality::YELLOW | quality::RED
+                                                       },
+                                                   },
+                                                   std::chrono::minutes(5));
+
+    llpp::core::discord::bot->start(dpp::st_return);
+
+    while (true) {
+        try {
+            if (swamp.run())
+                continue;
+            if (paste.run())
+                continue;
+            if (skylord.run())
+                continue;
+
+            std::cout << "No task ready....\n";
+        }
+        catch (asa::core::ShooterGameError& e) {
+            llpp::core::inform_crash_detected(e);
+            llpp::core::reconnect_to_server();
+        }
+        catch (const std::exception& e) {
+            llpp::core::discord::inform_fatal_error(e, "???");
+            break;
+        }
+    }
+    return 0;
 }

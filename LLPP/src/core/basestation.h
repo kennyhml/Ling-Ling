@@ -5,39 +5,56 @@
 
 namespace llpp::core
 {
-	class BaseStation
-	{
-	public:
-		enum Status
-		{
-			UNKNOWN,
-			IN_COMPLETION,
-			ON_COOLDOWN,
-			PENDING,
-			DISABLED
-		};
+    class BaseStation
+    {
+    public:
+        [[nodiscard]] std::string get_name() const { return name_; }
+        [[nodiscard]] int get_times_completed() const { return times_completed_; }
+        [[nodiscard]] virtual bool is_ready() const;
 
-		std::string get_name() const { return name; }
-		int get_times_completed() const { return times_completed; }
-		virtual bool is_ready() const;
+        [[nodiscard]] std::chrono::system_clock::time_point get_last_completion() const
+        {
+            return last_completed_;
+        }
 
-		std::chrono::system_clock::time_point get_last_completion() const;
-		std::chrono::system_clock::time_point get_next_completion() const;
-		std::chrono::minutes get_completion_interval() const;
+        [[nodiscard]] std::chrono::system_clock::time_point get_next_completion() const
+        {
+            return last_completed_ + completion_interval_;
+        }
 
-		virtual StationResult complete() = 0;
+        [[nodiscard]] std::chrono::minutes get_completion_interval() const
+        {
+            return completion_interval_;
+        }
 
-	protected:
-		BaseStation(const std::string name, std::chrono::minutes interval);
+    public:
+        enum Status
+        {
+            UNKNOWN,
+            IN_COMPLETION,
+            ON_COOLDOWN,
+            PENDING,
+            DISABLED
+        };
 
-		std::chrono::system_clock::time_point last_completed;
-		std::chrono::minutes completion_interval;
+    public:
+        virtual ~BaseStation() = default;
+        virtual StationResult complete() = 0;
+        BaseStation(const BaseStation&) = default;
+        BaseStation& operator=(const BaseStation&) = default;
+        BaseStation(BaseStation&&) = default;
+        BaseStation& operator=(BaseStation&&) = default;
 
-		int times_completed;
-		const std::string name;
+    protected:
+        BaseStation(std::string t_name, std::chrono::minutes t_interval);
 
-		Status status;
+        std::string name_;
+        std::chrono::minutes completion_interval_;
+        std::chrono::system_clock::time_point last_completed_;
 
-		void set_completed();
-	};
+        int times_completed_;
+        Status status_;
+
+        void set_completed();
+    };
 }

@@ -13,5 +13,5 @@ namespace llpp::core
 
 	void inform_crash_detected(asa::core::ShooterGameError&);
 	void inform_recovery_initiated(bool restart, bool reconnect);
-	void inform_recovery_successful(std::chrono::seconds timeTaken);
+	void inform_recovery_successful(std::chrono::seconds time_taken);
 }
