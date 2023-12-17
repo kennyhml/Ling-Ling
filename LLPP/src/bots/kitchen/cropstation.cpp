@@ -3,6 +3,7 @@
 #include <asapp/entities/localplayer.h>
 
 #include "embeds.h"
+#include "../../common/util.h"
 
 namespace llpp::bots::kitchen
 {
@@ -37,7 +38,7 @@ namespace llpp::bots::kitchen
                              const CropType crop,
                              const std::chrono::minutes t_interval) :
         BaseStation(std::move(t_name), t_interval), left_aligned_(t_left_aligned),
-        spawn_bed_(name_), fridge_(name_, 80),
+        spawn_bed_(name_), fridge_(name_, 80), vault_(name_ + " FERTILIZER", 350),
         crop_plots_({
             {"PLOT01"}, {"PLOT02"}, {"PLOT03"}, {"PLOT04"}, {"PLOT05"}, {"PLOT06"}
         }) { get_crop_and_seed(crop, crop_, seed_); };
@@ -48,15 +49,21 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->fast_travel_to(spawn_bed_);
 
         const int slots_needed = get_slots_to_refill();
-        if (slots_needed == 0) { std::cout << "[+] Fridge is completely filled!\n"; }
 
+        if (!slots_needed) {
+            std::cout << "[+] Fridge is completely filled!\n";
+            return {this, true, std::chrono::seconds(0), {}};
+        }
+
+        grab_fertilizer();
         get_crops(slots_needed + 1);
         int slots_in_fridge = -1;
         put_crops_in_fridge(slots_in_fridge);
 
-        const core::StationResult res(this, true, std::chrono::seconds(0), {});
-
+        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
+        const core::StationResult res(this, true, time_taken, {});
         send_success_embed(res, crop_, slots_in_fridge);
+
         return res;
     }
 
@@ -85,6 +92,26 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::milliseconds(500));
     }
 
+    void CropStation::grab_fertilizer()
+    {
+        asa::entities::local_player->look_fully_up();
+        asa::entities::local_player->access(vault_);
+        vault_.inventory->transfer_all(asa::items::resources::fertilizer);
+        vault_.inventory->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::entities::local_player->turn_down(90);
+    }
+
+    void CropStation::deposit_fertilizer()
+    {
+        asa::entities::local_player->look_fully_up();
+        asa::entities::local_player->access(vault_);
+        asa::entities::local_player->get_inventory()->transfer_all();
+        vault_.inventory->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::entities::local_player->turn_down(90);
+    }
+
     /**
      * @brief Puts the obtained crop of the station into the fridge.
      *
@@ -102,7 +129,7 @@ namespace llpp::bots::kitchen
             : asa::entities::local_player->turn_left();
 
         asa::entities::local_player->look_fully_down();
-        asa::entities::local_player->turn_up(60);
+        asa::entities::local_player->turn_up(90);
 
         asa::entities::local_player->access(fridge_);
         asa::entities::local_player->get_inventory()->drop_all(seed_);
@@ -129,6 +156,9 @@ namespace llpp::bots::kitchen
                 crop_, current_slots, true);
             std::cout << "\t[-] Current slots: " << current_slots << ".\n";
         }
+        else { asa::core::sleep_for(std::chrono::milliseconds(500)); }
+
+        asa::entities::local_player->get_inventory()->transfer_all();
         asa::entities::local_player->get_inventory()->close();
         asa::core::sleep_for(std::chrono::milliseconds(300));
     }

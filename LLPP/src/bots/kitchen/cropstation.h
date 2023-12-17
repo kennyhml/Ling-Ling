@@ -30,10 +30,14 @@ namespace llpp::bots::kitchen
 
         asa::structures::SimpleBed spawn_bed_;
         asa::structures::Container fridge_;
+        asa::structures::Container vault_;
         std::array<asa::structures::MediumCropPlot, 6> crop_plots_;
 
     private:
         int get_slots_to_refill();
+
+        void grab_fertilizer();
+        void deposit_fertilizer();
 
         void put_crops_in_fridge(int& fridge_slots_out);
         void empty(const asa::structures::MediumCropPlot&, int& current_slots,

@@ -29,8 +29,8 @@ int main()
     asa::window::get_handle(60, true);
     asa::window::set_foreground();
 
-    auto station = llpp::bots::kitchen::CropStation("CITRONAL01", false,
-                                                    llpp::bots::kitchen::CropStation::CITRONAL,
+    auto station = llpp::bots::kitchen::CropStation("ROCKARROT01", true,
+                                                    llpp::bots::kitchen::CropStation::ROCKARROT,
                                                     std::chrono::minutes(30));
 
 
