@@ -1,10 +1,10 @@
+#include <asapp/core/exceptions.h>
+#include <asapp/entities/localplayer.h>
 #include "bots/drops/cratemanager.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
 #include "core/discord.h"
 #include "core/recovery.h"
-#include <asapp/core/exceptions.h>
-#include <asapp/entities/localplayer.h>
 
 #include <asapp/core/init.h>
 #include <dpp/dpp.h>
@@ -13,8 +13,8 @@
 #include <nlohmann/json.hpp>
 
 #include "bots/drops/embeds.h"
-#include "core/data/database.h"
 #include "bots/kitchen/cropstation.h"
+#include "core/data/database.h"
 
 using json = nlohmann::json;
 
@@ -29,13 +29,10 @@ int main()
     asa::window::get_handle(60, true);
     asa::window::set_foreground();
 
-    auto station = llpp::bots::kitchen::CropStation("LONGRASS01", true,
-                                                    asa::items::consumables::longrass,
+    auto station = llpp::bots::kitchen::CropStation("CITRONAL01", false,
+                                                    llpp::bots::kitchen::CropStation::CITRONAL,
                                                     std::chrono::minutes(30));
 
-    station.complete();
-
-    return 0;
 
     std::ifstream f("src/config.json");
     json data = json::parse(f);
@@ -43,6 +40,11 @@ int main()
 
     llpp::core::discord::init(data["bot"]);
 
+    llpp::core::discord::bot->start(dpp::st_return);
+    station.complete();
+
+    Sleep(5000);
+    return 0;
 
     using quality = asa::structures::CaveLootCrate::Quality;
 
@@ -73,16 +75,12 @@ int main()
                                                    },
                                                    std::chrono::minutes(5));
 
-    llpp::core::discord::bot->start(dpp::st_return);
 
     while (true) {
         try {
-            if (swamp.run())
-                continue;
-            if (paste.run())
-                continue;
-            if (skylord.run())
-                continue;
+            if (swamp.run()) { continue; }
+            if (paste.run()) { continue; }
+            if (skylord.run()) { continue; }
 
             std::cout << "No task ready....\n";
         }
