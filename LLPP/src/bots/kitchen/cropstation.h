@@ -36,13 +36,13 @@ namespace llpp::bots::kitchen
     private:
         int get_slots_to_refill();
 
-        void grab_fertilizer();
-        void deposit_fertilizer();
+        void grab_fertilizer() const;
+        void deposit_fertilizer() const;
 
         void put_crops_in_fridge(int& fridge_slots_out);
         void empty(const asa::structures::MediumCropPlot&, int& current_slots,
-                   bool count);
-        void get_crops(int how_many_slots);
+                   bool count) const;
+        void get_crops(int how_many_slots) const;
         void turn_to_crop_plots() const;
     };
 }

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "cropstation.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
@@ -10,24 +11,23 @@ namespace llpp::bots::kitchen
     namespace
     {
         void get_crop_and_seed(const CropStation::CropType type,
-                               asa::items::Item*& crop_out,
-                               asa::items::Item*& seed_out)
+                               asa::items::Item*& crop_out, asa::items::Item*& seed_out)
         {
             switch (type) {
-            case CropStation::CropType::SAVOROOT:
-                crop_out = asa::items::consumables::savoroot;
+            case CropStation::CropType::SAVOROOT: crop_out =
+                    asa::items::consumables::savoroot;
                 seed_out = asa::items::consumables::savoroot_seed;
                 break;
-            case CropStation::CropType::ROCKARROT:
-                crop_out = asa::items::consumables::rockarrot;
+            case CropStation::CropType::ROCKARROT: crop_out =
+                    asa::items::consumables::rockarrot;
                 seed_out = asa::items::consumables::rockarrot_seed;
                 break;
-            case CropStation::CropType::CITRONAL:
-                crop_out = asa::items::consumables::citronal;
+            case CropStation::CropType::CITRONAL: crop_out =
+                    asa::items::consumables::citronal;
                 seed_out = asa::items::consumables::citronal_seed;
                 break;
-            case CropStation::CropType::LONGRASS:
-                crop_out = asa::items::consumables::longrass;
+            case CropStation::CropType::LONGRASS: crop_out =
+                    asa::items::consumables::longrass;
                 seed_out = asa::items::consumables::longrass_seed;
                 break;
             }
@@ -92,17 +92,17 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::milliseconds(500));
     }
 
-    void CropStation::grab_fertilizer()
+    void CropStation::grab_fertilizer() const
     {
         asa::entities::local_player->look_fully_up();
         asa::entities::local_player->access(vault_);
-        vault_.inventory->transfer_all(asa::items::resources::fertilizer);
+        vault_.inventory->transfer_all(*asa::items::resources::fertilizer);
         vault_.inventory->close();
         asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->turn_down(90);
     }
 
-    void CropStation::deposit_fertilizer()
+    void CropStation::deposit_fertilizer() const
     {
         asa::entities::local_player->look_fully_up();
         asa::entities::local_player->access(vault_);
@@ -132,28 +132,28 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->turn_up(90);
 
         asa::entities::local_player->access(fridge_);
-        asa::entities::local_player->get_inventory()->drop_all(seed_);
-        asa::entities::local_player->get_inventory()->transfer_all(crop_);
+        asa::entities::local_player->get_inventory()->drop_all(*seed_);
+        asa::entities::local_player->get_inventory()->transfer_all(*crop_);
 
-        while (asa::entities::local_player->get_inventory()->has(crop_)) {}
+        while (asa::entities::local_player->get_inventory()->has(*crop_)) {}
         asa::core::sleep_for(std::chrono::milliseconds(500));
         fridge_slots_out = fridge_.get_slot_count();
         fridge_.inventory->close();
     }
 
     void CropStation::empty(const asa::structures::MediumCropPlot& plot,
-                            int& current_slots, const bool count)
+                            int& current_slots, const bool count) const
     {
         std::cout << "[+] Emptying " << plot.name << "\n";
         asa::entities::local_player->access(plot);
-        plot.inventory->transfer_all(crop_);
-        std::cout << "\t[-] Took all " << crop_->name << ". Waiting for server... ";
-        while (count && plot.inventory->has(crop_)) {}
+        plot.inventory->transfer_all(*crop_);
+        std::cout << "\t[-] Took all " << crop_->get_name() << ". Waiting for server... ";
+        while (count && plot.inventory->has(*crop_)) {}
         std::cout << "Done\n";
 
         if (count) {
             asa::entities::local_player->get_inventory()->count_stacks(
-                crop_, current_slots, true);
+                *crop_, current_slots, true);
             std::cout << "\t[-] Current slots: " << current_slots << ".\n";
         }
         else { asa::core::sleep_for(std::chrono::milliseconds(500)); }
@@ -163,7 +163,7 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::milliseconds(300));
     }
 
-    void CropStation::get_crops(const int how_many_slots)
+    void CropStation::get_crops(const int how_many_slots) const
     {
         static std::array<int, 6> turns = {-25, 25, 25, -25, 27, 25};
         constexpr auto delay_per_turn = std::chrono::milliseconds(300);

@@ -32,7 +32,7 @@ namespace llpp::bots::kitchen
              .set_description(
                  std::format("The station was completed successfully {} times!",
                              data.get_station()->get_times_completed()))
-             .set_thumbnail(icon_map[item->name])
+             .set_thumbnail(icon_map[item->get_name()])
              .add_field("Time taken:",
                         std::format("{} seconds", data.get_time_taken().count()), true)
              .add_field("Fridge:",
