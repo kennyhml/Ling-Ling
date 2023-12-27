@@ -141,9 +141,9 @@
             <AdditionalOptions>/FS</AdditionalOptions>
         </ClCompile>
         <Link>
-            <SubSystem>Console</SubSystem>
+            <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalDependencies>ASAPPd.lib;opencv_world481d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>ASAPPd.lib;opencv_world481d.lib;%(AdditionalDependencies);d3d9.lib</AdditionalDependencies>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,14 +159,22 @@
             <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
         </ClCompile>
         <Link>
-            <SubSystem>Console</SubSystem>
+            <SubSystem>Windows</SubSystem>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalDependencies>ASAPP.lib;opencv_world481.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>ASAPP.lib;opencv_world481.lib;%(AdditionalDependencies);d3d9.lib</AdditionalDependencies>
+            <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link</AdditionalLibraryDirectories>
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ClCompile Include="external\imgui\imgui.cpp"/>
+        <ClCompile Include="external\imgui\imgui_demo.cpp"/>
+        <ClCompile Include="external\imgui\imgui_draw.cpp"/>
+        <ClCompile Include="external\imgui\imgui_impl_dx9.cpp"/>
+        <ClCompile Include="external\imgui\imgui_impl_win32.cpp"/>
+        <ClCompile Include="external\imgui\imgui_tables.cpp"/>
+        <ClCompile Include="external\imgui\imgui_widgets.cpp"/>
         <ClCompile Include="src\bots\drops\cratemanager.cpp"/>
         <ClCompile Include="src\bots\drops\lootcratestation.cpp"/>
         <ClCompile Include="src\bots\drops\embeds.cpp"/>
@@ -185,13 +193,23 @@
         <ClCompile Include="src\core\data\managedvar.cpp"/>
         <ClCompile Include="src\core\recovery.cpp"/>
         <ClCompile Include="src\core\discord.cpp"/>
+        <ClCompile Include="src\gui\gui.cpp"/>
         <ClCompile Include="src\main.cpp"/>
         <ClCompile Include="external\sqlite3.c"/>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="external\imgui\imconfig.h"/>
+        <ClInclude Include="external\imgui\imgui.h"/>
+        <ClInclude Include="external\imgui\imgui_impl_dx9.h"/>
+        <ClInclude Include="external\imgui\imgui_impl_win32.h"/>
+        <ClInclude Include="external\imgui\imgui_internal.h"/>
+        <ClInclude Include="external\imgui\imstb_rectpack.h"/>
+        <ClInclude Include="external\imgui\imstb_textedit.h"/>
+        <ClInclude Include="external\imgui\imstb_truetype.h"/>
         <ClInclude Include="src\bots\drops\cratemanager.h"/>
         <ClInclude Include="src\bots\drops\lootcratestation.h"/>
         <ClInclude Include="src\bots\drops\embeds.h"/>
+        <ClInclude Include="src\bots\drops\parameters.h"/>
         <ClInclude Include="src\bots\kitchen\cropstation.h"/>
         <ClInclude Include="src\bots\kitchen\embeds.h"/>
         <ClInclude Include="src\bots\paste\embeds.h"/>
@@ -211,10 +229,14 @@
         <ClInclude Include="src\core\stationresult.h"/>
         <ClInclude Include="src\core\discord.h"/>
         <ClInclude Include="external\sqlite3.h"/>
+        <ClInclude Include="src\gui\gui.h"/>
     </ItemGroup>
     <ItemGroup>
         <None Include=".clang-format"/>
         <None Include="src\config.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="src\fonts\Ruda-Bold.ttf"/>
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">

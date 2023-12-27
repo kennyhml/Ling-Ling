@@ -1,6 +1,7 @@
 #include <iostream>
 #include "pastestation.h"
 #include <asapp/entities/exceptions.h>
+#include <asapp/structures/exceptions.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 
@@ -37,16 +38,16 @@ namespace llpp::bots::paste
             return true;
         }
 
-        auto& slot = achatina.get_inventory()->slots[0];
-        bool hasPaste = slot.has(*asa::items::resources::achatina_paste);
-        if (hasPaste) {
+        const auto& slot = achatina.get_inventory()->slots[0];
+        const bool has_paste = slot.has(*asa::items::resources::achatina_paste);
+        if (!has_paste) { std::cerr << "[!] Achatina has no paste in it\n"; }
+        else {
             std::cout << "Achatina has paste, taking it...\n";
             achatina.get_inventory()->take_slot(0);
         }
-        else { std::cerr << "[!] Achatina has no paste in it!\n"; }
         achatina.exit();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        return hasPaste;
+        return has_paste;
     }
 
     void PasteStation::empty_all()
@@ -75,8 +76,15 @@ namespace llpp::bots::paste
         asa::entities::local_player->turn_left(135, std::chrono::milliseconds(300));
 
         int amount = 0;
-        asa::entities::local_player->deposit_into_dedi(
-            *asa::items::resources::achatina_paste, &amount);
+        try {
+            asa::entities::local_player->deposit_into_dedi(
+                *asa::items::resources::achatina_paste, &amount);
+        }
+        catch (const asa::structures::StructureError&) {
+            std::cerr << "[!] Depositing & OCR failed, trying without...\n";
+            asa::entities::local_player->deposit_into_dedi(
+                *asa::items::resources::achatina_paste, nullptr);
+        }
         return amount;
     }
 }

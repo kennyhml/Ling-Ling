@@ -9,20 +9,34 @@
 #include <asapp/core/init.h>
 #include <dpp/dpp.h>
 
-#include <fstream>
 #include <nlohmann/json.hpp>
 #include "bots/drops/embeds.h"
 #include "bots/kitchen/cropstation.h"
 #include "core/data/database.h"
-
-#include <asapp/items/items.h>
 #include <opencv2/highgui.hpp>
 #include "common/util.h"
+#include "gui/gui.h"
 
 using json = nlohmann::json;
 
-int main()
+
+int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
+                   _In_ PSTR cmd_line, _In_ int cmd_show)
 {
+    llpp::gui::create_window(L"Ling Ling++", L"Meow");
+    llpp::gui::create_device();
+    llpp::gui::create_imgui();
+
+    while (llpp::gui::exit) {
+        llpp::gui::begin_render();
+        llpp::gui::render();
+        llpp::gui::end_render();
+    }
+    llpp::gui::destroy_imgui();
+    llpp::gui::destroy_device();
+    llpp::gui::destroy_window();
+
+    return EXIT_SUCCESS;
     if (!asa::core::init(std::filesystem::path("src/config.json"))) {
         std::cerr << "[!] Failed to initialize ASAPP\n";
         return 0;
@@ -32,78 +46,50 @@ int main()
     std::ifstream f("src/config.json");
     json data = json::parse(f);
     f.close();
+
     llpp::core::discord::init(data["bot"]);
-    llpp::core::discord::bot->start(dpp::st_return);
-
-
     asa::window::get_handle(60, true);
     asa::window::set_foreground();
 
-
-    auto achatina = asa::entities::DinoEnt("Achatina");
-    auto paste = llpp::bots::paste::PasteManager("PASTE", 15, std::chrono::minutes(50));
-
-    paste.run();
-    return 0;
-
-    auto station = llpp::bots::kitchen::CropStation("ROCKARROT01", true,
-                                                    llpp::bots::kitchen::CropStation::ROCKARROT,
-                                                    std::chrono::minutes(30));
-
-
-    using quality = asa::structures::CaveLootCrate::Quality;
-
+    auto paste = llpp::bots::paste::PasteManager("PASTE", 16, std::chrono::minutes(50));
     auto suicide_station = llpp::bots::suicide::SuicideStation(
         "SUICIDE DEATH", "SUICIDE RESPAWN");
 
+    using quality = asa::structures::CaveLootCrate::Quality;
+
+    auto huw = llpp::bots::drops::CrateManager(
+        {"HUW", true, std::chrono::minutes(5), std::chrono::seconds(8)},
+        {{quality::ANY}, {quality::ANY}, {quality::ANY}}, &suicide_station);
+
+
     auto swamp = llpp::bots::drops::CrateManager(
-        "SWAMP", {
+        {"SWAMP", false, std::chrono::minutes(5), std::chrono::seconds(1)}, {
             {quality::RED, quality::RED},
             {quality::YELLOW, quality::YELLOW, quality::ANY}, {quality::BLUE}
-        }, std::chrono::minutes(5), &suicide_station);
+        }, &suicide_station);
 
-    auto skylord = llpp::bots::drops::CrateManager("SKYLORD", {
-                                                       {
-                                                           quality::YELLOW | quality::RED,
-                                                           quality::YELLOW | quality::RED,
-                                                           quality::YELLOW | quality::RED
-                                                       },
-                                                   }, std::chrono::minutes(5));
+    auto skylord = llpp::bots::drops::CrateManager(
+        {"SKYLORD", false, std::chrono::minutes(5), std::chrono::seconds(0)}, {
+            {
+                quality::YELLOW | quality::RED, quality::YELLOW | quality::RED,
+                quality::YELLOW | quality::RED
+            },
+        });
 
-
-    asa::window::get_handle();
-    try { asa::entities::local_player->get_inventory()->drop_all(); }
-    catch (std::exception& e) { std::cout << e.what() << "\n"; }
-
-    return 0;
-
-
-    auto vault = asa::structures::Container("Vault", 350);
-    auto slots = vault.inventory->slots;
-
-    auto start = std::chrono::system_clock::now();
-    for (size_t i = 0; i < slots.size(); i++) {
-        auto item = slots[i].get_item();
-        if (item.get()) { std::cout << i << ": " << item.get()->info() << "\n"; }
-        else { std::cout << i << ": Undetermined\n"; }
-    }
-
-    std::cout << "Time taken: " << llpp::util::get_elapsed<
-        std::chrono::milliseconds>(start) << "\n";
-    return 0;
+    llpp::core::discord::bot->start(dpp::st_return);
 
     while (true) {
         try {
             if (swamp.run()) { continue; }
-            if (paste.run()) { continue; }
             if (skylord.run()) { continue; }
-
+            if (huw.run()) { continue; }
+            if (paste.run()) { continue; }
             std::cout << "No task ready....\n";
         }
         catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
-            llpp::core::reconnect_to_server();
-        } catch (const std::exception& e) {
+            llpp::core::recover();
+        }catch (const std::exception& e) {
             llpp::core::discord::inform_fatal_error(e, "???");
             break;
         }

@@ -6,24 +6,30 @@
 #include <asapp/structures/simplebed.h>
 #include <dpp/dpp.h>
 
+#include "parameters.h"
+
 #define UNDEFINED_TIME std::chrono::system_clock::time_point::min()
 
 namespace llpp::bots::drops
 {
     using QualityFlags = int;
 
-    class CrateManager : public core::IStationManager
+    /**
+     * @brief Handles the completion of multiple related crate stations.
+     *
+     * 
+     * 
+     */
+    class CrateManager final : public core::IStationManager
     {
     public:
-        CrateManager(std::string t_prefix,
-                     const std::vector<std::vector<QualityFlags>>&
-                     t_grouped_crates,
-                     std::chrono::minutes t_interval,
+        CrateManager(const CrateStationParams& t_params,
+                     const std::vector<std::vector<QualityFlags>>& t_grouped_crates,
                      suicide::SuicideStation* t_suicide = nullptr);
 
         bool run() override;
-        bool is_ready_to_run() const override;
-        std::chrono::minutes get_time_left_until_ready() const override;
+        [[nodiscard]] bool is_ready_to_run() const override;
+        [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
     public:
         struct CrateGroupStatistics
@@ -33,12 +39,12 @@ namespace llpp::bots::drops
 
             void add_looted();
 
-            int get_times_looted() const { return times_looted; }
-            std::chrono::seconds get_avg_respawn() const { return avg_respawn; }
+            [[nodiscard ]] int get_times_looted() const { return times_looted_; }
+            [[nodiscard ]] std::chrono::seconds get_avg() const { return avg_respawn_; }
 
         private:
-            int times_looted = 0;
-            std::chrono::seconds avg_respawn;
+            int times_looted_ = 0;
+            std::chrono::seconds avg_respawn_ = std::chrono::seconds(0);
         };
 
         std::vector<CrateGroupStatistics> stats_per_group;
@@ -46,30 +52,29 @@ namespace llpp::bots::drops
         static core::data::ManagedVar<bool> get_reroll_mode();
 
     private:
-        const std::string prefix;
+        const std::string prefix_;
+        const bool use_beds_;
+        const std::chrono::seconds allowed_render_time_;
 
-        asa::structures::SimpleBed align_bed;
-        asa::structures::Teleporter dropoff_tp;
-        asa::structures::Container dropoff_vault;
+        asa::structures::SimpleBed align_bed_;
+        asa::structures::Teleporter dropoff_tp_;
+        asa::structures::Container dropoff_vault_;
 
-        suicide::SuicideStation* suicide;
+        suicide::SuicideStation* suicide_;
 
-        float last_known_vault_fill_level = 0.f;
-        inline static bool has_registered_reroll_command = false;
-        std::vector<std::vector<LootCrateStation>> crates;
+        float last_known_vault_fill_level_ = 0.f;
+        inline static bool has_registered_reroll_command_ = false;
+        std::vector<std::vector<LootCrateStation>> crates_;
 
     private:
         static void reroll_mode_callback(const dpp::slashcommand_t&);
 
-        void dropoff_items(float& filledLevelOut);
+        void dropoff_items(float& fill_level_out);
         void teleport_to_dropoff();
-        void run_all_stations(bool& wasAnyLootedOut);
-        void access_bed_above();
+        void run_all_stations(bool& any_looted);
         void spawn_on_align_bed();
         void register_slash_commands();
-        void set_group_cooldown(std::vector<LootCrateStation>& group);
-        void populate_groups(
-            const std::vector<std::vector<QualityFlags>>& groups,
-            std::chrono::minutes interval);
+        void populate_groups(const std::vector<std::vector<QualityFlags>>& groups,
+                             std::chrono::minutes interval);
     };
 }
