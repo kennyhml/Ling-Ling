@@ -14,6 +14,8 @@
 #include "bots/kitchen/cropstation.h"
 #include "core/data/database.h"
 #include <opencv2/highgui.hpp>
+
+#include "../external/imgui/imgui_internal.h"
 #include "common/util.h"
 #include "gui/gui.h"
 
@@ -27,9 +29,24 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::create_device();
     llpp::gui::create_imgui();
 
+    if (!AllocConsole()) { return false; }
+    FILE* pFile;
+    freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
+
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
+
+        // Render ImGui
+        ImGui::SetNextWindowPos({0, 0});
+        ImGui::SetNextWindowSize({
+            ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y
+        });
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(620, 420));
         llpp::gui::render();
+        ImGui::ShowStyleEditor();
+        ImGui::PopStyleVar(2);
         llpp::gui::end_render();
     }
     llpp::gui::destroy_imgui();
@@ -37,6 +54,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::destroy_window();
 
     return EXIT_SUCCESS;
+
     if (!asa::core::init(std::filesystem::path("src/config.json"))) {
         std::cerr << "[!] Failed to initialize ASAPP\n";
         return 0;

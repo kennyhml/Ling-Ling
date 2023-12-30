@@ -1,13 +1,14 @@
 #pragma once
 #include <d3d9.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "../../external/imgui/imgui.h"
 
 namespace llpp::gui
 {
     // window boundaries
-    constexpr int WIDTH = 550;
-    constexpr int HEIGHT = 300;
+    constexpr int WIDTH = 720;
+    constexpr int HEIGHT = 440;
 
     inline ImFont* font = nullptr;
     inline bool exit = true;

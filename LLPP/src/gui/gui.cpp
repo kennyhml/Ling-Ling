@@ -1,10 +1,19 @@
 #include "gui.h"
 
+#include <filesystem>
 #include <iostream>
-
+#include <windowsx.h>
+#include "../fonts/IconsFontAwesome6.h"
+#include "../fonts/fa.h"
+#include "custom.h"
 #include "../../external/imgui/imgui.h"
 #include "../../external/imgui/imgui_impl_dx9.h"
 #include "../../external/imgui/imgui_impl_win32.h"
+#include "../../external/imgui/imgui_internal.h"
+#include "../../external/imgui/ImGuiFileDialog.h"
+
+#define ALPHA   ( ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoBorder )
+#define NO_ALPHA ( ImGuiColorEditFlags_NoTooltip    | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoBorder )
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
     HWND window, UINT message, WPARAM wide_param, LPARAM long_param);
@@ -45,25 +54,25 @@ LRESULT CALLBACK WindowProcess(const HWND window, const UINT message,
         llpp::gui::position = MAKEPOINTS(long_param);
         return 0;
     }
-    case WM_MOUSEMOVE:
-    {
-        if (wide_param != MK_LBUTTON) { break; }
+    case WM_MOUSEMOVE: if (wide_param == MK_LBUTTON) {
+            const auto [x, y]{MAKEPOINTS(long_param)};
+            auto rect = RECT{};
 
-        const auto points = MAKEPOINTS(long_param);
-        auto rect = RECT{};
+            GetWindowRect(window, &rect);
 
-        GetWindowRect(window, &rect);
-        const auto pos = llpp::gui::position;
-        rect.left += points.x - pos.x;
-        rect.top += points.y - pos.y;
+            rect.left += x - llpp::gui::position.x;
+            rect.top += y - llpp::gui::position.y;
 
-        if (pos.x >= 0 && pos.x <= llpp::gui::WIDTH && pos.y >= 0 && pos.y <= 19) {
-            SetWindowPos(window, HWND_TOPMOST, rect.left, rect.top, 0, 0,
-                         SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOZORDER);
+            if (llpp::gui::position.x >= 0 && llpp::gui::position.x <= llpp::gui::WIDTH &&
+                llpp::gui::position.y >= 0 && llpp::gui::position.y <=
+                llpp::gui::HEIGHT) {
+                SetWindowPos(window, HWND_TOPMOST, rect.left, rect.top, 0, 0,
+                             SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOZORDER);
+            }
         }
+        break;
     }
-        return 0;
-    }
+
 
     return DefWindowProcW(window, message, wide_param, long_param);
 }
@@ -78,7 +87,7 @@ namespace llpp::gui
         window_class.lpfnWndProc = WindowProcess;
         window_class.cbClsExtra = 0;
         window_class.cbWndExtra = 0;
-        window_class.hInstance = GetModuleHandleA(nullptr);
+        window_class.hInstance = GetModuleHandle(nullptr);
         window_class.hCursor = nullptr;
         window_class.hbrBackground = nullptr;
         window_class.lpszMenuName = nullptr;
@@ -89,9 +98,10 @@ namespace llpp::gui
             LR_LOADFROMFILE | LR_DEFAULTSIZE));
 
         RegisterClassExW(&window_class);
-        window = CreateWindowW(class_name, window_name, WS_POPUP, 100, 100, WIDTH, HEIGHT,
-                               nullptr, nullptr, window_class.hInstance, nullptr);
-        ShowWindow(window, SW_SHOWNORMAL);
+        window = CreateWindowExW(WS_EX_TRANSPARENT, class_name, window_name, WS_POPUP, 0,
+                                 0, WIDTH, HEIGHT, nullptr, nullptr,
+                                 window_class.hInstance, nullptr);
+        ShowWindow(window, SW_SHOWDEFAULT);
         UpdateWindow(window);
     }
 
@@ -145,10 +155,8 @@ namespace llpp::gui
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
 
-        font = io.Fonts->AddFontFromFileTTF("C:/dev/LLPP/LLPP/src/fonts/Ruda-Bold.ttf",
-                                            16);
-
         io.IniFilename = nullptr;
+        ImGui::StyleColorsDark();
 
         ImGuiStyle* style = &ImGui::GetStyle();
 
@@ -167,7 +175,6 @@ namespace llpp::gui
         style->Colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
         style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
         style->Colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-        style->Colors[ImGuiCol_ChildBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
         style->Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
         style->Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.0f, 0.3f, 0.88f);
         style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
@@ -175,7 +182,7 @@ namespace llpp::gui
         style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
         style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
         style->Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-        style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+        style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.0f, 0.0f, 0.75f);
         style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
         style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
         style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
@@ -198,11 +205,13 @@ namespace llpp::gui
         style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
         style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
         style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+        static constexpr ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+        ImFontConfig icons_config;
 
-
-        //ImGui::StyleColorsDark();
-
-
+        io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 17.0f);
+        io.Fonts->AddFontFromMemoryCompressedTTF(FA_compressed_data, FA_compressed_size,
+                                                 17.0f, &icons_config, icon_ranges);
+        io.Fonts->Build();
         ImGui_ImplWin32_Init(window);
         ImGui_ImplDX9_Init(device);
     }
@@ -255,19 +264,91 @@ namespace llpp::gui
 
     void render()
     {
-        ImGui::SetNextWindowPos({0, 0});
-        ImGui::SetNextWindowSize({WIDTH, HEIGHT});
         ImGui::Begin("Ling Ling++", &exit,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
-                     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
-        // ImGui::PushFont(font);
-        ImGui::SetNextItemWidth(90.0f);
-        ImGui::SliderInt("Speed", &test_int, 1, 10);
-        ImGui::SameLine();
-        // ImGui::PopFont();
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-        ImGui::SetNextItemWidth(90.0f);
-        ImGui::SliderInt("Knockback", &test_int, -100, 100);
+        auto window = ImGui::GetCurrentWindow();
+        auto draw = window->DrawList;
+        auto style = ImGui::GetStyle();
+
+        animation = ImLerp(animation, 1.0f, 0.03f);
+        window->DrawList->AddLine(window->Pos + ImVec2(65, 65),
+                                  window->Pos + ImVec2(window->Size.x - 15, 60),
+                                  ImColor(1.f, 1.f, 1.f, 0.05f));
+
+        ImGui::SetCursorPosY(20);
+        render_main_tab_area("main_tabs", ImVec2(50, window->Size.y), []() {
+            for (int i = 0; i < main_tabs.size(); i++) {
+                if (tab_button(main_tab_icons[i], main_tabs[i], i == selected_main_tab,
+                               0.f, 0) && i != selected_main_tab) {
+                    selected_main_tab = static_cast<MainTabs>(i);
+                }
+            }
+        });
+
+        switch (selected_main_tab) {
+        case GENERAL:
+        {
+            render_subtab_buttons<GeneralTabs>(general_subtabs, selected_general_tab);
+            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+            ImGui::BeginChild("##general_children",
+                              ImVec2(ImGui::GetWindowWidth() - 20,
+                                     ImGui::GetWindowHeight() - 80));
+
+            switch (selected_general_tab) {
+            case ARK:
+            {
+                draw_general_ark_tabs();
+                break;
+            }
+            case BOT: { break; }
+            }
+
+            ImGui::EndChild();
+
+
+            break;
+        }
+        case DISCORD:
+        {
+            render_subtab_buttons<DiscordTabs>(discord_subtabs, selected_discord_tab);
+            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+            ImGui::BeginChild("##info_children",
+                              ImVec2(ImGui::GetWindowWidth() - 20,
+                                     ImGui::GetWindowHeight() - 80));
+            switch (selected_discord_tab) {
+            case BOT_CONFIG: draw_discord_bot_config();
+                break;
+            case INFO: draw_discord_info_tabs();
+                break;
+
+            case ALERTS: { break; }
+            }
+            ImGui::EndChild();
+
+            break;
+        }
+        case BOTS:
+        {
+            render_subtab_buttons<BotTabs>(bot_subtabs, selected_bot_tab);
+            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+            ImGui::BeginChild("##bots_children",
+                              ImVec2(ImGui::GetWindowWidth() - 20,
+                                     ImGui::GetWindowHeight() - 80));
+
+            switch (selected_bot_tab) {
+            case PASTE: draw_bots_paste_tabs();
+                break;
+
+            case DROPS: draw_bots_drops_tab();
+                break;
+            }
+            ImGui::EndChild();
+            break;
+        }
+        }
+
         ImGui::End();
     }
 }

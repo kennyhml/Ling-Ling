@@ -193,11 +193,13 @@
         <ClCompile Include="src\core\data\managedvar.cpp"/>
         <ClCompile Include="src\core\recovery.cpp"/>
         <ClCompile Include="src\core\discord.cpp"/>
+        <ClCompile Include="src\gui\custom.cpp"/>
         <ClCompile Include="src\gui\gui.cpp"/>
         <ClCompile Include="src\main.cpp"/>
         <ClCompile Include="external\sqlite3.c"/>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="external\imgui\dirent\dirent.h"/>
         <ClInclude Include="external\imgui\imconfig.h"/>
         <ClInclude Include="external\imgui\imgui.h"/>
         <ClInclude Include="external\imgui\imgui_impl_dx9.h"/>
@@ -229,6 +231,9 @@
         <ClInclude Include="src\core\stationresult.h"/>
         <ClInclude Include="src\core\discord.h"/>
         <ClInclude Include="external\sqlite3.h"/>
+        <ClInclude Include="src\fonts\fa.h"/>
+        <ClInclude Include="src\fonts\IconsFontAwesome6.h"/>
+        <ClInclude Include="src\gui\custom.h"/>
         <ClInclude Include="src\gui\gui.h"/>
     </ItemGroup>
     <ItemGroup>
@@ -236,6 +241,9 @@
         <None Include="src\config.json"/>
     </ItemGroup>
     <ItemGroup>
+        <Content Include="external\imgui\dirent\ChangeLog"/>
+        <Content Include="external\imgui\dirent\LICENSE"/>
+        <Content Include="external\imgui\dirent\README.md"/>
         <Content Include="src\fonts\Ruda-Bold.ttf"/>
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
