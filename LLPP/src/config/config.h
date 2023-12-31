@@ -40,6 +40,14 @@ namespace llpp::config
             inline ManagedVar<std::vector<const char*>> users(
                 BASE, "authorized_users", save, {});
         }
+
+        namespace advanced
+        {
+            inline const std::vector<std::string> BASE{"discord", "advanced"};
+
+            inline ManagedVar<bool> ephemeral_replies(BASE, "ephemeral_replies", save,
+                                                      false);
+        }
     }
 
     namespace bots::drops

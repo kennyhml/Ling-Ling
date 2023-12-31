@@ -14,7 +14,6 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     FILE* pFile;
     freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
 
-
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 

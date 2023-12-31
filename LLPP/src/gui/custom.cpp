@@ -241,7 +241,9 @@ namespace llpp::gui
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
 
         ImGui::SetCursorPos({10, 11});
-        ImGui::Checkbox("Use ephemeral replies", &bools[0]);
+        if (ImGui::Checkbox("Use ephemeral replies", config::discord::advanced::ephemeral_replies.get_ptr())) {
+            config::discord::advanced::ephemeral_replies.save();
+        }
         end_child();
     }
 
