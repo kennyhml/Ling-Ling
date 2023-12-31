@@ -1,5 +1,4 @@
 #pragma once
-#include "../../core/data/managedvar.h"
 #include "../../core/istationmanager.h"
 #include "../suicide/suicidestation.h"
 #include "lootcratestation.h"
@@ -49,7 +48,7 @@ namespace llpp::bots::drops
 
         std::vector<CrateGroupStatistics> stats_per_group;
 
-        static core::data::ManagedVar<bool> get_reroll_mode();
+        // static core::data::ManagedVar<bool> get_reroll_mode();
 
     private:
         const std::string prefix_;

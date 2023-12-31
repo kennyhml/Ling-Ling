@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include "../../external/imgui/imgui_internal.h"
+#include "../config/config.h"
 
 namespace llpp::gui
 {
@@ -188,8 +189,14 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##bot_token", dir_buffer, 256,
-                             ImGuiInputTextFlags_Password);
+            ImGui::InputText("##bot_token", config::discord::token.get().data(), 256,
+                             ImGuiInputTextFlags_Password |
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::discord::token.set(data->Buf);
+                                 return 0;
+                             });
+
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The token for your discord bot, you must create it yourself.\nDO NOT SHARE THIS WITH ANYONE.");
@@ -408,13 +415,14 @@ namespace llpp::gui
             ImGui::Text("Selected Manager:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::Combo("##selected_manager", &selected_manager, items.data(),
-                         items.size());
+            std::vector<const char*>* data = config::bots::drops::managers.get_ptr();
+            ImGui::Combo("##selected_manager", &selected_manager, data->data(),
+                         data->size());
 
             ImGui::SetCursorPos({5, 45});
             if (ImGui::Button("Create manager")) { new_name_popup = true; }
             ImGui::SameLine();
-            if (ImGui::Button("Delete selected manager") && !items.empty()) {
+            if (ImGui::Button("Delete selected manager") && !data->empty()) {
                 confirmation_popup = true;
             }
 
@@ -431,14 +439,15 @@ namespace llpp::gui
                                      IM_ARRAYSIZE(name_buffer));
                     if (ImGui::Button("OK")) {
                         new_name_popup = false;
-                        items.push_back(_strdup(name_buffer));
+                        data->push_back(_strdup(name_buffer));
+                        config::bots::drops::managers.save();
                     }
                     ImGui::EndPopup();
                 }
             }
 
             if (confirmation_popup) {
-                const auto name = items[selected_manager];
+                const auto name = (*data)[selected_manager];
                 const std::string title = "Delete '" + std::string(name) + "'";
                 ImGui::OpenPopup(title.c_str());
 
@@ -448,7 +457,8 @@ namespace llpp::gui
                     if (ImGui::Button("OK", ImVec2(80, 0))) {
                         printf("Action confirmed!\n");
                         confirmation_popup = false;
-                        items.erase(items.begin() + selected_manager);
+                        data->erase(data->begin() + selected_manager);
+                        config::bots::drops::managers.save();
                     }
 
                     ImGui::SameLine();

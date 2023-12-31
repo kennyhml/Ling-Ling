@@ -1,3 +1,8 @@
+#pragma once
+
+namespace llpp::config
+{
+    inline const char* required_data = R"(
 {
   "general": {
     "ark": {
@@ -42,4 +47,5 @@
     }
   }
 }
-
+)";
+}

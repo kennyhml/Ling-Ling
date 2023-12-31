@@ -1,0 +1,45 @@
+{
+    "general": {
+        "ark": {
+            "game_root_directory": "F:\\SteamLibrary\\steamapps\\common\\ARK Survival Ascended"
+        },
+        "bot": {
+            "assets": "C:/dev/ASAPP/ASAPP/assets",
+            "itemdata": "C:/dev/ASAPP/ASAPP/source/itemdata.json",
+            "tessdata": "C:/dev/LLPP/LLPP/tessdata"
+        }
+    },
+    "discord": {
+        "advanced": {
+            "ephemeral_replies": false
+        },
+        "authorization": {
+            "authorized_users": [],
+            "command_channels": [],
+            "authorized_roles": []
+        },
+        "channels": {
+            "error": "",
+            "info": ""
+        },
+        "roles": {
+            "helper_access": "",
+            "helper_no_access": ""
+        },
+        "token": "MTE4MzM3MDQ3MDkzMDc4ODQxMw.G7WbHg.AK9OzDWjwjJalFh1EDMGOYe8zA17VJ5PQhq9Bo"
+    },
+    "bots": {
+        "drops": {
+            "managers": []
+        },
+        "paste": {
+            "allow_partial": false,
+            "interval": 5,
+            "load_for": 15,
+            "num_stations": 16,
+            "ocr_amount": false,
+            "prefix": "PASTE",
+            "render_prefix": "RENDER"
+        }
+    }
+}

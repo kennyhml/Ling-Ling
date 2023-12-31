@@ -73,11 +73,11 @@ namespace llpp::bots::drops
             crates_[0][0].get_next_completion());
     }
 
-    core::data::ManagedVar<bool> CrateManager::get_reroll_mode()
-    {
-        static auto reroll_mode = core::data::ManagedVar<bool>("reroll_mode", false);
-        return reroll_mode;
-    }
+    // core::data::ManagedVar<bool> CrateManager::get_reroll_mode()
+    // {
+    //     static auto reroll_mode = core::data::ManagedVar<bool>("reroll_mode", false);
+    //     return reroll_mode;
+    // }
 
     void CrateManager::run_all_stations(bool& any_looted)
     {
@@ -89,7 +89,7 @@ namespace llpp::bots::drops
         for (auto& group : crates_) {
             for (auto& station : group) {
                 station.set_can_default_teleport(can_default_tp);
-                station.set_fully_loot(!get_reroll_mode().get());
+                //  station.set_fully_loot(!get_reroll_mode().get());
                 auto result = station.complete();
 
                 if (!let_teleporters_render) {
@@ -183,12 +183,12 @@ namespace llpp::bots::drops
         bool enable = subcommand.get_value<bool>(0);
         std::string as_string = enable ? "true" : "false";
 
-        std::cout << "[+] reroll mode changed via discord from" << get_reroll_mode().get()
-            << " to " << as_string << std::endl;
-        if (get_reroll_mode().get() == enable) {
-            return event.reply(std::format("`reroll mode` is already `{}`", as_string));
-        }
-        get_reroll_mode().set(enable);
-        event.reply(std::format("`reroll mode` has been changed to `{}`", as_string));
+        // std::cout << "[+] reroll mode changed via discord from" << get_reroll_mode().get()
+        //     << " to " << as_string << std::endl;
+        // if (get_reroll_mode().get() == enable) {
+        //     return event.reply(std::format("`reroll mode` is already `{}`", as_string));
+        // }
+        // get_reroll_mode().set(enable);
+        // event.reply(std::format("`reroll mode` has been changed to `{}`", as_string));
     }
 }
