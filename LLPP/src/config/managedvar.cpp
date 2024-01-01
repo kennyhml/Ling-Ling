@@ -6,37 +6,41 @@ namespace llpp::config
     template <typename T>
     T ManagedVar<T>::get()
     {
-        json& curr = walk_json(get_data());
-        value_ = curr.at(path_.back()).get<T>();
+        try {
+            json& curr = walk_json(get_data());
+            value_ = curr.at(path_.back()).get<T>();
+        }
+        catch (const json::out_of_range& e) { handle_not_found(e); }
         return value_;
     }
 
     template <>
     const char* ManagedVar<const char*>::get()
     {
-        json& curr = walk_json(get_data());
-        value_ = _strdup(curr.at(path_.back()).get<std::string>().c_str());
+        try {
+            json& curr = walk_json(get_data());
+            // need to copy the const char to our value, otherwise itll get deleted
+            // after we return the pointer to it.
+            value_ = _strdup(curr.at(path_.back()).get<std::string>().c_str());
+        }
+        catch (const json::out_of_range& e) { handle_not_found(e); }
         return value_;
     }
 
     template <>
     std::vector<const char*> ManagedVar<std::vector<const char*>>::get()
     {
-        json& curr = walk_json(get_data());
-        const auto& array = curr.at(path_.back());
-
-        value_.clear();
         try {
+            json& curr = walk_json(get_data());
+            // Need to copy each element into our value individually.
+            const auto& array = curr.at(path_.back());
+            value_.clear();
             for (const auto& element : array) {
-                std::cout << element << "\n";
                 value_.emplace_back(_strdup(element.get<std::string>().c_str()));
             }
-            return value_;
         }
-        catch (const std::exception& e) {
-            std::cout << e.what() << '\n';
-            return {};
-        }
+        catch (const json::out_of_range& e) { handle_not_found(e); }
+        return value_;
     }
 
     template <typename T>
@@ -66,7 +70,19 @@ namespace llpp::config
         }
         return *curr;
     }
+    
+    template <typename T>
+    void ManagedVar<T>::handle_not_found(const json::out_of_range& e)
+    {
+        if (has_inserted_default_) { throw e; }
+        std::cout << std::format(
+            "[!] ManagedVar '{}' was not found, inserting default value.\n",
+            path_.back());
+        set(default_);
+    }
 
+
+    
     template struct ManagedVar<std::vector<int>>;
     template struct ManagedVar<std::vector<char>>;
     template struct ManagedVar<std::array<char, 256>>;

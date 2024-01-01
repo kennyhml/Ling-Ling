@@ -23,14 +23,8 @@ namespace llpp::config
     public:
         explicit ManagedVar(const std::vector<std::string>& t_var_path,
                             const std::function<void()>& t_on_change,
-                            T t_default) : path_(t_var_path), on_change_(t_on_change)
-        {
-            try { get(); }
-            catch (const json::out_of_range& e) {
-                std::cout << "[!] Var " << t_var_path.back() << " does not yet exist!\n";
-                set(t_default);
-            }
-        }
+                            T t_default) : default_(t_default), path_(t_var_path),
+                                           on_change_(t_on_change) {};
 
         explicit ManagedVar(const std::vector<std::string>& t_base, std::string t_key,
                             const std::function<void()>& t_on_change,
@@ -46,9 +40,12 @@ namespace llpp::config
 
     private :
         T value_;
+        T default_;
+        bool has_inserted_default_ = false;
         std::vector<std::string> path_;
         std::function<void()> on_change_;
 
         json& walk_json(json& data, bool create_if_not_exist = false) const;
+        void handle_not_found(const json::out_of_range& e);
     };
 }

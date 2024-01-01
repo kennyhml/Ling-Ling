@@ -515,14 +515,15 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 73});
             if (ImGui::InputInt("##paste_count",
                                 config::bots::paste::num_stations.get_ptr(), 1, 5)) {
+                int* num_stations = config::bots::paste::num_stations.get_ptr();
+                *num_stations = std::clamp(*num_stations, 1, 100);
                 config::bots::paste::num_stations.save();
             }
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The number of paste stations you have.");
             }
-            int* num_stations = config::bots::paste::num_stations.get_ptr();
-            *num_stations = std::clamp(*num_stations, 1, 100);
+
 
             ImGui::SetCursorPos({10, 107});
             ImGui::Text("Interval (minutes):");
@@ -530,14 +531,15 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 104});
             if (ImGui::InputInt("##paste_interval",
                                 config::bots::paste::interval.get_ptr(), 1, 5)) {
+                int* interval = config::bots::paste::interval.get_ptr();
+                *interval = std::clamp(*interval, 5, 150);
                 config::bots::paste::interval.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
             }
-            int* interval = config::bots::paste::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+
 
             ImGui::SetCursorPos({10, 138});
             ImGui::Text("Load for (seconds):");
@@ -545,14 +547,15 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 135});
             if (ImGui::InputInt("##paste_render", config::bots::paste::load_for.get_ptr(), 1,
                             5)) {
+                int* load_for = config::bots::paste::load_for.get_ptr();
+                *load_for = std::clamp(*load_for, 5, 100);
                 config::bots::paste::load_for.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "How long to let the stations render at the source render bed (in seconds).\nMore structures -> longer render time required.");
             }
-            int* load_for = config::bots::paste::load_for.get_ptr();
-            *load_for = std::clamp(*load_for, 5, 100);
+
         }
         end_child();
 

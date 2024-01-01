@@ -25,6 +25,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(620, 420));
+        std::cout << "ui init now\n";
         llpp::gui::render();
         ImGui::ShowStyleEditor();
         ImGui::PopStyleVar(2);
