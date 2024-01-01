@@ -15,7 +15,9 @@
         },
         "authorization": {
             "authorized_users": [],
-            "command_channels": [],
+            "command_channels": [
+                "1184670076566261760"
+            ],
             "authorized_roles": []
         },
         "channels": {
@@ -26,7 +28,8 @@
             "helper_access": "",
             "helper_no_access": ""
         },
-        "token": "MTE4MzM3MDQ3MDkzMDc4ODQxMw.G7WbHg.AK9OzDWjwjJalFh1EDMGOYe8zA17VJ5PQhq9Bo"
+        "token": "MTE4MzM3MDQ3MDkzMDc4ODQxMw.G7WbHg.AK9OzDWjwjJalFh1EDMGOYe8zA17VJ5PQhq9Bo",
+        "guild": "1093755908951117905"
     },
     "bots": {
         "drops": {
@@ -36,7 +39,7 @@
             "allow_partial": false,
             "interval": 5,
             "load_for": 15,
-            "num_stations": 16,
+            "num_stations": 15,
             "ocr_amount": false,
             "prefix": "PASTE",
             "render_prefix": "RENDER"

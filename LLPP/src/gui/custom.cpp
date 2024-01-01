@@ -137,7 +137,6 @@ namespace llpp::gui
         ImGui::PopStyleVar();
     }
 
-    inline char dir_buffer[256];
     inline ImVec4 path_color = ImVec4(1.f, 0.f, 0.f, 1.f);
     inline bool bools[50]{};
     inline int ints[50]{};
@@ -154,7 +153,12 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPosY(10);
-            ImGui::InputText("##", dir_buffer, 256);
+            ImGui::InputText("##", config::general::ark::root_dir.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::general::ark::root_dir.set(data->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The path to the root game directory.");
             }
@@ -165,12 +169,13 @@ namespace llpp::gui
             if (ImGui::Button("Get")) {
                 std::string selected;
                 openFolder(selected);
-                if (!selected.empty()) { strcpy_s(dir_buffer, selected.c_str()); }
+                if (!selected.empty()) { config::general::ark::root_dir.set(selected); }
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("Select the directory.");
             }
-            const bool valid = exists(std::filesystem::path(dir_buffer));
+            const bool valid = exists(
+                std::filesystem::path(config::general::ark::root_dir.get()));
             path_color = valid ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f);
         }
         end_child();
@@ -180,14 +185,21 @@ namespace llpp::gui
         end_child();
     }
 
+    inline int selected_channel = 0;
+    inline int selected_role = 0;
+    inline int selected_user = 0;
+    inline bool new_channel_popup = false;
+    inline bool new_role_popup = false;
+    inline bool new_user_popup = false;
+
     void draw_discord_bot_config()
     {
-        begin_child("Bot settings", ImVec2(300, ImGui::GetWindowHeight()));
+        begin_child("Bot settings", ImVec2(375, ImGui::GetWindowHeight()));
         {
+            // TOKEN SHITS
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Discord Bot token:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 11});
             ImGui::InputText("##bot_token", config::discord::token.get().data(), 256,
                              ImGuiInputTextFlags_Password |
@@ -202,49 +214,172 @@ namespace llpp::gui
                     "The token for your discord bot, you must create it yourself.\nDO NOT SHARE THIS WITH ANYONE.");
             }
 
+
             ImGui::SetCursorPos({10, 45});
-            ImGui::Text("Command channels:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::Text("Discord (Guild) ID:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##command_channels", dir_buffer, 256);
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "The ids of the channels authorized to issue bot commands, split with ;.\nLeave empty to allow commands anywhere.");
-            }
+            ImGui::InputText("##bot_guild_id", config::discord::guild.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit |
+                             ImGuiInputTextFlags_CharsDecimal,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::discord::guild.set(data->Buf);
+                                 return 0;
+                             });
 
+            // COMMAND CHANNEL SHITS
             ImGui::SetCursorPos({10, 76});
-            ImGui::Text("Authorized roles:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::Text("Command channels:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.41f);
             ImGui::SetCursorPos({150, 73});
-            ImGui::InputText("##authorized_roles", dir_buffer, 256);
+            auto* channel_data = config::discord::authorization::channels.get_ptr();
+            ImGui::Combo("##command_channels", &selected_channel, channel_data->data(),
+                         channel_data->size());
+
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                    "The ids of the roles authorized to issue bot commands in, split with ;.\nLeave empty to allow any role to use commands (unless users are specified).");
+                    "A list of channel IDs where bot commands are permitted; roles and users are still respected.\n"
+                    "Leave this field empty to allow bot commands to be used in any channel.");
             }
-            ImGui::SetCursorPos({10, 107});
-            ImGui::Text("Authorized users:");
+
             ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            if (ImGui::Button("+##channel")) { new_channel_popup = true; }
+            ImGui::SameLine();
+            if (ImGui::Button("-##channel") && !channel_data->empty()) {
+                channel_data->erase(channel_data->begin() + selected_channel);
+                config::discord::authorization::channels.save();
+                selected_channel = max(0, selected_channel);
+            }
+
+            if (new_channel_popup) {
+                ImGui::OpenPopup("Add an authorized command channel");
+                if (ImGui::BeginPopupModal("Add an authorized command channel",
+                                           &new_channel_popup,
+                                           ImGuiWindowFlags_AlwaysAutoResize)) {
+                    static char name_buffer[256] = {};
+                    if (ImGui::IsWindowAppearing()) {
+                        memset(name_buffer, 0, sizeof(name_buffer));
+                    }
+
+                    ImGui::InputText("##input_command_channel", name_buffer,
+                                     IM_ARRAYSIZE(name_buffer),
+                                     ImGuiInputTextFlags_CharsDecimal);
+                    if (ImGui::Button("OK")) {
+                        new_channel_popup = false;
+                        channel_data->push_back(_strdup(name_buffer));
+                        config::discord::authorization::channels.save();
+                        selected_channel = channel_data->size() - 1;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+
+
+            // ROLES SHITS
+            ImGui::SetCursorPos({10, 107});
+            ImGui::Text("Authorized roles:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.41f);
             ImGui::SetCursorPos({150, 104});
-            ImGui::InputText("##authorized_users", dir_buffer, 256);
+            auto* roles_data = config::discord::authorization::roles.get_ptr();
+            ImGui::Combo("##authed_roles", &selected_role, roles_data->data(),
+                         roles_data->size());
+
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                    "The ids of the users authorized to issue bot commands in, split with ;.\nLeave empty to allow any user to issue commands (unless roles are specified).");
+                    "A list of role IDs authorized to execute bot commands.\n");
             }
+
+            ImGui::SameLine();
+            if (ImGui::Button("+##role")) { new_role_popup = true; }
+            ImGui::SameLine();
+            if (ImGui::Button("-##role") && !roles_data->empty()) {
+                roles_data->erase(roles_data->begin() + selected_role);
+                config::discord::authorization::roles.save();
+                selected_role = max(0, selected_role - 1);
+            }
+
+            if (new_role_popup) {
+                ImGui::OpenPopup("Add an authorized role");
+                if (ImGui::BeginPopupModal("Add an authorized role", &new_role_popup,
+                                           ImGuiWindowFlags_AlwaysAutoResize)) {
+                    static char name_buffer[256] = {};
+                    if (ImGui::IsWindowAppearing()) {
+                        memset(name_buffer, 0, sizeof(name_buffer));
+                    }
+
+                    ImGui::InputText("##input_role", name_buffer,
+                                     IM_ARRAYSIZE(name_buffer),
+                                     ImGuiInputTextFlags_CharsDecimal);
+                    if (ImGui::Button("OK")) {
+                        new_role_popup = false;
+                        roles_data->push_back(_strdup(name_buffer));
+                        config::discord::authorization::roles.save();
+                        selected_role = roles_data->size() - 1;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+
+            // USERS SHITS
+            ImGui::SetCursorPos({10, 138});
+            ImGui::Text("Authorized users:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.41f);
+            ImGui::SetCursorPos({150, 135});
+            auto* user_data = config::discord::authorization::users.get_ptr();
+            ImGui::Combo("##authed_users", &selected_user, user_data->data(),
+                         user_data->size());
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "A list of user IDs authorized to execute bot commands.\n"
+                    "Takes priority over roles; for example, a specified user does not require an authorized role.");
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("+##user")) { new_user_popup = true; }
+            ImGui::SameLine();
+            if (ImGui::Button("-##user") && !user_data->empty()) {
+                user_data->erase(user_data->begin() + selected_user);
+                config::discord::authorization::users.save();
+                selected_user = max(0, selected_user - 1);
+            }
+
+            if (new_user_popup) {
+                ImGui::OpenPopup("Add an authorized role");
+                if (ImGui::BeginPopupModal("Add an authorized role", &new_user_popup,
+                                           ImGuiWindowFlags_AlwaysAutoResize)) {
+                    static char name_buffer[256] = {};
+                    if (ImGui::IsWindowAppearing()) {
+                        memset(name_buffer, 0, sizeof(name_buffer));
+                    }
+
+                    ImGui::InputText("##input_role", name_buffer,
+                                     IM_ARRAYSIZE(name_buffer),
+                                     ImGuiInputTextFlags_CharsDecimal);
+                    if (ImGui::Button("OK")) {
+                        new_user_popup = false;
+                        user_data->push_back(_strdup(name_buffer));
+                        config::discord::authorization::users.save();
+                        selected_user = user_data->size() - 1;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+
+
+            end_child();
+            ImGui::SameLine();
+            begin_child("Advanced", ImVec2(205, ImGui::GetWindowHeight()));
+            {
+                ImGui::SetCursorPos({10, 11});
+                if (ImGui::Checkbox("Use ephemeral replies",
+                                    config::discord::advanced::ephemeral_replies.
+                                    get_ptr())) {
+                    config::discord::advanced::ephemeral_replies.save();
+                }
+            }
+            end_child();
         }
-        end_child();
-
-        ImGui::SameLine();
-
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
-
-        ImGui::SetCursorPos({10, 11});
-        if (ImGui::Checkbox("Use ephemeral replies", config::discord::advanced::ephemeral_replies.get_ptr())) {
-            config::discord::advanced::ephemeral_replies.save();
-        }
-        end_child();
     }
 
     void draw_discord_info_tabs()
@@ -256,7 +391,13 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##helpers_no_access", dir_buffer, 256);
+            ImGui::InputText("##helpers_no_access",
+                             config::discord::roles::helper_no_access.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::discord::roles::helper_no_access.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "This role will be mentioned for any problems ling ling encounters\nthat can be fixed by someone without direct access to ling ling.\n"
@@ -268,7 +409,13 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##helpers_with_access", dir_buffer, 256);
+            ImGui::InputText("##helpers_access",
+                             config::discord::roles::helper_access.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::discord::roles::helper_access.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "This role will be mentioned for any fatal problems ling ling encounters\n and require direct access to be fixed."
@@ -289,7 +436,13 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##info_channel", dir_buffer, 256);
+            ImGui::InputText("##info_channel",
+                             config::discord::channels::info.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::discord::channels::info.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[REQUIRED] - General info will be posted here (stations completed, times taken...)");
@@ -300,7 +453,13 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##error_channel", dir_buffer, 256);
+            ImGui::InputText("##error_channel",
+                             config::discord::channels::error.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::discord::channels::error.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[OPTIONAL] - Errors and warnings will be posted here (game crashed, vaults full..)\nIf empty these messages will fall back to the info channel.");
@@ -308,10 +467,6 @@ namespace llpp::gui
         }
         end_child();
     }
-
-    inline int num = 0;
-    inline int num2 = 0;
-    inline int num3 = 0;
 
     void draw_bots_paste_tabs()
     {
@@ -321,7 +476,12 @@ namespace llpp::gui
             ImGui::Text("Station prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##paste_prefix", dir_buffer, 256);
+            ImGui::InputText("##paste_prefix", config::bots::paste::prefix.get().data(),
+                             256, ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::bots::paste::prefix.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The prefix for your paste beds, must be included in your bed name but not be the exact same.\n"
@@ -332,7 +492,13 @@ namespace llpp::gui
             ImGui::Text("Render prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##paste_render", dir_buffer, 256);
+            ImGui::InputText("##render_prefix",
+                             config::bots::paste::render_prefix.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* event)-> int {
+                                 config::bots::paste::render_prefix.set(event->Buf);
+                                 return 0;
+                             });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The prefix for the render bed, for more info please read below.\n\n"
@@ -347,36 +513,46 @@ namespace llpp::gui
             ImGui::Text("Station count:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 73});
-            ImGui::InputInt("##paste_count", &num, 1, 5);
+            if (ImGui::InputInt("##paste_count",
+                                config::bots::paste::num_stations.get_ptr(), 1, 5)) {
+                config::bots::paste::num_stations.save();
+            }
+
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The number of paste stations you have.");
             }
-            num = (num <= 0) ? 1 : num;
-            if (num > 100) { num = 100; }
+            int* num_stations = config::bots::paste::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 100);
 
             ImGui::SetCursorPos({10, 107});
             ImGui::Text("Interval (minutes):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 104});
-            ImGui::InputInt("##paste_interval", &num2, 1, 5);
+            if (ImGui::InputInt("##paste_interval",
+                                config::bots::paste::interval.get_ptr(), 1, 5)) {
+                config::bots::paste::interval.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
             }
-            num2 = (num2 <= 5) ? 5 : num2;
-            if (num2 > 100) { num2 = 100; }
+            int* interval = config::bots::paste::interval.get_ptr();
+            *interval = std::clamp(*interval, 5, 150);
 
             ImGui::SetCursorPos({10, 138});
             ImGui::Text("Load for (seconds):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 135});
-            ImGui::InputInt("##paste_render", &num3, 1, 5);
+            if (ImGui::InputInt("##paste_render", config::bots::paste::load_for.get_ptr(), 1,
+                            5)) {
+                config::bots::paste::load_for.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "How long to let the stations render at the source render bed (in seconds).\nMore structures -> longer render time required.");
             }
-            num3 = (num3 <= 5) ? 5 : num3;
-            if (num3 > 100) { num3 = 100; }
+            int* load_for = config::bots::paste::load_for.get_ptr();
+            *load_for = std::clamp(*load_for, 5, 100);
         }
         end_child();
 
@@ -384,13 +560,19 @@ namespace llpp::gui
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
             ImGui::SetCursorPos({10, 11});
-            ImGui::Checkbox("OCR deposited amount", &bools[0]);
+            if (ImGui::Checkbox("OCR deposited amount",
+                            config::bots::paste::ocr_amount.get_ptr())) {
+                config::bots::paste::ocr_amount.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "Enable to use OCR to determine how much paste was put into the dedi per station.\n"
                     "This info is sent to the completion embed on discord, it has no other purpose as of now.");
             }
-            ImGui::Checkbox("Allow partial completion", &bools[0]);
+            if (ImGui::Checkbox("Allow partial completion",
+                            config::bots::paste::allow_partial.get_ptr())) {
+                config::bots::paste::allow_partial.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "Allow the bot to break after a certain station and pick back up after that.\n\n"
@@ -405,9 +587,12 @@ namespace llpp::gui
     }
 
 
-    int selected_manager = 0;
+    inline int selected_manager = 0;
     inline bool new_name_popup = false;
     inline bool confirmation_popup = false;
+
+    inline int num2 = 0;
+    char dir_buffer[256];
 
     void draw_bots_drops_tab()
     {

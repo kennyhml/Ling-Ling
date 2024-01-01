@@ -97,8 +97,8 @@ namespace llpp::gui
             LR_LOADFROMFILE | LR_DEFAULTSIZE));
 
         RegisterClassExW(&window_class);
-        window = CreateWindowExW(WS_EX_TRANSPARENT, class_name, window_name, WS_POPUP, 0,
-                                 0, WIDTH, HEIGHT, nullptr, nullptr,
+        window = CreateWindowExW(WS_EX_TRANSPARENT, class_name, window_name, WS_POPUP,
+                                 200, 200, WIDTH, HEIGHT, nullptr, nullptr,
                                  window_class.hInstance, nullptr);
         ShowWindow(window, SW_SHOWDEFAULT);
         UpdateWindow(window);

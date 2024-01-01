@@ -12,8 +12,7 @@ namespace llpp::config
     {
         inline const std::vector<std::string> BASE{"general", "ark"};
 
-        inline ManagedVar<std::filesystem::path> root_dir(
-            BASE, "game_root_directory", save, "");
+        inline ManagedVar<std::string> root_dir(BASE, "game_root_directory", save, "");
     }
 
     namespace general::bot
@@ -28,6 +27,7 @@ namespace llpp::config
         inline const std::vector<std::string> BASE{"discord"};
 
         inline ManagedVar<std::string> token(BASE, "token", save, {});
+        inline ManagedVar<std::string> guild(BASE, "guild", save, {});
 
         namespace authorization
         {
@@ -48,6 +48,24 @@ namespace llpp::config
             inline ManagedVar<bool> ephemeral_replies(BASE, "ephemeral_replies", save,
                                                       false);
         }
+
+        namespace roles
+        {
+            inline const std::vector<std::string> BASE{"discord", "roles"};
+            using role = ManagedVar<std::string>;
+
+            inline role helper_access(BASE, "helper_access", save, "");
+            inline role helper_no_access(BASE, "helper_no_access", save, "");
+        }
+
+        namespace channels
+        {
+            inline const std::vector<std::string> BASE{"discord", "channels"};
+            using channel = ManagedVar<std::string>;
+
+            inline channel info(BASE, "info", save, "");
+            inline channel error(BASE, "error", save, "");
+        }
     }
 
     namespace bots::drops
@@ -55,5 +73,21 @@ namespace llpp::config
         inline const std::vector<std::string> BASE{"bots", "drops"};
 
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+    }
+
+    namespace bots::paste
+    {
+        inline const std::vector<std::string> BASE{"bots", "paste"};
+
+        inline ManagedVar<std::string> prefix(BASE, "prefix", save, "PASTE");
+        inline ManagedVar<std::string> render_prefix(BASE, "render_prefix", save,
+                                                     "PASTE::RENDER");
+
+        inline ManagedVar<int> num_stations(BASE, "num_stations", save, 16);
+        inline ManagedVar<int> interval(BASE, "interval", save, 5);
+        inline ManagedVar<int> load_for(BASE, "load_for", save, 15);
+
+        inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
+        inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
     }
 }

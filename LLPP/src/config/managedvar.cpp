@@ -76,5 +76,6 @@ namespace llpp::config
     template struct ManagedVar<std::string>;
     template struct ManagedVar<const char*>;
     template struct ManagedVar<bool>;
+    template struct ManagedVar<int>;
     template struct ManagedVar<std::filesystem::path>;
 }
