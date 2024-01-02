@@ -153,12 +153,10 @@ namespace llpp::gui
             ImGui::TextColored(path_color, "Directory:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({100, 11});
-            ImGui::InputText("##", config::general::ark::root_dir.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::general::ark::root_dir.set(data->Buf);
-                                 return 0;
-                             });
+
+            if (ImGui::InputText("##root_dir", config::general::ark::root_dir.get_ptr())) {
+                config::general::ark::root_dir.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The path to the root game directory.");
             }
@@ -182,12 +180,9 @@ namespace llpp::gui
             ImGui::Text("Server:");
             ImGui::SetCursorPos({100, 42});
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-            ImGui::InputText("##server", config::general::ark::server.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::general::ark::server.set(data->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##server", config::general::ark::server.get_ptr())) {
+                config::general::ark::server.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("Your server name.");
             }
@@ -212,13 +207,9 @@ namespace llpp::gui
 
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({120, 10});
-            ImGui::InputText("##assets_dir",
-                             config::general::bot::assets_dir.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::general::bot::assets_dir.set(data->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##assets_dir", config::general::bot::assets_dir.get_ptr())) {
+                config::general::bot::assets_dir.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The path to the assets shipped with ling ling.");
             }
@@ -249,26 +240,11 @@ namespace llpp::gui
 
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({120, 42});
-            ImGui::InputText("##itemdata", config::general::bot::itemdata.get().data(),
-                             256, ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::general::bot::itemdata.set(data->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##itemdata", config::general::bot::itemdata.get_ptr())) {
+                config::general::bot::itemdata.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The path to the itemdata shipped with ling ling.");
-            }
-
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
-            ImGui::SetCursorPosY(10);
-            if (ImGui::Button("Get")) {
-                std::string selected;
-                openFolder(selected);
-                if (!selected.empty()) { config::general::bot::itemdata.set(selected); }
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip("Select the directory.");
             }
             valid = std::filesystem::exists(config::general::bot::itemdata.get()) ||
                 exists(
@@ -302,13 +278,9 @@ namespace llpp::gui
             ImGui::Text("Discord Bot token:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##bot_token", config::discord::token.get().data(), 256,
-                             ImGuiInputTextFlags_Password |
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::discord::token.set(data->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##bot_token", config::discord::token.get_ptr())) {
+                config::discord::token.save();
+            }
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
@@ -320,13 +292,9 @@ namespace llpp::gui
             ImGui::Text("Discord (Guild) ID:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##bot_guild_id", config::discord::guild.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit |
-                             ImGuiInputTextFlags_CharsDecimal,
-                             [](ImGuiInputTextCallbackData* data) -> int {
-                                 config::discord::guild.set(data->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##bot_token", config::discord::guild.get_ptr())) {
+                config::discord::guild.save();
+            }
 
             // COMMAND CHANNEL SHITS
             ImGui::SetCursorPos({10, 76});
@@ -492,13 +460,9 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##helpers_no_access",
-                             config::discord::roles::helper_no_access.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::discord::roles::helper_no_access.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##helpers_no_access", config::discord::roles::helper_no_access.get_ptr())) {
+                config::discord::roles::helper_no_access.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "This role will be mentioned for any problems ling ling encounters\nthat can be fixed by someone without direct access to ling ling.\n"
@@ -510,13 +474,9 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##helpers_access",
-                             config::discord::roles::helper_access.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::discord::roles::helper_access.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##helpers_access", config::discord::roles::helper_access.get_ptr())) {
+                config::discord::roles::helper_access.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "This role will be mentioned for any fatal problems ling ling encounters\n and require direct access to be fixed."
@@ -537,13 +497,9 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##info_channel",
-                             config::discord::channels::info.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::discord::channels::info.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##info_channel", config::discord::channels::info.get_ptr())) {
+                config::discord::channels::info.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[REQUIRED] - General info will be posted here (stations completed, times taken...)");
@@ -554,13 +510,9 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##error_channel",
-                             config::discord::channels::error.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::discord::channels::error.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##error_channel", config::discord::channels::error.get_ptr())) {
+                config::discord::channels::error.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[OPTIONAL] - Errors and warnings will be posted here (game crashed, vaults full..)\nIf empty these messages will fall back to the info channel.");
@@ -577,12 +529,9 @@ namespace llpp::gui
             ImGui::Text("Station prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##paste_prefix", config::bots::paste::prefix.get().data(),
-                             256, ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::bots::paste::prefix.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##paste_prefix", config::bots::paste::prefix.get_ptr())) {
+                config::bots::paste::prefix.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "Specifies the prefix for your paste beds. The prefix must be included in your bed name but may not be identical.\n"
@@ -593,13 +542,9 @@ namespace llpp::gui
             ImGui::Text("Render prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##render_prefix",
-                             config::bots::paste::render_prefix.get().data(), 256,
-                             ImGuiInputTextFlags_CallbackEdit,
-                             [](ImGuiInputTextCallbackData* event)-> int {
-                                 config::bots::paste::render_prefix.set(event->Buf);
-                                 return 0;
-                             });
+            if (ImGui::InputText("##render_prefix", config::bots::paste::render_prefix.get_ptr())) {
+                config::bots::paste::render_prefix.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "Specifies the prefix for the render bed. For more details, please refer to the explanation below.\n\n"
@@ -842,7 +787,7 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 42});
 
             if (ImGui::InputText("##crate_groups",
-                             &active_manager.get_ptr()->grouped_crates_raw)) {
+                                 &active_manager.get_ptr()->grouped_crates_raw)) {
                 active_manager.save();
             }
 
