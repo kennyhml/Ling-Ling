@@ -2,7 +2,7 @@
 #include <string>
 #include "managedvar.h"
 #include <filesystem>
-#include "../bots/drops/parameters.h"
+#include "../bots/drops/config.h"
 
 namespace llpp::config
 {

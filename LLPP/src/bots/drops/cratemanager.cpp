@@ -5,6 +5,8 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
+#include "../../config/config.h"
+
 namespace llpp::bots::drops
 {
     namespace
@@ -18,15 +20,11 @@ namespace llpp::bots::drops
         }
     }
 
-    CrateManager::CrateManager(const CrateStationParams& t_params,
-                               const std::vector<std::vector<QualityFlags>>&
-                               t_grouped_crates, suicide::SuicideStation* t_suicide) :
-        prefix_(t_params.name), use_beds_(t_params.is_bed_station),
-        allowed_render_time_(t_params.max_render_time), align_bed_(prefix_ + "::ALIGN"),
-        dropoff_tp_(prefix_ + "::DROPOFF"), dropoff_vault_(prefix_ + "::DROPOFF", 350),
-        suicide_(t_suicide)
+    CrateManager::CrateManager(CrateManagerConfig& t_config) : config_(t_config),
+        align_bed_(config_.prefix + "::ALIGN"), dropoff_tp_(config_.prefix + "::DROPOFF"),
+        dropoff_vault_(config_.prefix + "::DROPOFF", 350)
     {
-        populate_groups(t_grouped_crates, t_params.interval);
+        parse_groups(config_.grouped_crates_raw);
         register_slash_commands();
     }
 
@@ -48,17 +46,16 @@ namespace llpp::bots::drops
         if (!is_ready_to_run()) { return false; }
 
         const auto start = std::chrono::system_clock::now();
-        if (!use_beds_) { spawn_on_align_bed(); }
+        if (config_.uses_teleporters) { spawn_on_align_bed(); }
 
         bool any_looted = false;
         run_all_stations(any_looted);
-        if (!use_beds_) {
+        if (config_.uses_teleporters) {
             teleport_to_dropoff();
             if (any_looted) { dropoff_items(last_known_vault_fill_level_); }
         }
-        if (suicide_) { suicide_->complete(); }
 
-        send_summary_embed(prefix_, util::get_elapsed<std::chrono::seconds>(start),
+        send_summary_embed(config_.prefix, util::get_elapsed<std::chrono::seconds>(start),
                            stats_per_group, last_known_vault_fill_level_ * 100,
                            std::chrono::system_clock::now() + crates_[0][0].
                            get_completion_interval());
@@ -138,20 +135,71 @@ namespace llpp::bots::drops
         asa::entities::local_player->turn_down(20);
     }
 
-    void CrateManager::populate_groups(
-        const std::vector<std::vector<QualityFlags>>& groups,
-        std::chrono::minutes interval)
+    void CrateManager::parse_groups(std::string groups)
     {
-        crates_.resize(groups.size());
-        stats_per_group.resize(groups.size());
-        int n = 0;
+        std::erase_if(groups, isspace);
 
-        for (size_t i = 0; i < groups.size(); i++) {
-            for (QualityFlags qualities : groups[i]) {
-                std::string name = util::add_num_to_prefix(prefix_ + "::DROP", ++n);
-                crates_[i].emplace_back(name, qualities, interval, use_beds_,
-                                        allowed_render_time_);
+        std::vector<int> lefts;
+        std::vector<int> rights;
+
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.at(i) == '{') { lefts.push_back(i); }
+            else if (groups.at(i) == '}') { rights.push_back(i); }
+        }
+
+        if (lefts.size() != rights.size()) {
+            throw std::exception("Num left brackets does not match num right brackets");
+        }
+
+        std::cout << "[+] Allocating for " << lefts.size() << " groups...\n";
+        crates_.resize(lefts.size());
+        stats_per_group.resize(lefts.size());
+
+        int group = 0;
+        int num_station = 0;
+        for (int left : lefts) {
+            std::string roi = groups.substr(left + 1, rights[group] - left - 1);
+            std::vector<int> commas;
+            for (int j = 0; j < roi.size(); j++) {
+                if (roi.at(j) == ',') { commas.push_back(j); }
             }
+
+            std::cout << "Parsing " << roi << ", expecting " << commas.size() + 1 <<
+                " crates\n";
+
+            for (int crate = 0; crate < commas.size() + 1; crate++) {
+                int prev = crate > 0 ? commas[crate - 1] + 1 : 0;
+                int end = commas.empty() || crate >= commas.size()
+                              ? roi.size()
+                              : commas[crate] - prev;
+
+                QualityFlags curr_flag = 0;
+                std::string color = roi.substr(prev, end);
+                std::cout << "Parsing color of '" << color << "'\n";
+
+                std::vector<std::string> tokens;
+                std::istringstream stream(color);
+                std::string token;
+
+                while (std::getline(stream, token, '|')) {
+                    if (token == "RED") {
+                        curr_flag |= asa::structures::CaveLootCrate::Quality::RED;
+                    }
+                    else if (token == "YELLOW") {
+                        curr_flag |= asa::structures::CaveLootCrate::Quality::YELLOW;
+                    }
+                    if (token == "BLUE") {
+                        curr_flag |= asa::structures::CaveLootCrate::Quality::BLUE;
+                    }
+                    if (token == "ANY") {
+                        curr_flag |= asa::structures::CaveLootCrate::Quality::ANY;
+                    }
+                }
+                crates_[group].emplace_back(
+                    util::add_num_to_prefix(config_.prefix, num_station++), config_,
+                    asa::structures::CaveLootCrate(curr_flag));
+            }
+            group++;
         }
     }
 

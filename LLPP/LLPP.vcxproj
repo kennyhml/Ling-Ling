@@ -212,7 +212,7 @@
         <ClInclude Include="src\bots\drops\cratemanager.h"/>
         <ClInclude Include="src\bots\drops\lootcratestation.h"/>
         <ClInclude Include="src\bots\drops\embeds.h"/>
-        <ClInclude Include="src\bots\drops\parameters.h"/>
+        <ClInclude Include="src\bots\drops\config.h"/>
         <ClInclude Include="src\bots\kitchen\cropstation.h"/>
         <ClInclude Include="src\bots\kitchen\embeds.h"/>
         <ClInclude Include="src\bots\paste\embeds.h"/>

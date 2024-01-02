@@ -1,6 +1,7 @@
 #include <iostream>
 #include <asapp/core/init.h>
 
+#include "bots/drops/cratemanager.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicideembed.h"
 #include "bots/suicide/suicidestation.h"
@@ -52,8 +53,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     }
 
     asa::window::get_handle();
-
-
+    
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 

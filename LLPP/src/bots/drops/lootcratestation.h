@@ -4,15 +4,15 @@
 #include <asapp/structures/teleporter.h>
 #include <asapp/structures/simplebed.h>
 
+#include "config.h"
+
 namespace llpp::bots::drops
 {
     class LootCrateStation final : public core::BaseStation
     {
     public:
-        LootCrateStation(std::string t_name, asa::structures::CaveLootCrate t_crate,
-                         std::chrono::minutes t_interval, bool t_is_bed_station = false,
-                         std::chrono::seconds t_max_render_time = std::chrono::seconds(
-                             1));
+        explicit LootCrateStation(const std::string& t_name, CrateManagerConfig& t_config,
+                                  asa::structures::CaveLootCrate t_crate);
 
         core::StationResult complete() override;
 
@@ -24,8 +24,7 @@ namespace llpp::bots::drops
 
     private:
         bool fully_loot_ = true;
-        const bool is_bed_station_;
-        const std::chrono::seconds max_render_time_;
+        CrateManagerConfig& config_;
 
         std::map<std::string, bool> cherry_pick_items() const;
         void loot_crate(cv::Mat& screenshot_out,

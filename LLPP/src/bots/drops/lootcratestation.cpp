@@ -4,6 +4,8 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
+#include "../../config/config.h"
+
 #define ANY_CRAFTED(name) Item(name, false, ItemData::ASCENDANT), \
 Item(name, false, ItemData::MASTERCRAFT), \
 Item(name, false, ItemData::JOURNEYMAN), \
@@ -84,15 +86,12 @@ namespace llpp::bots::drops
         }
     }
 
-    LootCrateStation::LootCrateStation(std::string t_name,
-                                       asa::structures::CaveLootCrate t_crate,
-                                       std::chrono::minutes t_interval,
-                                       const bool t_is_bed_station,
-                                       std::chrono::seconds t_max_render_time) :
-        BaseStation(t_name, t_interval), is_bed_station_(t_is_bed_station),
-        max_render_time_(t_max_render_time), crate_(std::move(t_crate)),
-        teleporter_(asa::structures::Teleporter(t_name)),
-        bed_(asa::structures::SimpleBed(t_name)),
+    LootCrateStation::LootCrateStation(const std::string& t_name,
+                                       CrateManagerConfig& t_config,
+                                       asa::structures::CaveLootCrate t_crate) :
+        BaseStation(t_name, std::chrono::minutes(t_config.interval)), config_(t_config),
+        crate_(std::move(t_crate)), teleporter_(asa::structures::Teleporter(name_)),
+        bed_(asa::structures::SimpleBed(name_)),
         vault_(asa::structures::Container(name_ + "::VAULT", 350)) {};
 
     core::StationResult LootCrateStation::complete()
@@ -102,7 +101,7 @@ namespace llpp::bots::drops
 
         if (!util::await([this]() -> bool {
             return asa::entities::local_player->can_access(crate_);
-        }, max_render_time_)) {
+        }, std::chrono::seconds(config_.render_for))) {
             is_crate_up_ = false;
             set_completed();
             return {this, false, std::chrono::seconds(0), {}};
@@ -124,7 +123,7 @@ namespace llpp::bots::drops
         std::map<std::string, bool> cherry_picked_items;
         loot_crate(loot_screenshot, cherry_picked_items);
 
-        if (is_bed_station_) {
+        if (!config_.uses_teleporters) {
             std::cout << "Putting the items away..\n";
             asa::entities::local_player->turn_right();
             asa::entities::local_player->access(vault_);
@@ -216,7 +215,7 @@ namespace llpp::bots::drops
 
     void LootCrateStation::go_to()
     {
-        if (is_bed_station_) {
+        if (!config_.uses_teleporters) {
             asa::entities::local_player->fast_travel_to(bed_);
             asa::entities::local_player->turn_down(30);
             return;

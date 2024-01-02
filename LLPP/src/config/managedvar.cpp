@@ -1,5 +1,5 @@
 #include "managedvar.h"
-#include "../bots/drops/parameters.h"
+#include "../bots/drops/config.h"
 
 namespace llpp::config
 {
@@ -63,9 +63,6 @@ namespace llpp::config
             const std::string k = path_.back();
 
             if (!curr.contains(k)) { set(default_); }
-
-            std::cout << curr.dump(4) << "\n";
-
             value_.prefix = curr[k].value("prefix", default_.prefix);
             value_.grouped_crates_raw = curr[k].value("grouped_crates_raw",
                                                       default_.grouped_crates_raw);
@@ -128,7 +125,7 @@ namespace llpp::config
         curr.erase(path_.back());
         on_change_();
     }
-    
+
     template <typename T>
     json& ManagedVar<T>::walk_json(json& data, const bool create_if_not_exist) const
     {
