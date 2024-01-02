@@ -37,7 +37,7 @@ namespace llpp::config
 
         T* get_ptr()
         {
-            get();
+            if (!initial_loaded_) { get(); }
             return &value_;
         }
 
@@ -48,6 +48,7 @@ namespace llpp::config
         T value_;
         T default_;
         bool has_inserted_default_ = false;
+        bool initial_loaded_ = false;
         std::vector<std::string> path_;
         std::function<void()> on_change_;
 

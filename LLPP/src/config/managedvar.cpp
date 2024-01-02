@@ -6,6 +6,10 @@ namespace llpp::config
     template <typename T>
     T ManagedVar<T>::get()
     {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        if (initial_loaded_) { return value_; }
+        initial_loaded_ = true;
+
         try {
             json& curr = walk_json(get_data());
             value_ = curr.at(path_.back()).get<T>();
@@ -17,6 +21,10 @@ namespace llpp::config
     template <>
     const char* ManagedVar<const char*>::get()
     {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        if (initial_loaded_) { return value_; }
+        initial_loaded_ = true;
+
         try {
             json& curr = walk_json(get_data());
             // need to copy the const char to our value, otherwise itll get deleted
@@ -30,6 +38,10 @@ namespace llpp::config
     template <>
     std::vector<const char*> ManagedVar<std::vector<const char*>>::get()
     {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        if (initial_loaded_) { return value_; }
+        initial_loaded_ = true;
+
         try {
             json& curr = walk_json(get_data());
             // Need to copy each element into our value individually.
@@ -46,22 +58,33 @@ namespace llpp::config
     template <>
     bots::drops::CrateManagerConfig ManagedVar<bots::drops::CrateManagerConfig>::get()
     {
+        std::lock_guard<std::mutex> guard(save_mutex);
+
+        if (initial_loaded_) { return value_; }
+        initial_loaded_ = true;
+
         try {
             json& curr = walk_json(get_data());
             const std::string k = path_.back();
 
-            value_.prefix = curr[k]["prefix"];
-            value_.grouped_crates_raw = curr[k]["grouped_crates_raw"];
-            value_.interval = curr[k]["interval"];
-            value_.render_for = curr[k]["render_for"];
-            value_.uses_teleporters = curr[k]["uses_teleporters"];
-            value_.overrule_reroll_mode = curr[k]["overrule_reroll_mode"];
-            value_.allow_partial_completion = curr[k]["allow_partial_completion"];
+            if (!curr.contains(k)) { set(default_); }
+
+            std::cout << curr.dump(4) << "\n";
+
+            value_.prefix = curr[k].value("prefix", default_.prefix);
+            value_.grouped_crates_raw = curr[k].value("grouped_crates_raw",
+                                                      default_.grouped_crates_raw);
+            value_.interval = curr[k].value("interval", default_.interval);
+            value_.render_for = curr[k].value("render_for", default_.render_for);
+            value_.uses_teleporters = curr[k].value("uses_teleporters",
+                                                    default_.uses_teleporters);
+            value_.overrule_reroll_mode = curr[k].value(
+                "overrule_reroll_mode", default_.overrule_reroll_mode);
+            value_.allow_partial_completion = curr[k].value(
+                "allow_partial_completion", default_.allow_partial_completion);
         }
-        catch (const json::out_of_range& e) {
-            handle_not_found(e);
-            return value_;
-        }
+        catch (const json::out_of_range& e) { handle_not_found(e); } catch (const
+            std::exception& e) { std::cerr << "Uknown error " << e.what() << "\n"; }
         return value_;
     }
 

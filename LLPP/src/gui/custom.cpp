@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include "../../external/imgui/imgui_internal.h"
+#include "../../external/imgui/imgui_stdlib.h"
+
 #include "../config/config.h"
 
 namespace llpp::gui
@@ -773,6 +775,7 @@ namespace llpp::gui
         }
         end_child();
 
+        auto& active_manager = config::bots::drops::test_manager;
         ImGui::SameLine();
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
@@ -780,22 +783,28 @@ namespace llpp::gui
             ImGui::Text("Render (seconds):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputInt("##crate_render", &num2, 1, 5);
+            if (ImGui::InputInt("##crate_render", &active_manager.get_ptr()->render_for,
+                                1, 5)) { active_manager.save(); }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "How long to let the first crate at each group render, more structures nearby -> longer render time.");
             }
-            num2 = (num2 < 0) ? 0 : num2;
-            if (num2 > 15) { num2 = 15; }
 
             ImGui::SetCursorPos({10, 45});
-            ImGui::Checkbox("Overrule reroll mode", &bools[0]);
+            if (ImGui::Checkbox("Overrule reroll mode",
+                                &active_manager.get_ptr()->overrule_reroll_mode)) {
+                active_manager.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "Enable to always loot these crates, even when it is enabled.");
             }
+
             ImGui::SetCursorPos({10, 76});
-            ImGui::Checkbox("Allow partial completion", &bools[0]);
+            if (ImGui::Checkbox("Allow partial completion",
+                                &active_manager.get_ptr()->allow_partial_completion)) {
+                active_manager.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
@@ -815,7 +824,9 @@ namespace llpp::gui
             ImGui::Text("Station prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            ImGui::InputText("##crate_prefix", dir_buffer, 256);
+            if (ImGui::InputText("##crate_prefix", &active_manager.get_ptr()->prefix)) {
+                active_manager.save();
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The prefix of this crate manager.\n\n"
@@ -829,7 +840,12 @@ namespace llpp::gui
             ImGui::Text("Grouped Crates:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            ImGui::InputText("##crate_groups", dir_buffer, 256);
+
+            if (ImGui::InputText("##crate_groups",
+                             &active_manager.get_ptr()->grouped_crates_raw)) {
+                active_manager.save();
+            }
+
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "An array of arrays where each array represents one group of crates.\n"
@@ -849,16 +865,18 @@ namespace llpp::gui
             ImGui::Text("Interval (minutes):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 73});
-            ImGui::InputInt("##crate_interval", &num2, 1, 5);
+            if (ImGui::InputInt("##crate_interval", &active_manager.get_ptr()->interval,
+                                1, 5)) { active_manager.save(); }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the stations at (in minutes).");
             }
-            num2 = (num2 <= 5) ? 5 : num2;
-            if (num2 > 100) { num2 = 100; }
 
             ImGui::SetCursorPos({10, 107});
-            ImGui::Checkbox("Uses teleporters", &bools[5]);
+            if (ImGui::Checkbox("Uses teleporters",
+                                &active_manager.get_ptr()->uses_teleporters)) {
+                active_manager.save();
+            }
         }
         end_child();
     }

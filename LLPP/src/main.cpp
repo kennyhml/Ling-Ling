@@ -35,9 +35,9 @@ void llpp_main()
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
                    _In_ PSTR cmd_line, _In_ int cmd_show)
 {
-    // llpp::gui::create_window(L"Ling Ling++", L"Meow");
-    // llpp::gui::create_device();
-    // llpp::gui::create_imgui();
+    llpp::gui::create_window(L"Ling Ling++", L"Meow");
+    llpp::gui::create_device();
+    llpp::gui::create_imgui();
 
     if (!AllocConsole()) { return false; }
     FILE* pFile;
@@ -54,11 +54,6 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     asa::window::get_handle();
 
 
-    llpp::config::ManagedVar<llpp::bots::drops::CrateManagerConfig> test(
-        {"bots", "drops", "name"}, llpp::config::save,
-        llpp::bots::drops::CrateManagerConfig());
-
-    return 0;
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 
