@@ -6,7 +6,6 @@ namespace llpp::config
     template <typename T>
     T ManagedVar<T>::get()
     {
-        std::lock_guard<std::mutex> guard(save_mutex);
         if (initial_loaded_) { return value_; }
         initial_loaded_ = true;
 
@@ -21,7 +20,6 @@ namespace llpp::config
     template <>
     const char* ManagedVar<const char*>::get()
     {
-        std::lock_guard<std::mutex> guard(save_mutex);
         if (initial_loaded_) { return value_; }
         initial_loaded_ = true;
 
@@ -38,7 +36,6 @@ namespace llpp::config
     template <>
     std::vector<const char*> ManagedVar<std::vector<const char*>>::get()
     {
-        std::lock_guard<std::mutex> guard(save_mutex);
         if (initial_loaded_) { return value_; }
         initial_loaded_ = true;
 
@@ -58,8 +55,6 @@ namespace llpp::config
     template <>
     bots::drops::CrateManagerConfig ManagedVar<bots::drops::CrateManagerConfig>::get()
     {
-        std::lock_guard<std::mutex> guard(save_mutex);
-
         if (initial_loaded_) { return value_; }
         initial_loaded_ = true;
 
@@ -123,6 +118,17 @@ namespace llpp::config
         on_change_();
     }
 
+
+    template <typename T>
+    void ManagedVar<T>::erase()
+    {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        json& curr = walk_json(get_data(), true);
+
+        curr.erase(path_.back());
+        on_change_();
+    }
+    
     template <typename T>
     json& ManagedVar<T>::walk_json(json& data, const bool create_if_not_exist) const
     {

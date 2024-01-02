@@ -79,9 +79,6 @@ namespace llpp::config
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::drops::CrateManagerConfig>> configs;
-
-        inline ManagedVar<llpp::bots::drops::CrateManagerConfig> test_manager(
-            BASE, "test", save, llpp::bots::drops::CrateManagerConfig());
     }
 
     namespace bots::paste

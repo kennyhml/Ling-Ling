@@ -31,10 +31,10 @@ namespace llpp::config
                             T t_default) : ManagedVar(extend(t_base, std::move(t_key)),
                                                       t_on_change, t_default) {}
 
+        ManagedVar() = default;
         ~ManagedVar() = default;
 
         T get();
-
         T* get_ptr()
         {
             if (!initial_loaded_) { get(); }
@@ -43,6 +43,7 @@ namespace llpp::config
 
         void set(const T& value);
         void save();
+        void erase();
 
     private :
         T value_;

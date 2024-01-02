@@ -154,7 +154,8 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({100, 11});
 
-            if (ImGui::InputText("##root_dir", config::general::ark::root_dir.get_ptr())) {
+            if (ImGui::InputText("##root_dir",
+                                 config::general::ark::root_dir.get_ptr())) {
                 config::general::ark::root_dir.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -207,7 +208,8 @@ namespace llpp::gui
 
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({120, 10});
-            if (ImGui::InputText("##assets_dir", config::general::bot::assets_dir.get_ptr())) {
+            if (ImGui::InputText("##assets_dir",
+                                 config::general::bot::assets_dir.get_ptr())) {
                 config::general::bot::assets_dir.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -240,7 +242,8 @@ namespace llpp::gui
 
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({120, 42});
-            if (ImGui::InputText("##itemdata", config::general::bot::itemdata.get_ptr())) {
+            if (ImGui::InputText("##itemdata",
+                                 config::general::bot::itemdata.get_ptr())) {
                 config::general::bot::itemdata.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -317,7 +320,7 @@ namespace llpp::gui
             if (ImGui::Button("-##channel") && !channel_data->empty()) {
                 channel_data->erase(channel_data->begin() + selected_channel);
                 config::discord::authorization::channels.save();
-                selected_channel = max(0, selected_channel);
+                selected_channel = max(0, selected_channel - 1);
             }
 
             if (new_channel_popup) {
@@ -460,7 +463,8 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputText("##helpers_no_access", config::discord::roles::helper_no_access.get_ptr())) {
+            if (ImGui::InputText("##helpers_no_access",
+                                 config::discord::roles::helper_no_access.get_ptr())) {
                 config::discord::roles::helper_no_access.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -474,7 +478,8 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputText("##helpers_access", config::discord::roles::helper_access.get_ptr())) {
+            if (ImGui::InputText("##helpers_access",
+                                 config::discord::roles::helper_access.get_ptr())) {
                 config::discord::roles::helper_access.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -497,7 +502,8 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputText("##info_channel", config::discord::channels::info.get_ptr())) {
+            if (ImGui::InputText("##info_channel",
+                                 config::discord::channels::info.get_ptr())) {
                 config::discord::channels::info.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -510,7 +516,8 @@ namespace llpp::gui
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputText("##error_channel", config::discord::channels::error.get_ptr())) {
+            if (ImGui::InputText("##error_channel",
+                                 config::discord::channels::error.get_ptr())) {
                 config::discord::channels::error.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -529,7 +536,8 @@ namespace llpp::gui
             ImGui::Text("Station prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputText("##paste_prefix", config::bots::paste::prefix.get_ptr())) {
+            if (ImGui::InputText("##paste_prefix",
+                                 config::bots::paste::prefix.get_ptr())) {
                 config::bots::paste::prefix.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -542,7 +550,8 @@ namespace llpp::gui
             ImGui::Text("Render prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputText("##render_prefix", config::bots::paste::render_prefix.get_ptr())) {
+            if (ImGui::InputText("##render_prefix",
+                                 config::bots::paste::render_prefix.get_ptr())) {
                 config::bots::paste::render_prefix.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -689,6 +698,7 @@ namespace llpp::gui
                         new_name_popup = false;
                         data->push_back(_strdup(name_buffer));
                         config::bots::drops::managers.save();
+                        selected_manager = data->size() - 1;
                     }
                     ImGui::EndPopup();
                 }
@@ -706,7 +716,11 @@ namespace llpp::gui
                         printf("Action confirmed!\n");
                         confirmation_popup = false;
                         data->erase(data->begin() + selected_manager);
+                        auto map = config::bots::drops::configs;
+                        map[name].erase();
+                        map.erase(name);
                         config::bots::drops::managers.save();
+                        selected_manager = max(0, selected_manager - 1);
                     }
 
                     ImGui::SameLine();
@@ -720,44 +734,64 @@ namespace llpp::gui
         }
         end_child();
 
-        auto& active_manager = config::bots::drops::test_manager;
+        // get the crate manager instance thats selected, if none is selected then
+        // make everything inactive
+        config::ManagedVar<bots::drops::CrateManagerConfig>* active = nullptr;
+
+        if (!config::bots::drops::managers.get_ptr()->empty()) {
+            for (auto& manager : config::bots::drops::managers.get()) {
+                if (!config::bots::drops::configs.contains(manager)) {
+                    config::bots::drops::configs[manager] = config::ManagedVar<
+                        bots::drops::CrateManagerConfig>(
+                        {"bots", "drops", manager}, config::save,
+                        bots::drops::CrateManagerConfig());
+                }
+            }
+
+            std::string selected = (*config::bots::drops::managers.get_ptr())[
+                selected_manager];
+            active = &config::bots::drops::configs[selected];
+        }
+
         ImGui::SameLine();
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
-            ImGui::SetCursorPos({10, 14});
-            ImGui::Text("Render (seconds):");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputInt("##crate_render", &active_manager.get_ptr()->render_for,
-                                1, 5)) { active_manager.save(); }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "How long to let the first crate at each group render, more structures nearby -> longer render time.");
-            }
+            if (active) {
+                ImGui::SetCursorPos({10, 14});
+                ImGui::Text("Render (seconds):");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({150, 11});
+                if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
+                                    5)) { active->save(); }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "How long to let the first crate at each group render, more structures nearby -> longer render time.");
+                }
 
-            ImGui::SetCursorPos({10, 45});
-            if (ImGui::Checkbox("Overrule reroll mode",
-                                &active_manager.get_ptr()->overrule_reroll_mode)) {
-                active_manager.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "Enable to always loot these crates, even when it is enabled.");
-            }
+                ImGui::SetCursorPos({10, 45});
+                if (ImGui::Checkbox("Overrule reroll mode",
+                                    &active->get_ptr()->overrule_reroll_mode)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "Enable to always loot these crates, even when it is enabled.");
+                }
 
-            ImGui::SetCursorPos({10, 76});
-            if (ImGui::Checkbox("Allow partial completion",
-                                &active_manager.get_ptr()->allow_partial_completion)) {
-                active_manager.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
-                    "Allow the bot to break after a certain station and pick back up after that.\n\n"
-                    "Example:\nConsider we have Task A, Task B and Task C where the order is their priority and C is\n"
-                    "our CrateManager instance managing the crates.\nIf Task A and B are both on cooldown and C is started, A and B will be disregarded\n"
-                    "until C completes. With partial completion, C may go to complete station 3, complete task A/B,\n"
-                    "then pick C back up at 4.");
+                ImGui::SetCursorPos({10, 76});
+                if (ImGui::Checkbox("Allow partial completion",
+                                    &active->get_ptr()->allow_partial_completion)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
+                        "Allow the bot to break after a certain station and pick back up after that.\n\n"
+                        "Example:\nConsider we have Task A, Task B and Task C where the order is their priority and C is\n"
+                        "our CrateManager instance managing the crates.\nIf Task A and B are both on cooldown and C is started, A and B will be disregarded\n"
+                        "until C completes. With partial completion, C may go to complete station 3, complete task A/B,\n"
+                        "then pick C back up at 4.");
+                }
             }
         }
         end_child();
@@ -765,62 +799,64 @@ namespace llpp::gui
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.33) + 5);
         begin_child("Configuration", ImVec2(300, ImGui::GetWindowHeight() * 0.66));
         {
-            ImGui::SetCursorPos({10, 14});
-            ImGui::Text("Station prefix:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputText("##crate_prefix", &active_manager.get_ptr()->prefix)) {
-                active_manager.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "The prefix of this crate manager.\n\n"
-                    "The following structure instances will be created with the prefix:\n"
-                    "-[PREFIX]::ALIGN - The initial bed to spawn on for teleporter mode\n"
-                    "-[PREFIX]::DROPXX - The teleporter / bed per drop where XX is it's index\n"
-                    "-[PREFIX]::DROPOFF - The vault the items will be stored in for teleporter mode\n");
-            }
+            if (active) {
+                ImGui::SetCursorPos({10, 14});
+                ImGui::Text("Station prefix:");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({150, 11});
+                if (ImGui::InputText("##crate_prefix", &active->get_ptr()->prefix)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "The prefix of this crate manager.\n\n"
+                        "The following structure instances will be created with the prefix:\n"
+                        "-[PREFIX]::ALIGN - The initial bed to spawn on for teleporter mode\n"
+                        "-[PREFIX]::DROPXX - The teleporter / bed per drop where XX is it's index\n"
+                        "-[PREFIX]::DROPOFF - The vault the items will be stored in for teleporter mode\n");
+                }
 
-            ImGui::SetCursorPos({10, 45});
-            ImGui::Text("Grouped Crates:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 42});
+                ImGui::SetCursorPos({10, 45});
+                ImGui::Text("Grouped Crates:");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({150, 42});
 
-            if (ImGui::InputText("##crate_groups",
-                                 &active_manager.get_ptr()->grouped_crates_raw)) {
-                active_manager.save();
-            }
+                if (ImGui::InputText("##crate_groups",
+                                     &active->get_ptr()->grouped_crates_raw)) {
+                    active->save();
+                }
 
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "An array of arrays where each array represents one group of crates.\n"
-                    "Each group corresponds to crates that share the same uptime,\n"
-                    "meaning only one of them will be active at any given time (e.g., Swamp Cave big room).\n\n"
-                    "Guidelines:\n" " - Enclose each group in curly braces { and }.\n"
-                    " - Separate elements within a group with commas.\n"
-                    " - For each crate 'j' per crates[i], provide one bed or tp with the corresponding name.\n"
-                    " - Define each crate with its color options: BLUE, YELLOW, RED.\n"
-                    " - Use a pipe '|' to separate multiple options for a crate (e.g., YELLOW | RED).\n"
-                    " - 'ANY' can be used to represent multiple color options for a crate.\n\n"
-                    "Example for Island Swamp Cave:\n"
-                    "{RED, RED}, {YELLOW, YELLOW, ANY}, {BLUE}");
-            }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "An array of arrays where each array represents one group of crates.\n"
+                        "Each group corresponds to crates that share the same uptime,\n"
+                        "meaning only one of them will be active at any given time (e.g., Swamp Cave big room).\n\n"
+                        "Guidelines:\n" " - Enclose each group in curly braces { and }.\n"
+                        " - Separate elements within a group with commas.\n"
+                        " - For each crate 'j' per crates[i], provide one bed or tp with the corresponding name.\n"
+                        " - Define each crate with its color options: BLUE, YELLOW, RED.\n"
+                        " - Use a pipe '|' to separate multiple options for a crate (e.g., YELLOW | RED).\n"
+                        " - 'ANY' can be used to represent multiple color options for a crate.\n\n"
+                        "Example for Island Swamp Cave:\n"
+                        "{RED, RED}, {YELLOW, YELLOW, ANY}, {BLUE}");
+                }
 
-            ImGui::SetCursorPos({10, 76});
-            ImGui::Text("Interval (minutes):");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 73});
-            if (ImGui::InputInt("##crate_interval", &active_manager.get_ptr()->interval,
-                                1, 5)) { active_manager.save(); }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "The interval to complete the stations at (in minutes).");
-            }
+                ImGui::SetCursorPos({10, 76});
+                ImGui::Text("Interval (minutes):");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({150, 73});
+                if (ImGui::InputInt("##crate_interval", &active->get_ptr()->interval, 1,
+                                    5)) { active->save(); }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "The interval to complete the stations at (in minutes).");
+                }
 
-            ImGui::SetCursorPos({10, 107});
-            if (ImGui::Checkbox("Uses teleporters",
-                                &active_manager.get_ptr()->uses_teleporters)) {
-                active_manager.save();
+                ImGui::SetCursorPos({10, 107});
+                if (ImGui::Checkbox("Uses teleporters",
+                                    &active->get_ptr()->uses_teleporters)) {
+                    active->save();
+                }
             }
         }
         end_child();
