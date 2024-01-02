@@ -8,6 +8,8 @@
 #include <asapp/interfaces/serverselect.h>
 #include <asapp/interfaces/spawnmap.h>
 
+#include "../config/config.h"
+
 namespace llpp::core
 {
     void recover()
@@ -43,14 +45,12 @@ namespace llpp::core
 
     void reconnect_to_server()
     {
-        const std::string server_name = "NA-PVP-TheIsland2207";
-
         asa::interfaces::main_menu->accept_popup();
         asa::interfaces::main_menu->start();
         Sleep(1000);
         asa::interfaces::mode_select->join_game();
         Sleep(1000);
-        asa::interfaces::server_select->join_server(server_name);
+        asa::interfaces::server_select->join_server(config::general::ark::server.get());
 
         auto start = std::chrono::system_clock::now();
 
@@ -112,9 +112,12 @@ namespace llpp::core
                   dpp::embed_footer("Recovery should follow automatically."));
 
         const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
-        dpp::message message = dpp::message(dpp::snowflake(discord::info_channel_id),
-                                            "<@&1181159721433051136>").
-            set_allowed_mentions(false, true, false, false, {}, {});
+        dpp::message message = dpp::message(config::discord::channels::info.get(),
+                                            std::format(
+                                                "<@&{}>",
+                                                config::discord::roles::helper_access.
+                                                get())).set_allowed_mentions(
+            false, true, false, false, {}, {});
         message.add_file("image.png", file_data, "image/png ").add_embed(embed);
 
         discord::bot->message_create(message);
@@ -134,9 +137,11 @@ namespace llpp::core
               add_field("Restart required:", restart ? "Yes" : "No", true).add_field(
                   "Reconnect required:", reconnect ? "Yes" : "No", true);
 
-        if (reconnect) { embed.add_field("Reconnecting to:", "9236", true); }
+        if (reconnect) {
+            embed.add_field("Reconnecting to:", config::general::ark::server.get(), true);
+        }
 
-        const auto message = dpp::message(discord::info_channel_id, embed);
+        const auto message = dpp::message(config::discord::channels::info.get(), embed);
         discord::bot->message_create(message);
     }
 
@@ -157,7 +162,7 @@ namespace llpp::core
 
 
         const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
-        auto message = dpp::message(discord::info_channel_id, embed);
+        auto message = dpp::message(config::discord::channels::info.get(), embed);
         message.add_file("image.png", file_data, "image/png ");
 
         discord::bot->message_create(message);

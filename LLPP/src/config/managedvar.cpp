@@ -1,5 +1,5 @@
 #include "managedvar.h"
-
+#include "../bots/drops/parameters.h"
 
 namespace llpp::config
 {
@@ -43,6 +43,28 @@ namespace llpp::config
         return value_;
     }
 
+    template <>
+    bots::drops::CrateManagerConfig ManagedVar<bots::drops::CrateManagerConfig>::get()
+    {
+        try {
+            json& curr = walk_json(get_data());
+            const std::string k = path_.back();
+
+            value_.prefix = curr[k]["prefix"];
+            value_.grouped_crates_raw = curr[k]["grouped_crates_raw"];
+            value_.interval = curr[k]["interval"];
+            value_.render_for = curr[k]["render_for"];
+            value_.uses_teleporters = curr[k]["uses_teleporters"];
+            value_.overrule_reroll_mode = curr[k]["overrule_reroll_mode"];
+            value_.allow_partial_completion = curr[k]["allow_partial_completion"];
+        }
+        catch (const json::out_of_range& e) {
+            handle_not_found(e);
+            return value_;
+        }
+        return value_;
+    }
+
     template <typename T>
     void ManagedVar<T>::set(const T& value)
     {
@@ -60,6 +82,24 @@ namespace llpp::config
         on_change_();
     }
 
+    template <>
+    void ManagedVar<bots::drops::CrateManagerConfig>::save()
+    {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        json& curr = walk_json(get_data(), true);
+        const std::string k = path_.back();
+
+        curr[k]["prefix"] = value_.prefix;
+        curr[k]["grouped_crates_raw"] = value_.grouped_crates_raw;
+        curr[k]["interval"] = value_.interval;
+        curr[k]["render_for"] = value_.render_for;
+        curr[k]["uses_teleporters"] = value_.uses_teleporters;
+        curr[k]["overrule_reroll_mode"] = value_.overrule_reroll_mode;
+        curr[k]["allow_partial_completion"] = value_.allow_partial_completion;
+
+        on_change_();
+    }
+
     template <typename T>
     json& ManagedVar<T>::walk_json(json& data, const bool create_if_not_exist) const
     {
@@ -70,7 +110,7 @@ namespace llpp::config
         }
         return *curr;
     }
-    
+
     template <typename T>
     void ManagedVar<T>::handle_not_found(const json::out_of_range& e)
     {
@@ -81,13 +121,12 @@ namespace llpp::config
         set(default_);
     }
 
-
-    
     template struct ManagedVar<std::vector<int>>;
     template struct ManagedVar<std::vector<char>>;
     template struct ManagedVar<std::array<char, 256>>;
     template struct ManagedVar<std::vector<std::string>>;
     template struct ManagedVar<std::vector<const char*>>;
+    template struct ManagedVar<bots::drops::CrateManagerConfig>;
 
     template struct ManagedVar<std::string>;
     template struct ManagedVar<const char*>;

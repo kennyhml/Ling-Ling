@@ -6,6 +6,8 @@
 #include <asapp/game/window.h>
 #include <format>
 
+#include "../../config/config.h"
+
 
 namespace llpp::bots::paste
 {
@@ -37,7 +39,7 @@ namespace llpp::bots::paste
                                                   std::format("<t:{}:R>", nextCompletion),
                                                   true);
 
-        auto msg = dpp::message(core::discord::info_channel_id, embed);
+        auto msg = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(msg);
     }
 
@@ -61,9 +63,12 @@ namespace llpp::bots::paste
                   "Achatina: ", achatinaName, true).set_image("attachment://image.png");
 
         auto fileData = util::mat_to_strbuffer(asa::window::screenshot());
-        dpp::message message = dpp::message(core::discord::info_channel_id,
-                                            "<@&1181159721433051136>").
-            set_allowed_mentions(false, true, false, false, {}, {});
+        dpp::message message = dpp::message(config::discord::channels::info.get(),
+                                            std::format(
+                                                "<@&{}>",
+                                                config::discord::roles::helper_access.
+                                                get())).set_allowed_mentions(
+            false, true, false, false, {}, {});
         message.add_file("image.png", fileData, "image/png ").add_embed(embed);
         core::discord::bot->message_create(message);
     }

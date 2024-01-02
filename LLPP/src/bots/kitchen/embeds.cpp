@@ -1,5 +1,6 @@
 #include "embeds.h"
 #include "../../common/util.h"
+#include "../../config/config.h"
 #include "../../core/basestation.h"
 #include "../../core/discord.h"
 
@@ -41,7 +42,7 @@ namespace llpp::bots::kitchen
              .add_field("Next completion:",
                         std::format("<t:{}:R>", next_completion), true);
 
-        const auto message = dpp::message(core::discord::info_channel_id, embed);
+        const auto message = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(message);
     }
 }

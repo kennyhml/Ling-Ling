@@ -165,6 +165,8 @@ namespace llpp::gui
     }
 
     void draw_general_ark_tabs();
+    void draw_general_bot_tabs();
+
 
     void draw_discord_bot_config();
     void draw_discord_info_tabs();

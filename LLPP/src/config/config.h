@@ -2,6 +2,7 @@
 #include <string>
 #include "managedvar.h"
 #include <filesystem>
+#include "../bots/drops/parameters.h"
 
 namespace llpp::config
 {
@@ -13,13 +14,16 @@ namespace llpp::config
         inline const std::vector<std::string> BASE{"general", "ark"};
 
         inline ManagedVar<std::string> root_dir(BASE, "game_root_directory", save, "");
+        inline ManagedVar<std::string> server(BASE, "server", save, "");
     }
 
     namespace general::bot
     {
         inline const std::vector<std::string> BASE{"general", "bot"};
 
-        inline ManagedVar<std::string> assets(BASE, "assets", save, "assets");
+        inline ManagedVar<std::string> assets_dir(BASE, "assets", save, "assets");
+        inline ManagedVar<std::string> itemdata(BASE, "itemdata", save, "itemdata.json");
+        inline ManagedVar<std::string> tessdata_dir(BASE, "tessdata", save, "tessdata");
     }
 
     namespace discord
@@ -73,6 +77,8 @@ namespace llpp::config
         inline const std::vector<std::string> BASE{"bots", "drops"};
 
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+        inline std::unordered_map<std::string, ManagedVar<
+                                      llpp::bots::drops::CrateManagerConfig>> configs;
     }
 
     namespace bots::paste
@@ -87,6 +93,7 @@ namespace llpp::config
         inline ManagedVar<int> interval(BASE, "interval", save, 5);
         inline ManagedVar<int> load_for(BASE, "load_for", save, 15);
 
+        inline ManagedVar<bool> disable_completion(BASE, "disabled", save, false);
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
     }

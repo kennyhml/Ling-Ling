@@ -32,9 +32,7 @@ namespace llpp::config
 
     json& get_data()
     {
-        std::cout << "Get data called\n";
         const auto path = std::filesystem::current_path() / "config\\config.json";
-
         if (!has_passed_initial_check) {
             check_exists();
             has_passed_initial_check = true;

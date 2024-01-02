@@ -7,6 +7,7 @@
 
 #include "embeds.h"
 #include "../../common/util.h"
+#include "../../config/config.h"
 
 namespace llpp::bots::paste
 {
@@ -54,20 +55,20 @@ namespace llpp::bots::paste
     {
         std::cout << "[+] Emptying the achatinas..." << std::endl;
         empty(achatinas[4]);
-        do { asa::entities::local_player->turn_left(45); }
-        while (!empty(achatinas[3]));
-        do { asa::entities::local_player->turn_right(90); }
-        while (!empty(achatinas[5]));
+        asa::entities::local_player->turn_left(45);
+        empty(achatinas[3]);
+        asa::entities::local_player->turn_right(90);
+        empty(achatinas[5]);
 
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(12, std::chrono::milliseconds(300));
 
         empty(achatinas[2]);
-        do { asa::entities::local_player->turn_left(45); }
-        while (!empty(achatinas[1]));
+        asa::entities::local_player->turn_left(45);
+        empty(achatinas[1]);
 
-        do { asa::entities::local_player->turn_left(45); }
-        while (!empty(achatinas[0]));
+        asa::entities::local_player->turn_left(45);
+        empty(achatinas[0]);
     }
 
     int PasteStation::deposit_paste()
@@ -77,8 +78,14 @@ namespace llpp::bots::paste
 
         int amount = 0;
         try {
-            asa::entities::local_player->deposit_into_dedi(
-                *asa::items::resources::achatina_paste, &amount);
+            if (config::bots::paste::ocr_amount.get()) {
+                asa::entities::local_player->deposit_into_dedi(
+                    *asa::items::resources::achatina_paste, &amount);
+            }
+            else {
+                asa::entities::local_player->deposit_into_dedi(
+                    *asa::items::resources::achatina_paste, nullptr);
+            }
         }
         catch (const asa::structures::StructureError&) {
             std::cerr << "[!] Depositing & OCR failed, trying without...\n";

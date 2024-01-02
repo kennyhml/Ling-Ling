@@ -34,7 +34,13 @@ namespace llpp::config
         ~ManagedVar() = default;
 
         T get();
-        T* get_ptr() { return &value_; }
+
+        T* get_ptr()
+        {
+            get();
+            return &value_;
+        }
+
         void set(const T& value);
         void save();
 

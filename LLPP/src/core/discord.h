@@ -10,7 +10,6 @@ namespace llpp::core::discord
     using event_callback_t = std::function<void(const dpp::slashcommand_t&)>;
 
     inline std::unique_ptr<dpp::cluster> bot;
-    inline long long info_channel_id = 1178195307482325072;
 
     bool init(const std::string& token);
 
@@ -18,6 +17,5 @@ namespace llpp::core::discord
                                 const event_callback_t&);
 
     void inform_started();
-    void inform_fatal_error(
-        const std::exception& error, const std::string& task);
+    void inform_fatal_error(const std::exception& error, const std::string& task);
 }

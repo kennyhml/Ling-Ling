@@ -301,7 +301,11 @@ namespace llpp::gui
                 draw_general_ark_tabs();
                 break;
             }
-            case BOT: { break; }
+            case BOT:
+            {
+                draw_general_bot_tabs();
+                break;
+            }
             }
 
             ImGui::EndChild();

@@ -141,18 +141,16 @@ namespace llpp::gui
     inline bool bools[50]{};
     inline int ints[50]{};
     inline float color[4] = {1.f, 1.f, 1.f, 1.f};
-    inline std::vector<const char*> items = {};
 
     void draw_general_ark_tabs()
     {
         begin_child("Game Settings", ImVec2(300, ImGui::GetWindowHeight()));
         {
             // CONFIG FOR THE ARK ROOT DIRECTORY
-            ImGui::SetCursorPos(ImVec2(10, 14));
+            ImGui::SetCursorPos({10, 14});
             ImGui::TextColored(path_color, "Directory:");
-            ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-            ImGui::SetCursorPosY(10);
+            ImGui::SetCursorPos({100, 11});
             ImGui::InputText("##", config::general::ark::root_dir.get().data(), 256,
                              ImGuiInputTextFlags_CallbackEdit,
                              [](ImGuiInputTextCallbackData* data) -> int {
@@ -165,7 +163,6 @@ namespace llpp::gui
 
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
-            ImGui::SetCursorPosY(10);
             if (ImGui::Button("Get")) {
                 std::string selected;
                 openFolder(selected);
@@ -177,6 +174,21 @@ namespace llpp::gui
             const bool valid = exists(
                 std::filesystem::path(config::general::ark::root_dir.get()));
             path_color = valid ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f);
+
+            // CONFIG FOR THE ARK ROOT DIRECTORY
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Server:");
+            ImGui::SetCursorPos({100, 42});
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::InputText("##server", config::general::ark::server.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::general::ark::server.set(data->Buf);
+                                 return 0;
+                             });
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("Your server name.");
+            }
         }
         end_child();
 
@@ -184,6 +196,93 @@ namespace llpp::gui
         begin_child("f", ImVec2(280, ImGui::GetWindowHeight()));
         end_child();
     }
+
+    inline ImVec4 assets_path_col = ImVec4(1.f, 0.f, 0.f, 1.f);
+    inline ImVec4 itemdata_col = ImVec4(1.f, 0.f, 0.f, 1.f);
+
+    void draw_general_bot_tabs()
+    {
+        begin_child("Environment", ImVec2(375, ImGui::GetWindowHeight()));
+        {
+            // CONFIG FOR THE ARK ROOT DIRECTORY
+            ImGui::SetCursorPos({10, 14});
+            ImGui::TextColored(assets_path_col, "Assets directory:");
+
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({120, 10});
+            ImGui::InputText("##assets_dir",
+                             config::general::bot::assets_dir.get().data(), 256,
+                             ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::general::bot::assets_dir.set(data->Buf);
+                                 return 0;
+                             });
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The path to the assets shipped with ling ling.");
+            }
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
+            ImGui::SetCursorPosY(10);
+            if (ImGui::Button("Get")) {
+                std::string selected;
+                openFolder(selected);
+                if (!selected.empty()) { config::general::bot::assets_dir.set(selected); }
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("Select the directory.");
+            }
+            bool valid = std::filesystem::exists(config::general::bot::assets_dir.get())
+                || exists(
+                    std::filesystem::current_path() / config::general::bot::assets_dir.
+                    get());
+            assets_path_col = valid
+                                  ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                                  : ImVec4(1.f, 0.f, 0.f, 1.f);
+
+
+            // CONFIG FOR THE ARK ROOT DIRECTORY
+            ImGui::SetCursorPos({10, 45});
+            ImGui::TextColored(itemdata_col, "Itemdata path:");
+
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({120, 42});
+            ImGui::InputText("##itemdata", config::general::bot::itemdata.get().data(),
+                             256, ImGuiInputTextFlags_CallbackEdit,
+                             [](ImGuiInputTextCallbackData* data) -> int {
+                                 config::general::bot::itemdata.set(data->Buf);
+                                 return 0;
+                             });
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The path to the itemdata shipped with ling ling.");
+            }
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
+            ImGui::SetCursorPosY(10);
+            if (ImGui::Button("Get")) {
+                std::string selected;
+                openFolder(selected);
+                if (!selected.empty()) { config::general::bot::itemdata.set(selected); }
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("Select the directory.");
+            }
+            valid = std::filesystem::exists(config::general::bot::itemdata.get()) ||
+                exists(
+                    std::filesystem::current_path() / config::general::bot::itemdata.
+                    get());
+            itemdata_col = valid
+                               ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                               : ImVec4(1.f, 0.f, 0.f, 1.f);
+        }
+        end_child();
+
+        ImGui::SameLine();
+        begin_child("f", ImVec2(205, ImGui::GetWindowHeight()));
+        end_child();
+    }
+
 
     inline int selected_channel = 0;
     inline int selected_role = 0;
@@ -484,8 +583,8 @@ namespace llpp::gui
                              });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                    "The prefix for your paste beds, must be included in your bed name but not be the exact same.\n"
-                    "For example your bed may be named COOL SPOT // PASTE00, but your prefix can still be PASTE.");
+                    "Specifies the prefix for your paste beds. The prefix must be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named COOL SPOT // PASTE00, while your prefix can still be PASTE.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -501,12 +600,12 @@ namespace llpp::gui
                              });
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                    "The prefix for the render bed, for more info please read below.\n\n"
+                    "Specifies the prefix for the render bed. For more details, please refer to the explanation below.\n\n"
                     "Why is a render bed needed?\n"
-                    "When the snail gets loaded before the structure it's on, it visually glitches into it.\n"
-                    "Thus you have to render the structure, leave render of the dino and then move back to it.\n"
-                    "For this youre going to need a source bed close to the snails named PREFIX::SRC\n"
-                    "and a gateway bed out of snail rende named PREFIX::GATEWAY.");
+                    "When the snail is loaded before the structure it's on, it visually glitches into it.\n"
+                    "To resolve this issue, you need to render the structure, leave the render of the dino, and then move back to it.\n"
+                    "To achieve this, you'll require a source bed close to the snails named [PREFIX]::SRC\n"
+                    "and a gateway bed out of snail render named [PREFIX]::GATEWAY.");
             }
 
             ImGui::SetCursorPos({10, 76});
@@ -515,10 +614,10 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 73});
             if (ImGui::InputInt("##paste_count",
                                 config::bots::paste::num_stations.get_ptr(), 1, 5)) {
-                int* num_stations = config::bots::paste::num_stations.get_ptr();
-                *num_stations = std::clamp(*num_stations, 1, 100);
                 config::bots::paste::num_stations.save();
             }
+            int* num_stations = config::bots::paste::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 100);
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The number of paste stations you have.");
@@ -531,10 +630,10 @@ namespace llpp::gui
             ImGui::SetCursorPos({150, 104});
             if (ImGui::InputInt("##paste_interval",
                                 config::bots::paste::interval.get_ptr(), 1, 5)) {
-                int* interval = config::bots::paste::interval.get_ptr();
-                *interval = std::clamp(*interval, 5, 150);
                 config::bots::paste::interval.save();
             }
+            int* interval = config::bots::paste::interval.get_ptr();
+            *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -545,17 +644,15 @@ namespace llpp::gui
             ImGui::Text("Load for (seconds):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 135});
-            if (ImGui::InputInt("##paste_render", config::bots::paste::load_for.get_ptr(), 1,
-                            5)) {
-                int* load_for = config::bots::paste::load_for.get_ptr();
-                *load_for = std::clamp(*load_for, 5, 100);
-                config::bots::paste::load_for.save();
-            }
+            if (ImGui::InputInt("##paste_render", config::bots::paste::load_for.get_ptr(),
+                                1, 5)) { config::bots::paste::load_for.save(); }
+            int* load_for = config::bots::paste::load_for.get_ptr();
+            *load_for = std::clamp(*load_for, 5, 100);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                    "How long to let the stations render at the source render bed (in seconds).\nMore structures -> longer render time required.");
+                    "Specifies the duration for stations to render at the source render bed (in seconds).\n"
+                    "The rendering time increases with more structures; additional structures require a longer rendering time.");
             }
-
         }
         end_child();
 
@@ -563,8 +660,34 @@ namespace llpp::gui
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
             ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Disable station completion",
+                                config::bots::paste::disable_completion.get_ptr())) {
+                config::bots::paste::disable_completion.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Completely disable the paste manager's completion.\n\n"
+                    "Even when disabled, the paste manager is created but remains inactive.\n"
+                    "You can toggle its state at runtime or through the discord bot.");
+            }
+
+            if (ImGui::Checkbox("Allow partial completion",
+                                config::bots::paste::allow_partial.get_ptr())) {
+                config::bots::paste::allow_partial.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Enables the bot to pause its operation after reaching a specific station and resume afterward.\n\n"
+                    "For example:\nSuppose there are Task A, Task B, and Task C in order of priority. Task C represents\n"
+                    "a PasteManager instance handling paste stations. If both Task A and B are on cooldown and C is initiated,\n"
+                    "A and B will be temporarily ignored until C completes. In cases of partial completion, C might finish\n"
+                    "station 3, execute Task A/B, and then resume C at station 4.\n\n"
+                    "Not recommended if there will be frequent partial completions and rendering takes a considerable amount of time.\n");
+            }
+
+
             if (ImGui::Checkbox("OCR deposited amount",
-                            config::bots::paste::ocr_amount.get_ptr())) {
+                                config::bots::paste::ocr_amount.get_ptr())) {
                 config::bots::paste::ocr_amount.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -572,19 +695,7 @@ namespace llpp::gui
                     "Enable to use OCR to determine how much paste was put into the dedi per station.\n"
                     "This info is sent to the completion embed on discord, it has no other purpose as of now.");
             }
-            if (ImGui::Checkbox("Allow partial completion",
-                            config::bots::paste::allow_partial.get_ptr())) {
-                config::bots::paste::allow_partial.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "Allow the bot to break after a certain station and pick back up after that.\n\n"
-                    "Example:\nConsider we have Task A, Task B and Task C where the order is their priority and C is\n"
-                    "our PasteManager instance managing your paste stations.\nIf Task A and B are both on cooldown and C is started, A and B will be disregarded\n"
-                    "until C completes. With partial completion, C may go to complete station 3, complete task A/B,\n"
-                    "then pick C back up at 4.\n\n"
-                    "Not recommended if it's going to have to partial complete alot and the rendering takes long.\n");
-            }
+
             end_child();
         }
     }

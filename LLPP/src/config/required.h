@@ -15,7 +15,7 @@ namespace llpp::config
     }
   },
   "discord": {
-    "token": "MTE4MzM3MDQ3MDkzMDc4ODQxMw.G7WbHg.AK9OzDWjwjJalFh1EDMGOYe8zA17VJ5PQhq9Bo",
+    "token": "",
     "authorization": {
       "command_channels": [],
       "authorized_roles": [],
