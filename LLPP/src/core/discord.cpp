@@ -9,39 +9,66 @@ namespace llpp::core::discord
     std::unordered_map<std::string, event_callback_t> event_callbacks;
     std::vector<dpp::slashcommand> commands;
 
-    bool is_initialized = false;
 
-    void ready_callback(const dpp::ready_t& event)
+    namespace
     {
-        if (dpp::run_once<struct register_bot_commands>()) {
-            std::cout << "[+] Registering discord slash commands... ";
+        bool is_initialized = false;
 
-            for (auto& cmd : commands) { cmd.application_id = bot->me.id; }
+        void validate_configuration()
+        {
+            using namespace config::discord;
+            if (token.get_ptr()->empty()) {
+                throw config::BadConfigurationError(
+                    "Bad configuration: Bot token must be a valid token, not empty.");
+            }
 
-            bot->guild_bulk_command_create_sync(commands, config::discord::guild.get());
-            std::cout << "Done.\n";
+            if (guild.get_ptr()->empty()) {
+                throw config::BadConfigurationError(
+                    "Bad configuration: Guild ID must not be empty.");
+            }
+
+            if (channels::info.get_ptr()->empty()) {
+                throw config::BadConfigurationError(
+                    "Bad configuration: Info channel id must not be empty.");
+            }
+
+            if (roles::helper_no_access.get_ptr()->empty() || roles::helper_access.
+                get_ptr()->empty()) {
+                throw config::BadConfigurationError(
+                    "Bad configuration: Helper role ids must not be empty.");
+            }
         }
 
-        is_initialized = true;
+        void ready_callback(const dpp::ready_t& event)
+        {
+            if (dpp::run_once<struct register_bot_commands>()) {
+                std::cout << "[+] Registering discord slash commands... ";
+
+                for (auto& cmd : commands) { cmd.application_id = bot->me.id; }
+
+                bot->guild_bulk_command_create_sync(commands,
+                                                    config::discord::guild.get());
+                std::cout << "Done.\n";
+            }
+
+            is_initialized = true;
+        }
+
+        void slashcommand_callback(const dpp::slashcommand_t& event)
+        {
+            auto& fn = event_callbacks.at(event.command.get_command_name());
+            fn(event);
+        }
     }
 
-    void slashcommand_callback(const dpp::slashcommand_t& event)
-    {
-        auto& fn = event_callbacks.at(event.command.get_command_name());
-        fn(event);
-    }
-
-    bool init(const std::string& token)
+    bool init()
     {
         std::cout << "[+] Initializing Ling Ling++ discord bot...\n";
-
-        if (token.empty()) {
-            std::cerr << "\t[!] Empty token passed!\n";
-            return false;
-        }
+        validate_configuration();
 
         std::cout << "\t[-] Creating bot from token... ";
-        bot = std::make_unique<dpp::cluster>(token, dpp::i_all_intents);
+        bot = std::make_unique<dpp::cluster>(config::discord::token.get(),
+                                             dpp::i_all_intents);
         std::cout << "Done\n";
 
         std::cout << "\t[-] Registering static callbacks... ";

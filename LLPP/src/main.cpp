@@ -3,7 +3,6 @@
 
 #include "bots/drops/cratemanager.h"
 #include "bots/paste/pastemanager.h"
-#include "bots/suicide/suicideembed.h"
 #include "bots/suicide/suicidestation.h"
 #include "gui/gui.h"
 #include "config/config.h"
@@ -12,16 +11,21 @@
 
 static bool running = false;
 
-
 void llpp_main()
 {
     using namespace llpp::config::bots;
 
-    llpp::core::discord::init(llpp::config::discord::token.get());
+    llpp::core::discord::init();
     auto paste = llpp::bots::paste::PasteManager(paste::prefix.get(),
                                                  paste::num_stations.get(),
                                                  std::chrono::minutes(
                                                      paste::interval.get()));
+
+    std::vector<llpp::bots::drops::CrateManager*> crate_managers{};
+
+    for (auto& [key, config] : drops::configs) {
+        crate_managers.push_back(new llpp::bots::drops::CrateManager(*config.get_ptr()));
+    }
 
     auto suicide =
         llpp::bots::suicide::SuicideStation("SUICIDE DEATH", "SUICIDE RESPAWN");
@@ -29,7 +33,8 @@ void llpp_main()
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
-    while (running) { if (paste.run()) { suicide.complete(); } }
+    for (auto& m : crate_managers) { m->run(); }
+
     llpp::core::discord::bot->shutdown();
 }
 
@@ -39,6 +44,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
     llpp::gui::create_imgui();
+
 
     if (!AllocConsole()) { return false; }
     FILE* pFile;
@@ -53,7 +59,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     }
 
     asa::window::get_handle();
-    
+
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 

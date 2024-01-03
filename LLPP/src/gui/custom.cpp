@@ -274,14 +274,16 @@ namespace llpp::gui
 
     void draw_discord_bot_config()
     {
-        begin_child("Bot settings", ImVec2(375, ImGui::GetWindowHeight()));
+        begin_child("Bot settings",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
         {
             // TOKEN SHITS
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Discord Bot token:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 11});
-            if (ImGui::InputText("##bot_token", config::discord::token.get_ptr())) {
+            if (ImGui::InputText("##bot_token", config::discord::token.get_ptr(),
+                                 ImGuiInputTextFlags_Password)) {
                 config::discord::token.save();
             }
 
@@ -295,7 +297,7 @@ namespace llpp::gui
             ImGui::Text("Discord (Guild) ID:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
             ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputText("##bot_token", config::discord::guild.get_ptr())) {
+            if (ImGui::InputText("##guild_id", config::discord::guild.get_ptr())) {
                 config::discord::guild.save();
             }
 
@@ -456,7 +458,8 @@ namespace llpp::gui
 
     void draw_discord_info_tabs()
     {
-        begin_child("Roles / People", ImVec2(300, ImGui::GetWindowHeight() / 2));
+        begin_child("Roles / People",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Helpers [No Access]:");
@@ -495,7 +498,8 @@ namespace llpp::gui
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
-        begin_child("Channels", ImVec2(300, ImGui::GetWindowHeight() / 2));
+        begin_child("Channels",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Info Channel:");
@@ -530,11 +534,12 @@ namespace llpp::gui
 
     void draw_bots_paste_tabs()
     {
-        begin_child("Station Configuration", ImVec2(300, ImGui::GetWindowHeight()));
+        begin_child("Station Configuration",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Station prefix:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 11});
             if (ImGui::InputText("##paste_prefix",
                                  config::bots::paste::prefix.get_ptr())) {
@@ -548,7 +553,7 @@ namespace llpp::gui
 
             ImGui::SetCursorPos({10, 45});
             ImGui::Text("Render prefix:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 42});
             if (ImGui::InputText("##render_prefix",
                                  config::bots::paste::render_prefix.get_ptr())) {
@@ -566,7 +571,7 @@ namespace llpp::gui
 
             ImGui::SetCursorPos({10, 76});
             ImGui::Text("Station count:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 73});
             if (ImGui::InputInt("##paste_count",
                                 config::bots::paste::num_stations.get_ptr(), 1, 5)) {
@@ -582,7 +587,7 @@ namespace llpp::gui
 
             ImGui::SetCursorPos({10, 107});
             ImGui::Text("Interval (minutes):");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 104});
             if (ImGui::InputInt("##paste_interval",
                                 config::bots::paste::interval.get_ptr(), 1, 5)) {
@@ -598,7 +603,7 @@ namespace llpp::gui
 
             ImGui::SetCursorPos({10, 138});
             ImGui::Text("Load for (seconds):");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 135});
             if (ImGui::InputInt("##paste_render", config::bots::paste::load_for.get_ptr(),
                                 1, 5)) { config::bots::paste::load_for.save(); }
@@ -666,20 +671,26 @@ namespace llpp::gui
 
     void draw_bots_drops_tab()
     {
-        begin_child("Crate Managers", ImVec2(300, ImGui::GetWindowHeight() * 0.33));
+        begin_child("Crate Managers",
+                    ImVec2(425 - maintabs_data.width, ImGui::GetWindowHeight() * 0.33));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Selected Manager:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 11});
             std::vector<const char*>* data = config::bots::drops::managers.get_ptr();
             ImGui::Combo("##selected_manager", &selected_manager, data->data(),
                          data->size());
 
-            ImGui::SetCursorPos({5, 45});
-            if (ImGui::Button("Create manager")) { new_name_popup = true; }
+            ImGui::SetCursorPos({10, 45});
+            if (ImGui::Button("Add new")) { new_name_popup = true; }
             ImGui::SameLine();
-            if (ImGui::Button("Delete selected manager") && !data->empty()) {
+            if (ImGui::Button("Delete selected") && !data->empty()) {
+                confirmation_popup = true;
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("Rename selected") && !data->empty()) {
                 confirmation_popup = true;
             }
 
@@ -739,15 +750,6 @@ namespace llpp::gui
         config::ManagedVar<bots::drops::CrateManagerConfig>* active = nullptr;
 
         if (!config::bots::drops::managers.get_ptr()->empty()) {
-            for (auto& manager : config::bots::drops::managers.get()) {
-                if (!config::bots::drops::configs.contains(manager)) {
-                    config::bots::drops::configs[manager] = config::ManagedVar<
-                        bots::drops::CrateManagerConfig>(
-                        {"bots", "drops", manager}, config::save,
-                        bots::drops::CrateManagerConfig());
-                }
-            }
-
             std::string selected = (*config::bots::drops::managers.get_ptr())[
                 selected_manager];
             active = &config::bots::drops::configs[selected];
@@ -756,26 +758,25 @@ namespace llpp::gui
         ImGui::SameLine();
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
-            if (active) {
-                ImGui::SetCursorPos({10, 14});
-                ImGui::Text("Render (seconds):");
-                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-                ImGui::SetCursorPos({150, 11});
-                if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
-                                    5)) { active->save(); }
-                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                    ImGui::SetTooltip(
-                        "How long to let the first crate at each group render, more structures nearby -> longer render time.");
-                }
+            ImGui::SetCursorPos({10, 14});
+            if (ImGui::Checkbox("Reroll mode",
+                                config::bots::drops::reroll_mode.get_ptr())) {
+                config::bots::drops::reroll_mode.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "[GLOBAL]\nWhen enabled, Ling Ling++ will request a reroll of a found crate.");
+            }
 
+            if (active) {
                 ImGui::SetCursorPos({10, 45});
-                if (ImGui::Checkbox("Overrule reroll mode",
-                                    &active->get_ptr()->overrule_reroll_mode)) {
-                    active->save();
-                }
+                if (ImGui::Checkbox("Disable completion##crate_manager",
+                                    &active->get_ptr()->disabled)) { active->save(); }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                        "Enable to always loot these crates, even when it is enabled.");
+                        "Completely disable this crate manager's completion.\n\n"
+                        "Even when disabled, the paste manager is created but remains inactive.\n"
+                        "You can toggle its state at runtime or through the discord bot.");
                 }
 
                 ImGui::SetCursorPos({10, 76});
@@ -792,17 +793,39 @@ namespace llpp::gui
                         "until C completes. With partial completion, C may go to complete station 3, complete task A/B,\n"
                         "then pick C back up at 4.");
                 }
+
+                ImGui::SetCursorPos({10, 107});
+                if (ImGui::Checkbox("Overrule reroll mode",
+                                    &active->get_ptr()->overrule_reroll_mode)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "Enable to ignore the reroll mode for this crate manager, drops are always looted.");
+                }
+
+                ImGui::SetCursorPos({10, 138});
+                ImGui::Text("Render (seconds):");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({150, 135});
+                if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
+                                    5)) { active->save(); }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "How long to let the first crate at each group render, more structures nearby -> longer render time.");
+                }
             }
         }
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.33) + 5);
-        begin_child("Configuration", ImVec2(300, ImGui::GetWindowHeight() * 0.66));
+        begin_child("Configuration",
+                    ImVec2(425 - maintabs_data.width, ImGui::GetWindowHeight() * 0.66));
         {
             if (active) {
                 ImGui::SetCursorPos({10, 14});
                 ImGui::Text("Station prefix:");
-                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 ImGui::SetCursorPos({150, 11});
                 if (ImGui::InputText("##crate_prefix", &active->get_ptr()->prefix)) {
                     active->save();
@@ -818,7 +841,7 @@ namespace llpp::gui
 
                 ImGui::SetCursorPos({10, 45});
                 ImGui::Text("Grouped Crates:");
-                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 ImGui::SetCursorPos({150, 42});
 
                 if (ImGui::InputText("##crate_groups",
@@ -843,7 +866,7 @@ namespace llpp::gui
 
                 ImGui::SetCursorPos({10, 76});
                 ImGui::Text("Interval (minutes):");
-                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 ImGui::SetCursorPos({150, 73});
                 if (ImGui::InputInt("##crate_interval", &active->get_ptr()->interval, 1,
                                     5)) { active->save(); }

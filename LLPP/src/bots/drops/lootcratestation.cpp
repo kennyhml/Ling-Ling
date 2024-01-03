@@ -101,22 +101,17 @@ namespace llpp::bots::drops
 
         if (!util::await([this]() -> bool {
             return asa::entities::local_player->can_access(crate_);
-        }, std::chrono::seconds(config_.render_for))) {
+        }, std::chrono::seconds(is_rendered_ ? 0 : config_.render_for))) {
             is_crate_up_ = false;
             set_completed();
             return {this, false, std::chrono::seconds(0), {}};
         }
 
-        std::cout << "[+] Crate found...\n";
         if (!is_crate_up_) {
             is_crate_up_ = true;
             last_discovered_up_ = std::chrono::system_clock::now();
         }
 
-        if (has_buff_wait_expired()) {
-            std::cout << "[!] No buff looter within 15min.\n";
-            fully_loot_ = true;
-        }
         const auto quality = crate_.get_crate_quality();
 
         cv::Mat loot_screenshot;
@@ -124,7 +119,6 @@ namespace llpp::bots::drops
         loot_crate(loot_screenshot, cherry_picked_items);
 
         if (!config_.uses_teleporters) {
-            std::cout << "Putting the items away..\n";
             asa::entities::local_player->turn_right();
             asa::entities::local_player->access(vault_);
             asa::entities::local_player->get_inventory()->transfer_all();
@@ -134,7 +128,7 @@ namespace llpp::bots::drops
         const auto elapsed = util::get_elapsed<std::chrono::seconds>(start);
         core::StationResult result(this, true, elapsed, {});
 
-        if (fully_loot_) {
+        if (!should_reroll()) {
             send_success_embed(result, loot_screenshot, quality, ++times_looted_);
         }
         else {
@@ -145,22 +139,6 @@ namespace llpp::bots::drops
         return result;
     }
 
-    void LootCrateStation::set_can_default_teleport(const bool can_default_teleport)
-    {
-        can_default_teleport_ = can_default_teleport;
-    }
-
-    void LootCrateStation::set_cooldown()
-    {
-        last_completed_ = std::chrono::system_clock::now();
-    }
-
-    void LootCrateStation::set_fully_loot(const bool fully_loot)
-    {
-        std::cout << "[+] Fully loot set to " << fully_loot << "\n";
-        fully_loot_ = fully_loot;
-    }
-
     void LootCrateStation::loot_crate(cv::Mat& screenshot_out,
                                       std::map<std::string, bool>& cherry_picked_out)
     {
@@ -168,7 +146,7 @@ namespace llpp::bots::drops
         screenshot_out = asa::window::screenshot({1193, 227, 574, 200});
         std::cout << "\t[-] Loot screenshot has been taken.\n";
 
-        if (!fully_loot_) {
+        if (should_reroll()) {
             cherry_picked_out = cherry_pick_items();
             crate_.inventory->close();
         }
@@ -221,8 +199,11 @@ namespace llpp::bots::drops
             return;
         }
 
-        asa::entities::local_player->teleport_to(teleporter_, can_default_teleport_);
-        if (!can_default_teleport_) {
+        util::await([]() {
+            return asa::entities::local_player->can_use_default_teleport();
+        }, std::chrono::seconds(10));
+        asa::entities::local_player->teleport_to(teleporter_, is_default_dst_);
+        if (!is_default_dst_) {
             asa::entities::local_player->turn_up(60, std::chrono::milliseconds(500));
         }
     }
@@ -230,5 +211,11 @@ namespace llpp::bots::drops
     bool LootCrateStation::has_buff_wait_expired() const
     {
         return util::timedout(last_discovered_up_, max_buff_wait_time_);
+    }
+
+    bool LootCrateStation::should_reroll() const
+    {
+        return !has_buff_wait_expired() && !config_.overrule_reroll_mode &&
+            config::bots::drops::reroll_mode.get();
     }
 }

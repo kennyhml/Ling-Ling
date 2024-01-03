@@ -11,7 +11,7 @@ namespace llpp::core::discord
 
     inline std::unique_ptr<dpp::cluster> bot;
 
-    bool init(const std::string& token);
+    bool init();
 
     void register_slash_command(const dpp::slashcommand& command,
                                 const event_callback_t&);

@@ -43,9 +43,6 @@ namespace llpp::bots::drops
         };
 
         std::vector<CrateGroupStatistics> stats_per_group;
-
-        // static core::data::ManagedVar<bool> get_reroll_mode();
-
         void parse_groups(std::string groups);
 
     private:

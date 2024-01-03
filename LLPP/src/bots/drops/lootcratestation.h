@@ -3,7 +3,6 @@
 #include <asapp/structures/cavelootcrate.h>
 #include <asapp/structures/teleporter.h>
 #include <asapp/structures/simplebed.h>
-
 #include "config.h"
 
 namespace llpp::bots::drops
@@ -16,14 +15,13 @@ namespace llpp::bots::drops
 
         core::StationResult complete() override;
 
-        void set_can_default_teleport(bool can_default_teleport);
-        void set_cooldown();
-        void set_fully_loot(bool fully_loot);
+        void set_default_dst(const bool is_default) { is_default_dst_ = is_default; }
+        void set_cooldown() { last_completed_ = std::chrono::system_clock::now(); }
+        void set_rendered(const bool rendered) { is_rendered_ = rendered; }
 
         int get_times_looted() const { return times_looted_; }
 
     private:
-        bool fully_loot_ = true;
         CrateManagerConfig& config_;
 
         std::map<std::string, bool> cherry_pick_items() const;
@@ -31,11 +29,13 @@ namespace llpp::bots::drops
                         std::map<std::string, bool>& cherry_picked_out);
         void go_to();
         bool has_buff_wait_expired() const;
-
-        bool can_default_teleport_ = false;
+        bool should_reroll() const;
         int times_looted_ = 0;
 
         bool is_crate_up_ = false;
+        bool is_rendered_ = false;
+        bool is_default_dst_ = false;
+
         std::chrono::system_clock::time_point last_discovered_up_;
         std::chrono::minutes max_buff_wait_time_ = std::chrono::minutes(15);
 

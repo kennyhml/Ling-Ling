@@ -9,6 +9,19 @@ namespace llpp::config
     json& get_data();
     void save();
 
+    class BadConfigurationError final : public std::exception
+    {
+    public:
+        explicit BadConfigurationError(std::string t_message) : message_(
+            std::move(t_message)) {}
+
+        const char* what() const override { return message_.c_str(); }
+
+    private:
+        std::string message_;
+    };
+
+
     namespace general::ark
     {
         inline const std::vector<std::string> BASE{"general", "ark"};
@@ -77,6 +90,8 @@ namespace llpp::config
         inline const std::vector<std::string> BASE{"bots", "drops"};
 
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+        inline ManagedVar<bool> reroll_mode(BASE, "reroll_mode", save, false);
+
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::drops::CrateManagerConfig>> configs;
     }

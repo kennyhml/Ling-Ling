@@ -83,10 +83,11 @@ namespace llpp::gui
     enum MainTabs : int
     {
         GENERAL,
-        DISCORD,
-        MISC,
-        PROFILE,
         BOTS,
+        DISCORD,
+        PROFILE,
+        MISC,
+        LOGGING,
     };
 
     enum GeneralTabs : int
@@ -122,8 +123,9 @@ namespace llpp::gui
 
     inline float animation = 0.f;
     inline MainTabs selected_main_tab = GENERAL;
+
     inline std::vector<const char*> main_tabs = {
-        "General", "Discord", "Misc", "Profile", "Bots", "Logging"
+        "General", "Bots", "Discord", "Profile", "Misc", "Logging"
     };
 
     inline GeneralTabs selected_general_tab = ARK;
@@ -138,8 +140,8 @@ namespace llpp::gui
     };
 
     inline std::vector<const char*> main_tab_icons = {
-        ICON_FA_GEAR, ICON_FA_BELL, ICON_FA_WIFI, ICON_FA_PERSON_BREASTFEEDING,
-        ICON_FA_ROBOT, ICON_FA_NOTE_STICKY
+        ICON_FA_GEAR, ICON_FA_ROBOT, ICON_FA_BELL, ICON_FA_PERSON_BREASTFEEDING,
+        ICON_FA_WIFI, ICON_FA_NOTE_STICKY
     };
 
     bool tab_button(const char* icon, const char* label, bool selected, float rounding,

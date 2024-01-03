@@ -15,5 +15,6 @@ namespace llpp::bots::drops
         bool uses_teleporters{false};
         bool overrule_reroll_mode{false};
         bool allow_partial_completion{false};
+        bool disabled{false};
     };
 }

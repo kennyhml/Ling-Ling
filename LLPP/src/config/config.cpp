@@ -1,12 +1,14 @@
 #include "config.h"
 #include <fstream>
 #include "required.h"
+#include "../bots/drops/cratemanager.h"
 
 namespace llpp::config
 {
     namespace
     {
         bool has_passed_initial_check = false;
+        bool has_loaded_dynamic_maps = false;
 
         void check_exists()
         {
@@ -41,6 +43,19 @@ namespace llpp::config
         std::ifstream f(path);
         static json d = json::parse(f);
         f.close();
+
+        if (!has_loaded_dynamic_maps) {
+            has_loaded_dynamic_maps = true;
+            for (auto& manager : bots::drops::managers.get()) {
+                if (!bots::drops::configs.contains(manager)) {
+                    bots::drops::configs[manager] = config::ManagedVar<
+                        llpp::bots::drops::CrateManagerConfig>(
+                        {"bots", "drops", manager}, save,
+                        llpp::bots::drops::CrateManagerConfig());
+                }
+            }
+        }
+
         return d;
     }
 

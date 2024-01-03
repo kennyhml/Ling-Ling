@@ -14,9 +14,14 @@ namespace llpp::bots::drops
         void set_group_cooldown(std::vector<LootCrateStation>& group)
         {
             for (auto& station : group) {
-                station.set_can_default_teleport(false);
+                station.set_default_dst(false);
                 station.set_cooldown();
             }
+        }
+
+        void set_group_rendered(std::vector<LootCrateStation>& group, const bool rendered)
+        {
+            for (auto& station : group) { station.set_rendered(rendered); }
         }
     }
 
@@ -80,19 +85,14 @@ namespace llpp::bots::drops
     {
         any_looted = false;
         bool can_default_tp = true;
-        bool let_teleporters_render = false;
 
         int i = 0;
         for (auto& group : crates_) {
+            set_group_rendered(group, false);
             for (auto& station : group) {
-                station.set_can_default_teleport(can_default_tp);
-                //  station.set_fully_loot(!get_reroll_mode().get());
-                auto result = station.complete();
-
-                if (!let_teleporters_render) {
-                    asa::core::sleep_for(std::chrono::seconds(3));
-                    let_teleporters_render = true;
-                }
+                station.set_default_dst(can_default_tp);
+                const auto result = station.complete();
+                set_group_rendered(group, true);
 
                 if (result.get_success()) {
                     any_looted = true;
@@ -156,7 +156,7 @@ namespace llpp::bots::drops
         stats_per_group.resize(lefts.size());
 
         int group = 0;
-        int num_station = 0;
+        int num_station = 1;
         for (int left : lefts) {
             std::string roi = groups.substr(left + 1, rights[group] - left - 1);
             std::vector<int> commas;
@@ -196,8 +196,8 @@ namespace llpp::bots::drops
                     }
                 }
                 crates_[group].emplace_back(
-                    util::add_num_to_prefix(config_.prefix, num_station++), config_,
-                    asa::structures::CaveLootCrate(curr_flag));
+                    util::add_num_to_prefix(config_.prefix + "::DROP", num_station++),
+                    config_, asa::structures::CaveLootCrate(curr_flag));
             }
             group++;
         }
@@ -228,15 +228,14 @@ namespace llpp::bots::drops
         auto cmd_data = event.command.get_command_interaction();
 
         auto& subcommand = cmd_data.options[0];
-        bool enable = subcommand.get_value<bool>(0);
+        const bool enable = subcommand.get_value<bool>(0);
         std::string as_string = enable ? "true" : "false";
 
-        // std::cout << "[+] reroll mode changed via discord from" << get_reroll_mode().get()
-        //     << " to " << as_string << std::endl;
-        // if (get_reroll_mode().get() == enable) {
-        //     return event.reply(std::format("`reroll mode` is already `{}`", as_string));
-        // }
-        // get_reroll_mode().set(enable);
-        // event.reply(std::format("`reroll mode` has been changed to `{}`", as_string));
+        auto& reroll = config::bots::drops::reroll_mode;
+        if (reroll.get() == enable) {
+            return event.reply(std::format("`reroll mode` is already `{}`", as_string));
+        }
+        reroll.set(enable);
+        event.reply(std::format("`reroll mode` has been changed to `{}`", as_string));
     }
 }

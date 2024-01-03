@@ -74,6 +74,8 @@ namespace llpp::config
                 "overrule_reroll_mode", default_.overrule_reroll_mode);
             value_.allow_partial_completion = curr[k].value(
                 "allow_partial_completion", default_.allow_partial_completion);
+
+            value_.disabled = curr[k].value("disabled", default_.disabled);
         }
         catch (const json::out_of_range& e) { handle_not_found(e); } catch (const
             std::exception& e) { std::cerr << "Uknown error " << e.what() << "\n"; }
@@ -111,7 +113,7 @@ namespace llpp::config
         curr[k]["uses_teleporters"] = value_.uses_teleporters;
         curr[k]["overrule_reroll_mode"] = value_.overrule_reroll_mode;
         curr[k]["allow_partial_completion"] = value_.allow_partial_completion;
-
+        curr[k]["disabled"] = value_.disabled;
         on_change_();
     }
 
