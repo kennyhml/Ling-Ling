@@ -208,17 +208,21 @@ namespace llpp::bots::drops
         dpp::slashcommand crate_commands("crates", "Controls all crate managers.", 0);
 
         if (!has_registered_reroll_command_) {
-            dpp::command_option reroll_field(dpp::co_sub_command, "reroll",
+            dpp::command_option reroll_group(dpp::co_sub_command_group, "reroll",
                                              "Manage reroll mode test");
 
-            reroll_field.add_option(dpp::command_option(dpp::co_boolean,
-                                                        "toggle",
-                                                        "Whether to use reroll mode.",
-                                                        true));
-            crate_commands.add_option(reroll_field);
+            const auto set(dpp::command_option(dpp::co_boolean, "toggle",
+                                         "Whether to use reroll mode.", true));
+
+            reroll_group.add_option(
+                dpp::command_option(dpp::co_sub_command, "set", "Set reroll mode").
+                add_option(set));
+
+            reroll_group.add_option(dpp::command_option(dpp::co_sub_command, "get",
+                                                        "Get current reroll mode"));
+            crate_commands.add_option(reroll_group);
 
             has_registered_reroll_command_ = true;
-
             core::discord::register_slash_command(crate_commands, reroll_mode_callback);
         }
     }
@@ -227,7 +231,12 @@ namespace llpp::bots::drops
     {
         auto cmd_data = event.command.get_command_interaction();
 
-        auto& subcommand = cmd_data.options[0];
+        auto& subcommand = cmd_data.options[0].options[0];
+
+        if (subcommand.name == "get") {
+            return event.reply(std::format("Reroll mode is currently off"));
+        }
+        
         const bool enable = subcommand.get_value<bool>(0);
         std::string as_string = enable ? "true" : "false";
 
