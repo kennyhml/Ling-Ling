@@ -67,19 +67,16 @@ namespace llpp::bots::drops
         return true;
     }
 
-    bool CrateManager::is_ready_to_run() const { return crates_[0][0].is_ready(); }
+    bool CrateManager::is_ready_to_run() const
+    {
+        return !is_disabled() && crates_[0][0].is_ready();
+    }
 
     std::chrono::minutes CrateManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
             crates_[0][0].get_next_completion());
     }
-
-    // core::data::ManagedVar<bool> CrateManager::get_reroll_mode()
-    // {
-    //     static auto reroll_mode = core::data::ManagedVar<bool>("reroll_mode", false);
-    //     return reroll_mode;
-    // }
 
     void CrateManager::run_all_stations(bool& any_looted)
     {
@@ -207,12 +204,13 @@ namespace llpp::bots::drops
     {
         dpp::slashcommand crate_commands("crates", "Controls all crate managers.", 0);
 
+        // reroll command must only be registered once for the first crate manager to be crated.
         if (!has_registered_reroll_command_) {
             dpp::command_option reroll_group(dpp::co_sub_command_group, "reroll",
                                              "Manage reroll mode test");
 
             const auto set(dpp::command_option(dpp::co_boolean, "toggle",
-                                         "Whether to use reroll mode.", true));
+                                               "Whether to use reroll mode.", true));
 
             reroll_group.add_option(
                 dpp::command_option(dpp::co_sub_command, "set", "Set reroll mode").
@@ -236,7 +234,7 @@ namespace llpp::bots::drops
         if (subcommand.name == "get") {
             return event.reply(std::format("Reroll mode is currently off"));
         }
-        
+
         const bool enable = subcommand.get_value<bool>(0);
         std::string as_string = enable ? "true" : "false";
 

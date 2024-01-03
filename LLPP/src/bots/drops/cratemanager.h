@@ -5,7 +5,8 @@
 #include <dpp/dpp.h>
 #include "config.h"
 
-#define UNDEFINED_TIME std::chrono::system_clock::time_point::min()
+#define UNDEFINED_TIME std::chrono::system_clock::time_point()
+
 
 namespace llpp::bots::drops
 {
@@ -23,6 +24,8 @@ namespace llpp::bots::drops
         explicit CrateManager(CrateManagerConfig& t_config);
 
         bool run() override;
+        bool is_disabled() const { return config_.disabled; }
+
         [[nodiscard]] bool is_ready_to_run() const override;
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
