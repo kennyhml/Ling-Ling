@@ -346,6 +346,10 @@ namespace llpp::gui
 
             case DROPS: draw_bots_drops_tab();
                 break;
+
+            case SAP:
+                draw_bots_sap_tabs();
+                break;
             }
             ImGui::EndChild();
             break;

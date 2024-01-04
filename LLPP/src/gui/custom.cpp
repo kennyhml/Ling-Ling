@@ -885,6 +885,70 @@ namespace llpp::gui
         end_child();
     }
 
+    void draw_bots_sap_tabs()
+    {
+        begin_child("Station Configuration",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Station prefix:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputText("##sap_prefix", config::bots::sap::prefix.get_ptr())) {
+                config::bots::sap::prefix.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Specifies the prefix for your sap beds. The prefix must be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named COOL MYSAP01, while your prefix can still be SAP.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Station count:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##sap_count", config::bots::sap::num_stations.get_ptr(),
+                                1, 5)) { config::bots::sap::num_stations.save(); }
+            int* num_stations = config::bots::sap::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 100);
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of sap stations you have.");
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Interval (minutes):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputInt("##sap_interval", config::bots::sap::interval.get_ptr(),
+                                1, 5)) { config::bots::sap::interval.save(); }
+            int* interval = config::bots::sap::interval.get_ptr();
+            *interval = std::clamp(*interval, 5, 150);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The interval to complete the station at (in minutes).");
+            }
+        }
+        end_child();
+
+        ImGui::SameLine();
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
+        {
+            ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Disable station completion",
+                                config::bots::sap::disabled.get_ptr())) {
+                config::bots::sap::disabled.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Completely disable the sap manager's completion.\n\n"
+                    "Even when disabled, the sap manager is created but remains inactive.\n"
+                    "You can toggle its state at runtime or through the discord bot.");
+            }
+            end_child();
+        }
+    }
+
     void begin_child(const char* name, ImVec2 size)
     {
         const ImGuiWindow* window = ImGui::GetCurrentWindow();

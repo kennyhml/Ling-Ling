@@ -112,4 +112,15 @@ namespace llpp::config
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
     }
+
+    namespace bots::sap
+    {
+        inline const std::vector<std::string> BASE{"bots", "sap"};
+
+        inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SAP");
+        inline ManagedVar<int> num_stations(BASE, "num_stations", save, 12);
+        inline ManagedVar<int> interval(BASE, "interval", save, 5);
+
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+    }
 }
