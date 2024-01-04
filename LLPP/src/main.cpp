@@ -6,6 +6,7 @@
 
 
 #include "bots/drops/cratemanager.h"
+#include "bots/kitchen/cropmanager.h"
 #include "bots/kitchen/cropstation.h"
 #include "bots/kitchen/sapstation.h"
 #include "bots/paste/pastemanager.h"
@@ -34,6 +35,7 @@ void llpp_main()
         crate_managers.push_back(new llpp::bots::drops::CrateManager(*config.get_ptr()));
     }
 
+    auto crops = llpp::bots::kitchen::CropManager();
     auto suicide =
         llpp::bots::suicide::SuicideStation("SUICIDE DEATH", "SUICIDE RESPAWN");
 
@@ -56,7 +58,8 @@ void llpp_main()
             Sleep(3000);
             continue;
         }
-        if (paste.run()) {}
+        if (paste.run()) { continue; }
+        if (crops.run()) {}
     }
 
     llpp::core::discord::bot->shutdown();

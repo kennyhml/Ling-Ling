@@ -2,6 +2,7 @@
 #include "../../common/util.h"
 #include "../../core/discord.h"
 #include "embeds.h"
+#include "../../config/config.h"
 
 namespace llpp::bots::paste
 {
@@ -16,7 +17,9 @@ namespace llpp::bots::paste
 
     bool PasteManager::run()
     {
-        if (!is_ready_to_run()) { return false; }
+        if (!is_ready_to_run() || config::bots::paste::disable_completion.get()) {
+            return false;
+        }
 
         auto renderStationResult = render_station.complete();
         if (!renderStationResult.get_success()) {

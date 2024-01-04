@@ -34,11 +34,10 @@ namespace llpp::bots::kitchen
         }
     }
 
-    CropStation::CropStation(std::string t_name, const bool t_left_aligned,
-                             const CropType crop,
+    CropStation::CropStation(std::string t_name, const CropType crop,
                              const std::chrono::minutes t_interval) :
-        BaseStation(std::move(t_name), t_interval), left_aligned_(t_left_aligned),
-        spawn_bed_(name_), fridge_(name_, 80), vault_(name_ + " FERTILIZER", 350),
+        BaseStation(std::move(t_name), t_interval), spawn_bed_(name_), fridge_(name_, 80),
+        vault_(name_ + " FERTILIZER", 350),
         crop_plots_({
             {"PLOT01"}, {"PLOT02"}, {"PLOT03"}, {"PLOT04"}, {"PLOT05"}, {"PLOT06"}
         }) { get_crop_and_seed(crop, crop_, seed_); };
@@ -89,8 +88,8 @@ namespace llpp::bots::kitchen
 
     void CropStation::turn_to_crop_plots() const
     {
-        if (left_aligned_) { asa::entities::local_player->turn_left(); }
-        else { asa::entities::local_player->turn_right(); }
+        if (aligned_ == RIGHT) { asa::entities::local_player->turn_right(); }
+        else { asa::entities::local_player->turn_left(); }
         asa::core::sleep_for(std::chrono::milliseconds(500));
     }
 
@@ -126,7 +125,7 @@ namespace llpp::bots::kitchen
      */
     void CropStation::put_crops_in_fridge(int& fridge_slots_out)
     {
-        left_aligned_
+        aligned_ == LEFT
             ? asa::entities::local_player->turn_right()
             : asa::entities::local_player->turn_left();
 
@@ -134,10 +133,11 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->turn_up(90);
 
         asa::entities::local_player->access(fridge_);
-        asa::entities::local_player->get_inventory()->drop_all(*seed_);
         asa::entities::local_player->get_inventory()->transfer_all(*crop_);
 
         while (asa::entities::local_player->get_inventory()->has(*crop_)) {}
+        asa::core::sleep_for(std::chrono::milliseconds(500));
+        fridge_.inventory->transfer_all(*seed_);
         asa::core::sleep_for(std::chrono::milliseconds(500));
         fridge_slots_out = fridge_.get_slot_count();
         fridge_.inventory->close();
@@ -166,12 +166,12 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::milliseconds(300));
     }
 
-    void CropStation::get_crops(const int how_many_slots) const
+    void CropStation::get_crops(const int how_many_slots)
     {
         static std::array<int, 6> turns = {-25, 25, 25, -25, 27, 25};
         constexpr auto delay_per_turn = std::chrono::milliseconds(300);
 
-        Sleep(500);
+        asa::core::sleep_for(std::chrono::seconds(1));
         turn_to_crop_plots();
         int slots_looted = 0;
         const bool count_required = how_many_slots < 8;
@@ -180,6 +180,16 @@ namespace llpp::bots::kitchen
         for (int i = 0; i < 6 && slots_looted < how_many_slots; i++) {
             if (i == 3) { asa::entities::local_player->stand_up(); }
             asa::entities::local_player->turn_up(turns[i], delay_per_turn);
+
+            if (aligned_ == UNKNOWN) {
+                asa::core::sleep_for(std::chrono::seconds(1));
+                if (asa::entities::local_player->can_access_bed()) {
+                    aligned_ = RIGHT;
+                    asa::entities::local_player->turn_right(180);
+                }
+                else { aligned_ = LEFT; }
+            }
+
             empty(crop_plots_[i], slots_looted, count_required);
         }
     }

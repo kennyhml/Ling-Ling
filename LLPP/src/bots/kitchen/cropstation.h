@@ -17,13 +17,19 @@ namespace llpp::bots::kitchen
         };
 
     public:
-        CropStation(std::string t_name, bool t_left_aligned, CropType crop,
-                    std::chrono::minutes t_interval);
+        CropStation(std::string t_name, CropType crop, std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
 
     private:
-        bool left_aligned_;
+        enum CropAlignment
+        {
+            LEFT,
+            RIGHT,
+            UNKNOWN
+        };
+
+        CropAlignment aligned_ = UNKNOWN;
         asa::items::Item* crop_;
         asa::items::Item* seed_;
 
@@ -41,7 +47,7 @@ namespace llpp::bots::kitchen
         void put_crops_in_fridge(int& fridge_slots_out);
         void empty(const asa::structures::MediumCropPlot&, int& current_slots,
                    bool count) const;
-        void get_crops(int how_many_slots) const;
+        void get_crops(int how_many_slots);
         void turn_to_crop_plots() const;
     };
 }
