@@ -1,8 +1,8 @@
 #include <iostream>
+#include <asapp/items/items.h>
 #include "cropstation.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
-
 #include "embeds.h"
 #include "../../common/util.h"
 
@@ -59,9 +59,11 @@ namespace llpp::bots::kitchen
         get_crops(slots_needed + 1);
         int slots_in_fridge = -1;
         put_crops_in_fridge(slots_in_fridge);
+        deposit_fertilizer();
 
         const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
         const core::StationResult res(this, true, time_taken, {});
+        set_completed();
         send_success_embed(res, crop_, slots_in_fridge);
 
         return res;
@@ -139,6 +141,7 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::milliseconds(500));
         fridge_slots_out = fridge_.get_slot_count();
         fridge_.inventory->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
     }
 
     void CropStation::empty(const asa::structures::MediumCropPlot& plot,
@@ -156,7 +159,7 @@ namespace llpp::bots::kitchen
                 *crop_, current_slots, true);
             std::cout << "\t[-] Current slots: " << current_slots << ".\n";
         }
-        else { asa::core::sleep_for(std::chrono::milliseconds(500)); }
+        asa::core::sleep_for(std::chrono::seconds(1));
 
         asa::entities::local_player->get_inventory()->transfer_all();
         asa::entities::local_player->get_inventory()->close();

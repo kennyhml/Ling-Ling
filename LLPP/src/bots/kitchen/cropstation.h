@@ -1,5 +1,4 @@
 #pragma once
-#include <asapp/items/items.h>
 #include <asapp/structures/mediumcropplot.h>
 #include <asapp/structures/simplebed.h>
 #include "../../core/basestation.h"

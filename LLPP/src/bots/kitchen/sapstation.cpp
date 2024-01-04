@@ -1,0 +1,52 @@
+#include "sapstation.h"
+
+#include <asapp/core/init.h>
+#include <asapp/core/state.h>
+
+#include "../../common/util.h"
+#include <asapp/entities/localplayer.h>
+
+namespace llpp::bots::kitchen
+{
+    SapStation::SapStation(std::string t_name, const std::chrono::minutes t_interval) :
+        BaseStation(std::move(t_name), t_interval), spawn_bed_(name_),
+        storage_box_(name_ + "::STORAGE", 45), tap_(name_ + "::TAP", 1) {}
+
+    core::StationResult SapStation::complete()
+    {
+        const auto start = std::chrono::system_clock::now();
+        asa::entities::local_player->fast_travel_to(spawn_bed_);
+
+        if (!take_sap()) {
+            set_completed();
+            return {this, false, util::get_elapsed<std::chrono::seconds>(start), {}};
+        }
+
+        put_away_sap();
+        set_completed();
+        // send a success embed
+        return {this, true, util::get_elapsed<std::chrono::seconds>(start), {}};
+    }
+
+    bool SapStation::take_sap() const
+    {
+        asa::entities::local_player->access(tap_);
+        if (tap_.inventory->slots[0].is_empty()) {
+            // send a warning, interval too low? no sap in the tap at least
+            return false;
+        }
+
+        tap_.inventory->transfer_all();
+        tap_.inventory->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+        return true;
+    }
+
+    void SapStation::put_away_sap() const
+    {
+        asa::entities::local_player->turn_right();
+        asa::entities::local_player->access(storage_box_);
+        asa::entities::local_player->get_inventory()->transfer_all();
+        asa::entities::local_player->get_inventory()->close();
+    }
+}

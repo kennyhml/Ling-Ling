@@ -181,6 +181,7 @@
         <ClCompile Include="src\bots\drops\embeds.cpp"/>
         <ClCompile Include="src\bots\kitchen\cropstation.cpp"/>
         <ClCompile Include="src\bots\kitchen\embeds.cpp"/>
+        <ClCompile Include="src\bots\kitchen\sapstation.cpp"/>
         <ClCompile Include="src\bots\paste\embeds.cpp"/>
         <ClCompile Include="src\bots\paste\pastestation.cpp"/>
         <ClCompile Include="src\bots\paste\pastemanager.cpp"/>
@@ -215,6 +216,7 @@
         <ClInclude Include="src\bots\drops\config.h"/>
         <ClInclude Include="src\bots\kitchen\cropstation.h"/>
         <ClInclude Include="src\bots\kitchen\embeds.h"/>
+        <ClInclude Include="src\bots\kitchen\sapstation.h"/>
         <ClInclude Include="src\bots\paste\embeds.h"/>
         <ClInclude Include="src\bots\paste\pastestation.h"/>
         <ClInclude Include="src\bots\paste\pastemanager.h"/>
