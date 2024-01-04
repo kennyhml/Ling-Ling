@@ -175,7 +175,9 @@ namespace llpp::gui
 
     void draw_bots_paste_tabs();
     void draw_bots_drops_tab();
+    void draw_bots_crops_tabs();
     void draw_bots_sap_tabs();
+
 
     void begin_child(const char* name, ImVec2 size);
     void end_child();

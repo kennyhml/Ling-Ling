@@ -885,6 +885,94 @@ namespace llpp::gui
         end_child();
     }
 
+    void draw_bots_crops_tabs()
+    {
+        begin_child("Station Configuration",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Longrass stations:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputInt("##num_longrass",
+                                config::bots::crops::num_longrass.get_ptr(), 1, 5)) {
+                config::bots::crops::num_longrass.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of longrass stations you have.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Citronal stations:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##num_citronal",
+                                config::bots::crops::num_citronal.get_ptr(), 1, 5)) {
+                config::bots::crops::num_citronal.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of citronal stations you have.");
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Rockarrot stations:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputInt("##num_rockarrot",
+                                config::bots::crops::num_rockarrot.get_ptr(), 1, 5)) {
+                config::bots::crops::num_rockarrot.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of rockarrot stations you have.");
+            }
+
+            ImGui::SetCursorPos({10, 107});
+            ImGui::Text("Savoroot stations:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 104});
+            if (ImGui::InputInt("##num_savoroot",
+                                config::bots::crops::num_savoroot.get_ptr(), 1, 5)) {
+                config::bots::crops::num_savoroot.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of savoroot stations you have.");
+            }
+
+
+            ImGui::SetCursorPos({10, 138});
+            ImGui::Text("Interval (hours):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 135});
+            if (ImGui::InputInt("##crop_interval",
+                                config::bots::crops::interval.get_ptr(), 1, 24)) {
+                config::bots::crops::interval.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The interval to complete the station at (in hours).\n"
+                    "150 crops take 8 hours to grow on 300/% greenhouse effect.");
+            }
+        }
+        end_child();
+
+        ImGui::SameLine();
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
+        {
+            ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Disable station completion",
+                                config::bots::crops::disabled.get_ptr())) {
+                config::bots::crops::disabled.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Completely disable the crop manager's completion.\n\n"
+                    "Even when disabled, crop sap manager is created but remains inactive.\n"
+                    "You can toggle its state at runtime or through the discord bot.");
+            }
+            end_child();
+        }
+    }
+
     void draw_bots_sap_tabs()
     {
         begin_child("Station Configuration",

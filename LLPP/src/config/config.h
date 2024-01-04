@@ -123,4 +123,18 @@ namespace llpp::config
 
         inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
     }
+
+    namespace bots::crops
+    {
+        inline const std::vector<std::string> BASE{"bots", "crops"};
+
+        inline ManagedVar<int> num_longrass(BASE, "num_longrass", save, 1);
+        inline ManagedVar<int> num_citronal(BASE, "num_citronal", save, 1);
+        inline ManagedVar<int> num_rockarrot(BASE, "num_rockarrot", save, 1);
+        inline ManagedVar<int> num_savoroot(BASE, "num_savoroot", save, 1);
+        inline ManagedVar<int> interval(BASE, "interval", save, 1);
+
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        inline ManagedVar<bool> dont_refert(BASE, "disabled", save, true);
+    }
 }
