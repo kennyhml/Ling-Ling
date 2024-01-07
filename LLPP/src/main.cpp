@@ -1,13 +1,16 @@
 #include <iostream>
+#include <asapp/core/exceptions.h>
 #include <asapp/core/init.h>
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
-
+#include <asapp/game/globals.h>
 
 #include "bots/drops/cratemanager.h"
 #include "bots/kitchen/cropmanager.h"
 #include "bots/kitchen/cropstation.h"
+#include "bots/kitchen/sapmanager.h"
 #include "bots/kitchen/sapstation.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
@@ -15,6 +18,7 @@
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/discord.h"
+#include "core/recovery.h"
 
 
 static bool running = false;
@@ -22,6 +26,16 @@ static bool running = false;
 void llpp_main()
 {
     using namespace llpp::config::bots;
+
+    if (!asa::core::init(llpp::config::general::ark::root_dir.get(),
+                         llpp::config::general::bot::assets_dir.get(),
+                         llpp::config::general::bot::itemdata.get(),
+                         llpp::config::general::bot::tessdata_dir.get())) {
+        std::cerr << "[!] Failed to init asapp\n";
+        return;
+    }
+
+    asa::window::get_handle();
 
     llpp::core::discord::init();
     auto paste = llpp::bots::paste::PasteManager(paste::prefix.get(),
@@ -36,30 +50,44 @@ void llpp_main()
     }
 
     auto crops = llpp::bots::kitchen::CropManager();
+    auto sap = llpp::bots::kitchen::SapManager(sap::prefix.get(), sap::num_stations.get(),
+                                               std::chrono::minutes(sap::interval.get()));
     auto suicide =
         llpp::bots::suicide::SuicideStation("SUICIDE DEATH", "SUICIDE RESPAWN");
 
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
-
     while (running) {
-        asa::entities::local_player->get_inventory()->open();
-        Sleep(2000);
-        if (asa::entities::local_player->get_inventory()->info.get_health_level() <
-            0.75f) {
-            asa::entities::local_player->get_inventory()->close();
-            suicide.complete();
-        }
-        else { asa::entities::local_player->get_inventory()->close(); }
+        try {
+            asa::entities::local_player->get_inventory()->open();
+            Sleep(2000);
+            auto& info = asa::entities::local_player->get_inventory()->info;
+            if (info.get_health_level() < 0.75f || info.get_water_level() < 0.75f || info.
+                get_food_level() < 0.75f) {
+                asa::entities::local_player->get_inventory()->close();
+                suicide.complete();
+            }
+            else { asa::entities::local_player->get_inventory()->close(); }
 
-        if (std::any_of(crate_managers.begin(), crate_managers.end(),
-                        [](llpp::bots::drops::CrateManager* m) { return m->run(); })) {
-            Sleep(3000);
-            continue;
+            if (std::any_of(crate_managers.begin(), crate_managers.end(),
+                            [](llpp::bots::drops::CrateManager* m) {
+                                return m->run();
+                            })) {
+                Sleep(3000);
+                continue;
+            }
+            if (paste.run()) { continue; }
+            if (crops.run()) {}
+            if (sap.run()) {}
         }
-        if (paste.run()) { continue; }
-        if (crops.run()) {}
+        catch (asa::core::ShooterGameError& e) {
+            llpp::core::inform_crash_detected(e);
+            llpp::core::recover();
+        } catch (const std::exception& e) {
+            llpp::core::discord::inform_fatal_error(e, "?");
+            running = false;
+        }
     }
 
     llpp::core::discord::bot->shutdown();
@@ -72,21 +100,9 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::create_device();
     llpp::gui::create_imgui();
 
-
     if (!AllocConsole()) { return false; }
     FILE* pFile;
     freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
-
-
-    if (!asa::core::init(llpp::config::general::ark::root_dir.get(),
-                         llpp::config::general::bot::assets_dir.get(),
-                         llpp::config::general::bot::itemdata.get(),
-                         llpp::config::general::bot::tessdata_dir.get())) {
-        std::cerr << "[!] Failed to init asapp\n";
-    }
-
-
-    asa::window::get_handle();
 
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
@@ -110,6 +126,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 
         if ((GetAsyncKeyState(VK_F3) & 0x1) && running) { running = false; }
     }
+
     llpp::gui::destroy_imgui();
     llpp::gui::destroy_device();
     llpp::gui::destroy_window();
