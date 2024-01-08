@@ -5,13 +5,10 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
-#include <asapp/game/globals.h>
 
 #include "bots/drops/cratemanager.h"
 #include "bots/kitchen/cropmanager.h"
-#include "bots/kitchen/cropstation.h"
 #include "bots/kitchen/sapmanager.h"
-#include "bots/kitchen/sapstation.h"
 #include "bots/paste/pastemanager.h"
 #include "bots/suicide/suicidestation.h"
 #include "common/util.h"

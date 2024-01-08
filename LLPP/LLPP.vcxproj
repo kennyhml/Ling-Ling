@@ -197,6 +197,7 @@
         <ClCompile Include="src\core\basestation.cpp"/>
         <ClCompile Include="src\core\recovery.cpp"/>
         <ClCompile Include="src\core\discord.cpp"/>
+        <ClCompile Include="src\core\task.cpp"/>
         <ClCompile Include="src\gui\custom.cpp"/>
         <ClCompile Include="src\gui\gui.cpp"/>
         <ClCompile Include="src\main.cpp"/>
@@ -240,6 +241,7 @@
         <ClInclude Include="src\core\stationresult.h"/>
         <ClInclude Include="src\core\discord.h"/>
         <ClInclude Include="external\sqlite3.h"/>
+        <ClInclude Include="src\core\task.h"/>
         <ClInclude Include="src\fonts\fa.h"/>
         <ClInclude Include="src\fonts\IconsFontAwesome6.h"/>
         <ClInclude Include="src\gui\custom.h"/>
