@@ -750,9 +750,16 @@ namespace llpp::gui
         config::ManagedVar<bots::drops::CrateManagerConfig>* active = nullptr;
 
         if (!config::bots::drops::managers.get_ptr()->empty()) {
-            std::string selected = (*config::bots::drops::managers.get_ptr())[
+            const std::string selected = (*config::bots::drops::managers.get_ptr())[
                 selected_manager];
-            active = &config::bots::drops::configs[selected];
+            if (config::bots::drops::configs.contains(selected)) {
+                active = &config::bots::drops::configs[selected];
+            }
+            else {
+                config::bots::drops::configs[selected] = config::ManagedVar(
+                    {"bots", "drops", selected}, config::save,
+                    bots::drops::CrateManagerConfig());
+            }
         }
 
         ImGui::SameLine();
