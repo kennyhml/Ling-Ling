@@ -6,16 +6,14 @@
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
 
-#include "bots/drops/cratemanager.h"
 #include "bots/kitchen/cropmanager.h"
-#include "bots/kitchen/sapmanager.h"
-#include "bots/paste/pastemanager.h"
-#include "bots/suicide/suicidestation.h"
 #include "common/util.h"
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/discord.h"
 #include "core/recovery.h"
+#include "core/task.h"
+#include "core/taskmanager.h"
 
 
 static bool running = false;
@@ -32,57 +30,29 @@ void llpp_main()
         return;
     }
 
-    asa::window::get_handle();
+    auto taskmanager = llpp::core::TaskManager();
 
-    llpp::core::discord::init();
-    auto paste = llpp::bots::paste::PasteManager(paste::prefix.get(),
-                                                 paste::num_stations.get(),
-                                                 std::chrono::minutes(
-                                                     paste::interval.get()));
-
-    std::vector<llpp::bots::drops::CrateManager*> crate_managers{};
-
-    for (auto& [key, config] : drops::configs) {
-        crate_managers.push_back(new llpp::bots::drops::CrateManager(*config.get_ptr()));
+    try {
+        asa::window::get_handle();
+        llpp::core::discord::init();
+        taskmanager.collect_tasks();
     }
-
-    auto crops = llpp::bots::kitchen::CropManager();
-    auto sap = llpp::bots::kitchen::SapManager(sap::prefix.get(), sap::num_stations.get(),
-                                               std::chrono::minutes(sap::interval.get()));
-    auto suicide =
-        llpp::bots::suicide::SuicideStation("SUICIDE DEATH", "SUICIDE RESPAWN");
+    catch (const llpp::config::BadConfigurationError& e) {
+        std::cerr << "[!] Configuration error " << e.what() << std::endl;
+        return;
+    }
 
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
     while (running) {
-        try {
-            asa::entities::local_player->get_inventory()->open();
-            Sleep(2000);
-            auto& info = asa::entities::local_player->get_inventory()->info;
-            if (info.get_health_level() < 0.75f || info.get_water_level() < 0.75f || info.
-                get_food_level() < 0.75f) {
-                asa::entities::local_player->get_inventory()->close();
-                suicide.complete();
-            }
-            else { asa::entities::local_player->get_inventory()->close(); }
-
-            if (std::any_of(crate_managers.begin(), crate_managers.end(),
-                            [](llpp::bots::drops::CrateManager* m) {
-                                return m->run();
-                            })) {
-                Sleep(3000);
-                continue;
-            }
-            if (paste.run()) { continue; }
-            if (crops.run()) {}
-            if (sap.run()) {}
-        }
+        try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
         } catch (const std::exception& e) {
-            llpp::core::discord::inform_fatal_error(e, "?");
+            llpp::core::discord::inform_fatal_error(
+                e, taskmanager.get_previous_task()->get_name());
             running = false;
         }
     }

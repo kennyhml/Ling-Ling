@@ -8,8 +8,7 @@ namespace llpp::bots::kitchen
     class SapManager final : public core::IStationManager
     {
     public:
-        SapManager(std::string t_prefix, int t_num_stations,
-                   std::chrono::minutes t_interval);
+        SapManager();
 
         bool run() override;
         bool is_ready_to_run() const override;

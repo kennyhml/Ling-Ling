@@ -1,8 +1,10 @@
 #include "task.h"
 
+#include <iostream>
+
 namespace llpp::core
 {
-    Task::Task(std::string t_name, std::function<void()> t_run) :
+    Task::Task(std::string t_name, std::function<bool()> t_run) :
         name_(std::move(t_name)), manager_(nullptr), run_(std::move(t_run)) {}
 
     Task::Task(std::string t_name, std::unique_ptr<IStationManager> t_station_manager) :
@@ -10,10 +12,7 @@ namespace llpp::core
 
     bool Task::execute() const
     {
-        if (run_) {
-            run_();
-            return true;
-        }
+        if (run_) { return run_(); }
         return manager_->run();
     }
 }

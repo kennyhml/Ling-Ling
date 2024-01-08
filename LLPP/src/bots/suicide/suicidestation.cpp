@@ -17,7 +17,6 @@ namespace llpp::bots::suicide
         auto start = std::chrono::system_clock::now();
         asa::entities::local_player->fast_travel_to(death_bed);
         asa::entities::local_player->suicide();
-        std::this_thread::sleep_for(std::chrono::seconds(5));
         asa::interfaces::spawn_map->spawn_at(respawn_bed.name);
         std::this_thread::sleep_for(std::chrono::seconds(10));
         set_completed();

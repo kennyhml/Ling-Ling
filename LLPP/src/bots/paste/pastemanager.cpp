@@ -6,12 +6,14 @@
 
 namespace llpp::bots::paste
 {
-    PasteManager::PasteManager(std::string t_prefix, int t_num_stations,
-                               std::chrono::minutes t_interval)
+    PasteManager::PasteManager()
     {
-        for (int i = 0; i < t_num_stations; i++) {
-            std::string name = util::add_num_to_prefix(t_prefix, i + 1);
-            stations.push_back(std::make_unique<PasteStation>(name, t_interval));
+        using namespace llpp::config::bots::paste;
+
+        std::chrono::minutes station_interval(interval.get());
+        for (int i = 0; i < num_stations.get(); i++) {
+            std::string name = util::add_num_to_prefix(prefix.get(), i + 1);
+            stations.push_back(std::make_unique<PasteStation>(name, station_interval));
         }
     };
 

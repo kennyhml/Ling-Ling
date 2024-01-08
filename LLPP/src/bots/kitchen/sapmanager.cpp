@@ -6,13 +6,13 @@
 
 namespace llpp::bots::kitchen
 {
-    SapManager::SapManager(std::string t_prefix, int t_num_stations,
-                           std::chrono::minutes t_interval)
+    SapManager::SapManager()
     {
-        for (int i = 0; i < t_num_stations; i++) {
-            stations_.push_back(
-                std::make_unique<SapStation>(util::add_num_to_prefix(t_prefix, i + 1),
-                                             t_interval));
+        using namespace llpp::config::bots::sap;
+        std::chrono::minutes station_interval(interval.get());
+        for (int i = 0; i < num_stations.get(); i++) {
+            stations_.push_back(std::make_unique<SapStation>(
+                util::add_num_to_prefix(prefix.get(), i + 1), station_interval));
         }
     }
 
