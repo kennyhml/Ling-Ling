@@ -45,7 +45,7 @@ namespace llpp::util
 	const std::string mat_to_strbuffer(const cv::Mat& source)
 	{
 		std::vector<uchar> img_buffer;
-		cv::imencode(".png", source, img_buffer);
+		imencode(".png", source, img_buffer);
 		std::string img_content(img_buffer.begin(), img_buffer.end());
 		return img_content;
 	}
@@ -57,5 +57,16 @@ namespace llpp::util
 		oss << std::setw(fill_zeros) << std::setfill('0') << number;
 		return prefix + oss.str();
 	}
+
+	std::string get_role_mention(const std::string& role)
+	{
+		return std::format("<@&{}>", role);
+	}
+
+	std::string get_user_mention(const std::string& zser)
+	{
+		return std::format("<@{}>", zser);
+	}
+
 
 }
