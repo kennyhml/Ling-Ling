@@ -18,6 +18,7 @@
 
 static bool running = false;
 
+
 void llpp_main()
 {
     using namespace llpp::config::bots;
@@ -29,19 +30,19 @@ void llpp_main()
         std::cerr << "[!] Failed to init asapp\n";
         return;
     }
-
+    
     auto taskmanager = llpp::core::TaskManager();
 
     try {
         asa::window::get_handle();
+        asa::window::set_foreground();
         llpp::core::discord::init();
         taskmanager.collect_tasks();
     }
     catch (const llpp::config::BadConfigurationError& e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
-    }
-
+    } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
@@ -70,6 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     if (!AllocConsole()) { return false; }
     FILE* pFile;
     freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
+
 
     while (llpp::gui::exit) {
         llpp::gui::begin_render();

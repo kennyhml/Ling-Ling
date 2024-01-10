@@ -83,6 +83,7 @@ namespace llpp::bots::kitchen
         std::cout << filled_slots << "\\" << fridge_.get_max_slots() << ".\n";
 
         fridge_.inventory->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
         return fridge_.get_max_slots() - filled_slots;
     }
 
@@ -95,9 +96,9 @@ namespace llpp::bots::kitchen
 
     void CropStation::grab_fertilizer() const
     {
-        asa::entities::local_player->look_fully_up();
+        asa::entities::local_player->turn_up(180);
         asa::entities::local_player->access(vault_);
-        vault_.inventory->transfer_all(*asa::items::resources::fertilizer);
+        vault_.inventory->transfer_rows(*asa::items::resources::fertilizer, 5);
         vault_.inventory->close();
         asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->turn_down(90);
@@ -105,7 +106,7 @@ namespace llpp::bots::kitchen
 
     void CropStation::deposit_fertilizer() const
     {
-        asa::entities::local_player->look_fully_up();
+        asa::entities::local_player->turn_up(180);
         asa::entities::local_player->access(vault_);
         asa::entities::local_player->get_inventory()->transfer_all();
         vault_.inventory->close();
@@ -129,7 +130,7 @@ namespace llpp::bots::kitchen
             ? asa::entities::local_player->turn_right()
             : asa::entities::local_player->turn_left();
 
-        asa::entities::local_player->look_fully_down();
+        asa::entities::local_player->turn_down(180);
         asa::entities::local_player->turn_up(90);
 
         asa::entities::local_player->access(fridge_);
