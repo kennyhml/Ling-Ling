@@ -91,7 +91,8 @@ namespace llpp::config
 
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
         inline ManagedVar<bool> reroll_mode(BASE, "reroll_mode", save, false);
-
+        inline ManagedVar<int> vault_alert_threshold(BASE, "vault_alert_threshold", save,
+                                                     70);
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::drops::CrateManagerConfig>> configs;
     }

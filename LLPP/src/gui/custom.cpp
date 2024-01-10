@@ -822,6 +822,21 @@ namespace llpp::gui
                         "How long to let the first crate at each group render, more structures nearby -> longer render time.");
                 }
             }
+
+            ImGui::SetCursorPos({10, active ? 169.f : 45.f});
+            ImGui::Text("Max vault slots:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, active ? 166.f : 42.f});
+            if (ImGui::InputInt("##vault_threshold",
+                                config::bots::drops::vault_alert_threshold.get_ptr(), 10,
+                                50)) {
+                config::bots::drops::vault_alert_threshold.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "[GLOBAL]\nThe maximum slots the vaults the items are dumped into is allowed to have.\n"
+                    "When the threshold is exceeded, the 'helper [no access]' role will be tagged to empty it.");
+            }
         }
         end_child();
 
