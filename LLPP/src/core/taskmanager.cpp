@@ -1,5 +1,6 @@
 #include "taskmanager.h"
 
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/hud.h>
 
@@ -26,6 +27,7 @@ namespace llpp::core
 			if (!need_suicide) {
 				auto& info = player->get_inventory()->info;
 				player->get_inventory()->open();
+				asa::core::sleep_for(std::chrono::seconds(3));
 				need_suicide = info.get_health_level() < 0.75f ||
 							   info.get_water_level() < 0.75f ||
 							   info.get_food_level() < 0.75f;

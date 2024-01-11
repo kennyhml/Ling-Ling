@@ -37,7 +37,7 @@ namespace llpp::bots::drops
 	}
 
 	void send_success_embed(const core::StationResult& data, cv::Mat loot,
-		asa::structures::CaveLootCrate::Quality quality, int times_looted)
+		asa::structures::CaveLootCrate::Quality quality, int times_looted, const bool got_rerolled)
 	{
 		auto color = dpp::colors::white;
 		std::string thumbnail = WHITE_CRATE_THUMBNAIL;
@@ -63,6 +63,10 @@ namespace llpp::bots::drops
 				std::format("<t:{}:R>", next_completion), true)
 			.set_image("attachment://image.png");
 
+		if (got_rerolled) {
+			embed.set_footer({"The drop was rerolled and left up."});
+		}
+		
 		const auto fdata = util::mat_to_strbuffer(loot);
 		auto message = dpp::message(1178962441091162173, embed);
 		message.add_file("image.png", fdata, "image/png");

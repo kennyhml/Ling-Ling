@@ -24,7 +24,7 @@ namespace llpp::bots::drops
 		"c/c5/Red_Crate.png/revision/latest?cb=20190116151200";
 
 	void send_success_embed(const core::StationResult&, cv::Mat loot,
-		asa::structures::CaveLootCrate::Quality, int times_looted);
+		asa::structures::CaveLootCrate::Quality, int times_looted, bool got_rerolled);
 
 	void request_reroll(const core::StationResult&, cv::Mat loot,
 		asa::structures::CaveLootCrate::Quality,
