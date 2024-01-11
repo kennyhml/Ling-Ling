@@ -18,7 +18,9 @@ namespace llpp::bots::kitchen
         asa::structures::Container tap_;
 
     private:
+        int storage_box_slots_ = 0;
+
         bool take_sap() const;
-        void put_away_sap() const;
+        void put_away_sap();
     };
 }

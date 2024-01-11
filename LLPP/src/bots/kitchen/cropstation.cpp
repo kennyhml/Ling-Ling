@@ -63,7 +63,7 @@ namespace llpp::bots::kitchen
         const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
         const core::StationResult res(this, true, time_taken, {});
         set_completed();
-        send_success_embed(res, crop_, slots_in_fridge);
+        send_crops_collected(res, crop_, slots_in_fridge);
 
         return res;
     }

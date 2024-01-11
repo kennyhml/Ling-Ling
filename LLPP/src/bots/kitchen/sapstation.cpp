@@ -1,10 +1,9 @@
 #include "sapstation.h"
-
-#include <asapp/core/init.h>
 #include <asapp/core/state.h>
-
 #include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
+
+#include "embeds.h"
 
 namespace llpp::bots::kitchen
 {
@@ -24,8 +23,10 @@ namespace llpp::bots::kitchen
 
         put_away_sap();
         set_completed();
-        // send a success embed
-        return {this, true, util::get_elapsed<std::chrono::seconds>(start), {}};
+        core::StationResult res(this, true,
+                                util::get_elapsed<std::chrono::seconds>(start), {});
+        send_sap_collected(res, storage_box_slots_);
+        return res;
     }
 
     bool SapStation::take_sap() const
@@ -42,11 +43,14 @@ namespace llpp::bots::kitchen
         return true;
     }
 
-    void SapStation::put_away_sap() const
+    void SapStation::put_away_sap()
     {
         asa::entities::local_player->turn_right();
         asa::entities::local_player->access(storage_box_);
         asa::entities::local_player->get_inventory()->transfer_all();
+        asa::core::sleep_for(std::chrono::seconds(2));
+        storage_box_slots_ = storage_box_.get_slot_count();
         asa::entities::local_player->get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
     }
 }
