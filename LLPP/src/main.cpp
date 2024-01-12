@@ -50,11 +50,6 @@ void llpp_main()
     auto station2 =
         llpp::bots::paste::GrindStation("GRINDING02", std::chrono::minutes(5));
 
-    while (true) {
-        if (station.is_ready()) { station.complete(); }
-        if (station2.is_ready()) { station2.complete(); }
-    }
-
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {

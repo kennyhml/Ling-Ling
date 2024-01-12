@@ -112,6 +112,12 @@ namespace llpp::config
         inline ManagedVar<bool> disable_completion(BASE, "disabled", save, false);
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
+
+        inline ManagedVar<std::string> grind_prefix(BASE, "grind_prefix", save,
+                                                    "PASTE::GRINDING");
+        inline ManagedVar<int> num_grind_stations(BASE, "num_grind_stations", save, 2);
+        inline ManagedVar<int> grind_interval(BASE, "grind_interval", save, 5);
+        inline ManagedVar<bool> grind_disabled(BASE, "grind_disabled", save, false);
     }
 
     namespace bots::sap
