@@ -185,6 +185,7 @@
         <ClCompile Include="src\bots\kitchen\sapmanager.cpp"/>
         <ClCompile Include="src\bots\kitchen\sapstation.cpp"/>
         <ClCompile Include="src\bots\paste\embeds.cpp"/>
+        <ClCompile Include="src\bots\paste\grindstation.cpp"/>
         <ClCompile Include="src\bots\paste\pastestation.cpp"/>
         <ClCompile Include="src\bots\paste\pastemanager.cpp"/>
         <ClCompile Include="src\bots\render\renderstation.cpp"/>
@@ -224,6 +225,7 @@
         <ClInclude Include="src\bots\kitchen\sapmanager.h"/>
         <ClInclude Include="src\bots\kitchen\sapstation.h"/>
         <ClInclude Include="src\bots\paste\embeds.h"/>
+        <ClInclude Include="src\bots\paste\grindstation.h"/>
         <ClInclude Include="src\bots\paste\pastestation.h"/>
         <ClInclude Include="src\bots\paste\pastemanager.h"/>
         <ClInclude Include="src\bots\render\renderstation.h"/>

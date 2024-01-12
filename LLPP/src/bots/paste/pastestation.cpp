@@ -27,7 +27,7 @@ namespace llpp::bots::paste
         core::StationResult resultData(this, true, duration,
                                        {{"Achatina Paste", pasteObtained}});
 
-        send_success_embed(resultData);
+        send_paste_collected(resultData);
         return resultData;
     }
 

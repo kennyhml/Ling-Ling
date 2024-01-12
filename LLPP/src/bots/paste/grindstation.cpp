@@ -1,0 +1,138 @@
+#include "grindstation.h"
+#include <asapp/core/state.h>
+#include <asapp/items/items.h>
+#include "embeds.h"
+#include "asapp/entities/localplayer.h"
+
+namespace llpp::bots::paste
+{
+    GrindStation::GrindStation(std::string name, const std::chrono::minutes interval) :
+        BaseStation(std::move(name), interval), bed_(asa::structures::SimpleBed(name_)),
+        grinder_(asa::structures::Container(name_ + "::GRINDER", 120)),
+        paste_dedi_(name_ + "::PASTE") {}
+
+
+    core::StationResult GrindStation::complete()
+    {
+        const auto start = std::chrono::system_clock::now();
+        asa::entities::local_player->fast_travel_to(bed_);
+        bool was_emptied = false;
+
+        if (state_ == GRINDING) {
+            empty_grinder();
+            deposit_items();
+            state_ = WAITING;
+            was_emptied = true;
+        }
+
+        take_paste();
+        put_paste_and_grind();
+
+        flint_grind_start_ = std::chrono::system_clock::now();
+        state_ = GRINDING;
+        set_completed();
+
+        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
+        core::StationResult res(this, true, time_taken, {});
+        send_paste_grinded(res, was_emptied);
+        return res;
+    }
+
+    void GrindStation::take_paste()
+    {
+        using asa::interfaces::DedicatedStorageInfo;
+
+        asa::entities::local_player->turn_left(90);
+        asa::entities::local_player->turn_down(20);
+        asa::entities::local_player->crouch();
+        asa::entities::local_player->access(paste_dedi_);
+
+        if (!paste_dedi_.get_info()->withdraw(DedicatedStorageInfo::THIRD)) {
+            // this means the station is out of paste, signal that it must be disabled until
+            // the dedi is refilled and re-enabled.
+        }
+
+        paste_dedi_.get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+    }
+
+    void GrindStation::put_paste_and_grind()
+    {
+        std::cout << "[+] Putting paste away..\n";
+        asa::entities::local_player->turn_left(90);
+        asa::entities::local_player->access(grinder_);
+        std::cout << "grinder is open\n";
+        asa::core::sleep_for(std::chrono::seconds(1));
+
+        asa::entities::local_player->get_inventory()->transfer_all();
+        util::await([]() {
+            return !asa::entities::local_player->get_inventory()->slots[1].has(
+                *asa::items::resources::achatina_paste);
+        }, std::chrono::seconds(5));
+
+        std::cout << "grinding the paste..\n";
+        for (int i = 0; i < 5; i++) {
+            asa::window::post_mouse_press_at({963, 832}, asa::controls::LEFT);
+            asa::core::sleep_for(std::chrono::milliseconds(300));
+        }
+
+        grinder_.get_inventory()->select_slot(0);
+
+        for (int i = 0; i < 10; i++) {
+            asa::window::press("a");
+            asa::core::sleep_for(std::chrono::milliseconds(300));
+        }
+        std::cout << "[+] Items q'd...\n";
+
+        grinder_.get_inventory()->transfer_all(*asa::items::resources::chitin);
+        asa::core::sleep_for(std::chrono::seconds(1));
+        grinder_.get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+    }
+
+    void GrindStation::empty_grinder()
+    {
+        asa::entities::local_player->turn_right(180);
+        asa::entities::local_player->access(grinder_);
+        asa::core::sleep_for(std::chrono::milliseconds(300));
+        grinder_.get_inventory()->transfer_all();
+        asa::core::sleep_for(std::chrono::milliseconds(300));
+        grinder_.get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+
+        asa::entities::local_player->turn_left(180);
+    }
+
+    void GrindStation::deposit_items()
+    {
+        asa::entities::local_player->crouch();
+        asa::entities::local_player->turn_down(20, std::chrono::milliseconds(300));
+
+        asa::entities::local_player->turn_left(20, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->stand_up();
+        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->turn_left(40, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(300));
+        asa::controls::press(asa::settings::use);
+
+        asa::entities::local_player->set_yaw(0);
+        asa::entities::local_player->set_pitch(0);
+    }
+
+    bool GrindStation::flint_finished() const
+    {
+        return util::timedout(flint_grind_start_, std::chrono::seconds(360));
+    }
+}

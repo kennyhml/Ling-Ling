@@ -1,15 +1,11 @@
 #pragma once
 #include "../../core/stationresult.h"
-#include <asapp/entities/dinoent.h>
-#include <format>
 
 namespace llpp::bots::paste
 {
-	void send_success_embed(const core::StationResult& data);
-	void send_achatina_not_accessible(
-		const std::string& stationName, const std::string& achatina);
+    void send_paste_collected(const core::StationResult& data);
+    void send_paste_grinded(const core::StationResult& data, bool grinder_emptied);
 
-	void SendAchatinaNotProducing();
-	void SendDedisFull();
-	void SendPasteNotDeposited();
+    void send_achatina_not_accessible(const std::string& station_name,
+                                      const std::string& achatina_name);
 }

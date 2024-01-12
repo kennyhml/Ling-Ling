@@ -61,9 +61,14 @@ namespace llpp::bots::kitchen
                   data.get_station()->get_times_completed())).set_thumbnail(SAP_URL).
               add_field("Time taken:",
                         std::format("{} seconds", data.get_time_taken().count()),
-                        true).add_field("Storage:", std::format("{}/45", slots_in_storage),
+                        true).add_field("Storage:",
+                                        std::format("{}/45", slots_in_storage),
                                         true).add_field(
                   "Next completion:", std::format("<t:{}:R>", next_completion), true);
+
+        if (slots_in_storage > 30) {
+            embed.set_footer(dpp::embed_footer("Please empty the storage box."));
+        }
 
         dpp::message msg(config::discord::channels::info.get(), embed);
 
@@ -71,7 +76,6 @@ namespace llpp::bots::kitchen
             msg.set_content(
                 util::get_role_mention(config::discord::roles::helper_no_access.get()));
             msg.set_allowed_mentions(false, true, true, false, {}, {});
-            embed.set_footer(dpp::embed_footer("Please empty the storage box."));
         }
         core::discord::bot->message_create(msg);
     }

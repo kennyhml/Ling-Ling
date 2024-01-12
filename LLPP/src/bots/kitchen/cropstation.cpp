@@ -73,16 +73,16 @@ namespace llpp::bots::kitchen
         std::cout << "[+] Checking current amount of crops...\n";
         asa::entities::local_player->access(fridge_);
         std::cout << "\t[-] Fridge accessed, restacking crops... ";
-        fridge_.inventory->auto_stack();
+        fridge_.get_inventory()->auto_stack();
         std::cout << "Done.\n";
 
         // if the server is laggy the slots my need some time to load
         asa::core::sleep_for(std::chrono::seconds(2));
         std::cout << "\t[-] Counting current slots of crops... ";
-        const int filled_slots = fridge_.get_slot_count();
+        const int filled_slots = fridge_.get_current_slots();
         std::cout << filled_slots << "\\" << fridge_.get_max_slots() << ".\n";
 
-        fridge_.inventory->close();
+        fridge_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
         return fridge_.get_max_slots() - filled_slots;
     }
@@ -98,8 +98,8 @@ namespace llpp::bots::kitchen
     {
         asa::entities::local_player->turn_up(180);
         asa::entities::local_player->access(vault_);
-        vault_.inventory->transfer_rows(*asa::items::resources::fertilizer, 5);
-        vault_.inventory->close();
+        vault_.get_inventory()->transfer_rows(*asa::items::resources::fertilizer, 5);
+        vault_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->turn_down(90);
     }
@@ -109,7 +109,7 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->turn_up(180);
         asa::entities::local_player->access(vault_);
         asa::entities::local_player->get_inventory()->transfer_all();
-        vault_.inventory->close();
+        vault_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->turn_down(90);
     }
@@ -138,21 +138,21 @@ namespace llpp::bots::kitchen
 
         while (asa::entities::local_player->get_inventory()->has(*crop_)) {}
         asa::core::sleep_for(std::chrono::milliseconds(500));
-        fridge_.inventory->transfer_all(*seed_);
+        fridge_.get_inventory()->transfer_all(*seed_);
         asa::core::sleep_for(std::chrono::milliseconds(500));
-        fridge_slots_out = fridge_.get_slot_count();
-        fridge_.inventory->close();
+        fridge_slots_out = fridge_.get_current_slots();
+        fridge_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
     }
 
     void CropStation::empty(const asa::structures::MediumCropPlot& plot,
                             int& current_slots, const bool count) const
     {
-        std::cout << "[+] Emptying " << plot.name << "\n";
+        std::cout << "[+] Emptying " << plot.get_name() << "\n";
         asa::entities::local_player->access(plot);
-        plot.inventory->transfer_all(*crop_);
+        plot.get_inventory()->transfer_all(*crop_);
         std::cout << "\t[-] Took all " << crop_->get_name() << ". Waiting for server... ";
-        while (count && plot.inventory->has(*crop_)) {}
+        while (count && plot.get_inventory()->has(*crop_)) {}
         std::cout << "Done\n";
 
         if (count) {

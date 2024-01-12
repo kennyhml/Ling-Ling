@@ -100,14 +100,6 @@ namespace llpp::bots::drops
                 return "Crate has already been rerolled.\n";
             }
         };
-
-        class NewCrateSpawnedError : public std::exception
-        {
-        public:
-            NewCrateSpawnedError() = default;
-
-            const char* what() const override { return "A new crate has spawned.\n"; }
-        };
     }
 
     LootCrateStation::LootCrateStation(const std::string& t_name,
@@ -147,16 +139,18 @@ namespace llpp::bots::drops
             asa::entities::local_player->turn_right();
             asa::entities::local_player->access(vault_);
             asa::entities::local_player->get_inventory()->transfer_all();
-            asa::core::sleep_for(std::chrono::seconds(2));
-            vault_slots_ = vault_.get_slot_count();
-            vault_.inventory->close();
+            asa::core::sleep_for(std::chrono::seconds(1));
+            vault_slots_ = vault_.get_current_slots();
+            vault_.get_inventory()->close();
+            asa::core::sleep_for(std::chrono::seconds(1));
         }
         set_completed();
         const auto elapsed = util::get_elapsed<std::chrono::seconds>(start);
         core::StationResult result(this, true, elapsed, {});
 
         if (!should_reroll()) {
-            send_success_embed(result, loot_screenshot, quality, ++times_looted_, got_rerolled_);
+            send_success_embed(result, loot_screenshot, quality, ++times_looted_,
+                               got_rerolled_);
         }
         else {
             request_reroll(result, loot_screenshot, quality,
@@ -174,19 +168,19 @@ namespace llpp::bots::drops
         std::cout << "\t[-] Loot screenshot has been taken.\n";
 
         if (should_reroll()) {
-            try {
-                cherry_picked_out = cherry_pick_items();
-            } catch (const CrateAlreadyRerolledError&) {
+            try { cherry_picked_out = cherry_pick_items(); }
+            catch (const CrateAlreadyRerolledError&) {
                 std::cout << "The crate was rerolled!\n";
                 got_rerolled_ = true;
                 return loot_crate(screenshot_out, cherry_picked_out);
             }
-            crate_.inventory->make_new_folder("checked");
-            crate_.inventory->close();
+            crate_.get_inventory()->make_new_folder("checked");
+            asa::core::sleep_for(std::chrono::milliseconds(500));
+            crate_.get_inventory()->close();
         }
         else {
-            do { crate_.inventory->transfer_all(); }
-            while (!util::await([this]() { return !crate_.inventory->is_open(); },
+            do { crate_.get_inventory()->transfer_all(); }
+            while (!util::await([this]() { return !crate_.get_inventory()->is_open(); },
                                 std::chrono::seconds(6)));
         }
 
@@ -198,7 +192,7 @@ namespace llpp::bots::drops
     {
         std::cout << "[+] Cherry picking high priority items due to reroll mode...\n";
         std::map<std::string, bool> items_taken{};
-        auto items = crate_.inventory->get_current_page_items();
+        auto items = crate_.get_inventory()->get_current_page_items();
         std::vector<std::string> found_items;
 
         // set all looted states to 0 initially.
@@ -212,7 +206,7 @@ namespace llpp::bots::drops
         if (!last_seen_items_.empty() && (found_items != last_seen_items_)) {
             // if the folder is still here, that means someone rerolled the drop
             // and left the items in it for us to take them and drop them off.
-            if (crate_.inventory->slots[0].is_folder()) {
+            if (crate_.get_inventory()->slots[0].is_folder()) {
                 throw CrateAlreadyRerolledError();
             }
             last_discovered_up_ = std::chrono::system_clock::now();
@@ -226,7 +220,7 @@ namespace llpp::bots::drops
                 for (size_t i = 0; i < items.size(); i++) {
                     if (!items[i] || *items[i] != priority) { continue; }
 
-                    crate_.inventory->take_slot(static_cast<int>(i));
+                    crate_.get_inventory()->take_slot(static_cast<int>(i));
                     items_taken[std::format("{}: {}", i, get_repr(items[i]))] = true;
                     std::cout << "\t[-] Took " << items[i]->info() << "\n";
                     items.erase(items.begin() + static_cast<int>(i));
