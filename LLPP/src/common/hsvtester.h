@@ -15,12 +15,13 @@ namespace llpp::util
 
         [[nodiscard]] const HsvFilter& get_current_filter() const { return filter_; }
 
+        void static filter_changed(int pos, void* data);
+
     private:
         inline static int num_instances_ = 0;
 
         HsvFilter filter_;
 
-        void static filter_changed(int pos, void* data);
 
         void create_windows();
 

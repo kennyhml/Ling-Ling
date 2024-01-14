@@ -1,7 +1,5 @@
 #include "task.h"
 
-#include <iostream>
-
 namespace llpp::core
 {
     Task::Task(std::string t_name, std::function<bool()> t_run) :

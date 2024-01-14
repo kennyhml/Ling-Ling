@@ -46,7 +46,7 @@ namespace llpp::bots::paste
             std::cout << "Achatina has paste, taking it...\n";
             achatina.get_inventory()->take_slot(0);
         }
-        achatina.exit();
+        achatina.get_inventory()->close();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         return has_paste;
     }

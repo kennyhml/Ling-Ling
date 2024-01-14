@@ -179,6 +179,8 @@
         <ClCompile Include="src\bots\drops\cratemanager.cpp"/>
         <ClCompile Include="src\bots\drops\lootcratestation.cpp"/>
         <ClCompile Include="src\bots\drops\embeds.cpp"/>
+        <ClCompile Include="src\bots\farm\commands.cpp"/>
+        <ClCompile Include="src\bots\farm\farmbot.cpp"/>
         <ClCompile Include="src\bots\kitchen\cropmanager.cpp"/>
         <ClCompile Include="src\bots\kitchen\cropstation.cpp"/>
         <ClCompile Include="src\bots\kitchen\embeds.cpp"/>
@@ -219,6 +221,8 @@
         <ClInclude Include="src\bots\drops\lootcratestation.h"/>
         <ClInclude Include="src\bots\drops\embeds.h"/>
         <ClInclude Include="src\bots\drops\config.h"/>
+        <ClInclude Include="src\bots\farm\commands.h"/>
+        <ClInclude Include="src\bots\farm\farmbot.h"/>
         <ClInclude Include="src\bots\kitchen\cropmanager.h"/>
         <ClInclude Include="src\bots\kitchen\cropstation.h"/>
         <ClInclude Include="src\bots\kitchen\embeds.h"/>

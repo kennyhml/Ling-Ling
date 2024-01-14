@@ -47,8 +47,7 @@ namespace llpp::util
             cvtColor(result, dst, cv::COLOR_HSV2RGB);
         }
     }
-
-
+    
     HsvTester::HsvTester(cv::Mat source, cv::Mat templ) : original_source_(source),
                                                           original_template_(templ)
     {
@@ -67,16 +66,12 @@ namespace llpp::util
     void HsvTester::filter_changed(int pos, void* data)
     {
         auto inst = static_cast<HsvTester*>(data);
+        inst->original_source_ = asa::window::screenshot({1880, 954, 11, 45});
         apply_filter(inst->filter_, inst->original_source_, inst->current_source_);
         apply_filter(inst->filter_, inst->original_template_, inst->current_template_);
 
         imshow(inst->source_win_, inst->current_source_);
-        imshow(inst->template_win_, inst->current_template_);
-
-        float accuracy = 0.f;
-        asa::window::locate_template(inst->current_source_, inst->current_template_, 0.7,
-                                     cv::Mat(), &accuracy);
-        std::cout << "[+] Current accuracy: " << accuracy << "\n";
+        // imshow(inst->template_win_, inst->current_template_);
     }
 
     void HsvTester::create_windows()
@@ -85,9 +80,9 @@ namespace llpp::util
         template_win_ = "HSV-Test Template " + std::to_string(num_instances_);
         filter_win_ = "HSV-Test Filter " + std::to_string(num_instances_);
 
-        namedWindow(source_win_, cv::WINDOW_NORMAL);
-        namedWindow(template_win_, cv::WINDOW_NORMAL);
-        namedWindow(filter_win_, cv::WINDOW_NORMAL);
+        namedWindow(source_win_, cv::WINDOW_AUTOSIZE);
+        namedWindow(template_win_, cv::WINDOW_AUTOSIZE);
+        namedWindow(filter_win_, cv::WINDOW_AUTOSIZE);
 
         const auto& win = filter_win_;
 

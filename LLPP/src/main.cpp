@@ -1,11 +1,16 @@
 #include <iostream>
 #include <asapp/core/exceptions.h>
 #include <asapp/core/init.h>
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
+#include <opencv2/highgui.hpp>
+
+#include "bots/farm/commands.h"
 #include "bots/kitchen/cropmanager.h"
 #include "bots/paste/grindstation.h"
+#include "common/hsvtester.h"
 #include "common/util.h"
 #include "gui/gui.h"
 #include "config/config.h"
@@ -14,9 +19,7 @@
 #include "core/task.h"
 #include "core/taskmanager.h"
 
-
 static bool running = false;
-
 
 void llpp_main()
 {
@@ -37,6 +40,7 @@ void llpp_main()
         asa::window::set_foreground();
         llpp::core::discord::init();
         taskmanager.collect_tasks();
+        llpp::bots::farm::register_commands();
     }
     catch (const llpp::config::BadConfigurationError& e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
@@ -44,11 +48,6 @@ void llpp_main()
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
-
-
-    auto station = llpp::bots::paste::GrindStation("GRINDING01", std::chrono::minutes(5));
-    auto station2 =
-        llpp::bots::paste::GrindStation("GRINDING02", std::chrono::minutes(5));
 
     while (running) {
         try { taskmanager.execute_next(); }
