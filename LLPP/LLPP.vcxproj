@@ -205,7 +205,6 @@
         <ClCompile Include="src\gui\custom.cpp"/>
         <ClCompile Include="src\gui\gui.cpp"/>
         <ClCompile Include="src\main.cpp"/>
-        <ClCompile Include="external\sqlite3.c"/>
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="external\imgui\imconfig.h"/>
@@ -247,7 +246,6 @@
         <ClInclude Include="src\core\recovery.h"/>
         <ClInclude Include="src\core\stationresult.h"/>
         <ClInclude Include="src\core\discord.h"/>
-        <ClInclude Include="external\sqlite3.h"/>
         <ClInclude Include="src\core\task.h"/>
         <ClInclude Include="src\core\taskmanager.h"/>
         <ClInclude Include="src\fonts\fa.h"/>
