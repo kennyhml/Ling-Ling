@@ -24,7 +24,8 @@ namespace llpp::bots::drops
     }
 
     CrateManager::CrateManager(CrateManagerConfig& t_config) : config_(t_config),
-        align_bed_(config_.prefix + "::ALIGN"), dropoff_tp_(config_.prefix + "::DROPOFF"),
+        align_bed_(config_.prefix + "::ALIGN"), out_bed_(config_.prefix + "::DROPS::OUT"),
+        dropoff_tp_(config_.prefix + "::DROPOFF"),
         dropoff_vault_(config_.prefix + "::DROPOFF", 350)
     {
         parse_groups(config_.grouped_crates_raw);
@@ -53,10 +54,12 @@ namespace llpp::bots::drops
 
         bool any_looted = false;
         run_all_stations(any_looted);
+
         if (config_.uses_teleporters) {
             teleport_to_dropoff();
             if (any_looted) { dropoff_items(); }
         }
+        else { asa::entities::local_player->fast_travel_to(out_bed_); }
 
         send_summary_embed(config_.prefix, util::get_elapsed<std::chrono::seconds>(start),
                            stats_per_group, vault_fill_levels_,

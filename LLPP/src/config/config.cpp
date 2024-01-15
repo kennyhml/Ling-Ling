@@ -1,7 +1,8 @@
 #include "config.h"
 #include <fstream>
 #include "required.h"
-#include "../bots/drops/cratemanager.h"
+#include "../bots/drops/config.h"
+#include <ShlObj.h>
 
 namespace llpp::config
 {
@@ -10,9 +11,17 @@ namespace llpp::config
         bool has_passed_initial_check = false;
         bool has_loaded_dynamic_maps = false;
 
+
+        std::filesystem::path get_appdata_path()
+        {
+            PWSTR path;
+            auto res = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path);
+            return path;
+        }
+
         void check_exists()
         {
-            const auto path = std::filesystem::current_path() / "config\\config.json";
+            const auto path = get_appdata_path() / "llpp\\config\\config.json";
 
             std::cout << "[+] Verifying config exists at " << path << "... ";
             if (exists(path)) { std::cout << "Done.\n"; }
@@ -34,7 +43,7 @@ namespace llpp::config
 
     json& get_data()
     {
-        const auto path = std::filesystem::current_path() / "config\\config.json";
+        const auto path = get_appdata_path() / "llpp\\config\\config.json";
         if (!has_passed_initial_check) {
             check_exists();
             has_passed_initial_check = true;
@@ -61,7 +70,7 @@ namespace llpp::config
 
     void save()
     {
-        const auto path = std::filesystem::current_path() / "config\\config.json";
+        const auto path = get_appdata_path() / "llpp\\config\\config.json";
 
         std::ofstream f(path);
         f << std::setw(4) << get_data();

@@ -1,6 +1,4 @@
 #include "farmbot.h"
-
-#include <asapp/core/init.h>
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/hud.h>
@@ -35,15 +33,16 @@ namespace llpp::bots::farm
     void FarmBot::run()
     {
         if (stop_requested_) { return; }
+        has_started_ = true;
 
         const auto start = std::chrono::system_clock::now();
         asa::entities::local_player->fast_travel_to(spawn_at_);
         asa::entities::local_player->crouch();
         asa::entities::local_player->mount(mount_);
 
-        auto item = resource_ == METAL
-                        ? asa::items::resources::metal
-                        : asa::items::resources::wood;
+        const auto item = resource_ == METAL
+                              ? asa::items::resources::metal
+                              : asa::items::resources::wood;
 
 
         asa::entities::local_player->set_pitch(90);
@@ -61,15 +60,11 @@ namespace llpp::bots::farm
             if (util::timedout(last_rm_check, std::chrono::seconds(5))) {
                 last_rm_check = std::chrono::system_clock::now();
                 if (asa::entities::local_player->deposited_item(*item)) {
-                    std::cout << "[+] Wood is being popcorned, I will help!\n";
                     help_popcorn(*item);
                 }
             }
         }
-        // self destruct, this instance of the bot is now done.
-        delete this;
-        inst_ = nullptr;
-
+        destroy();
         asa::entities::local_player->suicide();
         asa::interfaces::spawn_map->spawn_at("RESET BED");
     }
@@ -114,5 +109,11 @@ namespace llpp::bots::farm
         }
 
         mount_.get_inventory()->close();
+    }
+
+    void FarmBot::destroy()
+    {
+        delete this;
+        inst_ = nullptr;
     }
 }

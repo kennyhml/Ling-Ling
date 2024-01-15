@@ -8,7 +8,6 @@ namespace llpp::bots::farm
     {
         bool registered = false;
 
-
         FarmBot::FarmType type_enum(const std::string& type)
         {
             if (type == "metal") { return FarmBot::METAL; }
@@ -56,8 +55,9 @@ namespace llpp::bots::farm
                 if (!bot) {
                     return event.reply("There is no active farming session you ape.");
                 }
+                if (bot->has_started()) { bot->signal_end(); }
+                else { bot->destroy(); }
                 event.reply("The farming session was ended.");
-                bot->signal_end();
             }
         }
     }

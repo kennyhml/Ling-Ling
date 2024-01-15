@@ -170,7 +170,6 @@ namespace llpp::bots::drops
         if (should_reroll()) {
             try { cherry_picked_out = cherry_pick_items(); }
             catch (const CrateAlreadyRerolledError&) {
-                std::cout << "The crate was rerolled!\n";
                 got_rerolled_ = true;
                 return loot_crate(screenshot_out, cherry_picked_out);
             }

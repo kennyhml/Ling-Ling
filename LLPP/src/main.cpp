@@ -1,7 +1,6 @@
 #include <iostream>
 #include <asapp/core/exceptions.h>
 #include <asapp/core/init.h>
-#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
@@ -9,8 +8,6 @@
 
 #include "bots/farm/commands.h"
 #include "bots/kitchen/cropmanager.h"
-#include "bots/paste/grindstation.h"
-#include "common/hsvtester.h"
 #include "common/util.h"
 #include "gui/gui.h"
 #include "config/config.h"
@@ -71,9 +68,11 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::create_device();
     llpp::gui::create_imgui();
 
+
     if (!AllocConsole()) { return false; }
     FILE* pFile;
     freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
+
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 

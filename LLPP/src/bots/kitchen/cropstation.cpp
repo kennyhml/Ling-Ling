@@ -136,7 +136,9 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->access(fridge_);
         asa::entities::local_player->get_inventory()->transfer_all(*crop_);
 
-        while (asa::entities::local_player->get_inventory()->has(*crop_)) {}
+        while (asa::entities::local_player->get_inventory()->has(*crop_)) {
+            if (fridge_.get_current_slots() == 80) { break; }
+        }
         asa::core::sleep_for(std::chrono::milliseconds(500));
         fridge_.get_inventory()->transfer_all(*seed_);
         asa::core::sleep_for(std::chrono::milliseconds(500));
