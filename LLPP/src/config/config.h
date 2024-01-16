@@ -21,6 +21,11 @@ namespace llpp::config
         std::string message_;
     };
 
+    namespace user
+    {
+        inline ManagedVar<std::string> name({"user"}, "name", save, "");
+        inline ManagedVar<std::string> key({"user"}, "key", save, "");
+    }
 
     namespace general::ark
     {
