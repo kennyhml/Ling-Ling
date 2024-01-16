@@ -6,6 +6,7 @@
 #include <asapp/interfaces/hud.h>
 #include <opencv2/highgui.hpp>
 
+#include "auth/auth.h"
 #include "bots/farm/commands.h"
 #include "bots/kitchen/cropmanager.h"
 #include "common/util.h"
@@ -15,6 +16,8 @@
 #include "core/recovery.h"
 #include "core/task.h"
 #include "core/taskmanager.h"
+#include "asapp/structures/craftingstation.h"
+#include "bots/crafting/sparkstation.h"
 
 static bool running = false;
 
@@ -64,14 +67,25 @@ void llpp_main()
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
                    _In_ PSTR cmd_line, _In_ int cmd_show)
 {
+    if (!AllocConsole()) { return false; }
+
+    FILE* pFile;
+    if (freopen_s(&pFile, "CONIN$", "r", stdin) != 0) {
+        // Handle error, if any
+        return false;
+    }
+
+    if (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0) {
+        // Handle error, if any
+        return false;
+    }
+
+    llpp::auth::login();
+
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
     llpp::gui::create_imgui();
 
-
-    if (!AllocConsole()) { return false; }
-    FILE* pFile;
-    freopen_s(&pFile, "CONOUT$", "w", stdout) != 0;
 
     while (llpp::gui::exit) {
         llpp::gui::begin_render();

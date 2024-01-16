@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/basestation.h"
-#include <asapp/structures/container.h>
+#include <asapp/structures/craftingstation.h>
 #include <asapp/structures/simplebed.h>
 #include <asapp/structures/dedicatedstorage.h>
 
@@ -25,7 +25,7 @@ namespace llpp::bots::paste
         State state_ = WAITING;
 
         asa::structures::SimpleBed bed_;
-        asa::structures::Container grinder_;
+        asa::structures::CraftingStation grinder_;
         asa::structures::DedicatedStorage paste_dedi_;
 
         std::array<asa::structures::DedicatedStorage, 6> depo_dedis_{

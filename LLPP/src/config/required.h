@@ -39,21 +39,61 @@ namespace llpp::config
         "paste": {
             "prefix": "PASTE",
             "render_prefix": "RENDER",
-            "num_stations": 16,
-            "interval": 5,
-            "load_for": 15,
+            "num_stations": 20,
+            "interval": 50,
+            "load_for": 10,
             "ocr_amount": false,
-            "allow_partial": false,
-            "disabled": false,
+            "allow_partial": true,
+            "disabled": true,
             "grind_prefix": "PASTE::GRINDING",
             "num_grind_stations": 2,
             "grind_interval": 5,
-            "grind_disabled": false
+            "grind_disabled": true
         },
         "drops": {
-            "managers": [],
+            "managers": [
+                "SKYLORD",
+                "SWAMP",
+                "HUW"
+            ],
+            "SWAMP": {
+                "prefix": "SWAMP",
+                "grouped_crates_raw": "{RED, RED} {YELLOW, YELLOW, ANY} {BLUE}",
+                "interval": 5,
+                "render_for": 2,
+                "uses_teleporters": true,
+                "overrule_reroll_mode": false,
+                "allow_partial_completion": false,
+                "disabled": true
+            },
+            "SKYLORD": {
+                "prefix": "SKYLORD",
+                "grouped_crates_raw": "{YELLOW | RED, YELLOW | RED, YELLOW | RED}",
+                "interval": 5,
+                "render_for": 0,
+                "uses_teleporters": true,
+                "overrule_reroll_mode": false,
+                "allow_partial_completion": false,
+                "disabled": true
+            },
+            "HUW": {
+                "prefix": "HUW",
+                "grouped_crates_raw": "{ANY} {ANY} {ANY}",
+                "interval": 5,
+                "render_for": 5,
+                "uses_teleporters": false,
+                "overrule_reroll_mode": false,
+                "allow_partial_completion": false,
+                "disabled": true
+            },
             "reroll_mode": false,
-            "vault_alert_threshold": 70
+            "vault_alert_threshold": 75
+        },
+        "sap": {
+            "prefix": "SAP",
+            "num_stations": 12,
+            "interval": 5,
+            "disabled": true
         },
         "crops": {
             "num_longrass": 1,
@@ -63,11 +103,9 @@ namespace llpp::config
             "interval": 1,
             "disabled": true
         },
-        "sap": {
-            "prefix": "SAP",
-            "num_stations": 12,
-            "interval": 5,
-            "disabled": true
+        "user": {
+            "name": "",
+            "key": ""
         }
     }
 }

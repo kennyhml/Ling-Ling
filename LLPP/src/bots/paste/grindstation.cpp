@@ -7,9 +7,8 @@
 namespace llpp::bots::paste
 {
     GrindStation::GrindStation(std::string name, const std::chrono::minutes interval) :
-        BaseStation(std::move(name), interval), bed_(asa::structures::SimpleBed(name_)),
-        grinder_(asa::structures::Container(name_ + "::GRINDER", 120)),
-        paste_dedi_(name_ + "::PASTE") {}
+        BaseStation(std::move(name), interval), bed_(name_),
+        grinder_(name_ + "::GRINDER", 120), paste_dedi_(name_ + "::PASTE") {}
 
 
     core::StationResult GrindStation::complete()
@@ -61,7 +60,6 @@ namespace llpp::bots::paste
         std::cout << "[+] Putting paste away..\n";
         asa::entities::local_player->turn_left(90);
         asa::entities::local_player->access(grinder_);
-        std::cout << "grinder is open\n";
         asa::core::sleep_for(std::chrono::seconds(1));
 
         asa::entities::local_player->get_inventory()->transfer_all();
@@ -70,20 +68,12 @@ namespace llpp::bots::paste
                 *asa::items::resources::achatina_paste);
         }, std::chrono::seconds(5));
 
-        std::cout << "grinding the paste..\n";
         for (int i = 0; i < 5; i++) {
             asa::window::post_mouse_press_at({963, 832}, asa::controls::LEFT);
             asa::core::sleep_for(std::chrono::milliseconds(300));
         }
 
-        grinder_.get_inventory()->select_slot(0);
-
-        for (int i = 0; i < 10; i++) {
-            asa::window::press("a");
-            asa::core::sleep_for(std::chrono::milliseconds(300));
-        }
-        std::cout << "[+] Items q'd...\n";
-
+        grinder_.get_inventory()->craft(0, 1000);
         grinder_.get_inventory()->transfer_all(*asa::items::resources::chitin);
         asa::core::sleep_for(std::chrono::seconds(1));
         grinder_.get_inventory()->close();
