@@ -22,7 +22,7 @@ namespace llpp::bots::paste
         };
 
         std::chrono::system_clock::time_point flint_grind_start_;
-        State state_ = WAITING;
+        State state_ = GRINDING;
 
         asa::structures::SimpleBed bed_;
         asa::structures::CraftingStation grinder_;
