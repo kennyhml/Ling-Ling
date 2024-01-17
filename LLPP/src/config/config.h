@@ -149,4 +149,27 @@ namespace llpp::config
         inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
         inline ManagedVar<bool> dont_refert(BASE, "disabled", save, true);
     }
+
+    namespace bots::crafting
+    {
+        namespace spark
+        {
+            inline const std::vector<std::string> BASE{"bots", "crafting", "spark"};
+
+            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SPARK");
+            inline ManagedVar<int> num_stations(BASE, "num_stations", save, 2);
+            inline ManagedVar<int> interval(BASE, "interval", save, 10);
+            inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        }
+
+        namespace gunpowder
+        {
+            inline const std::vector<std::string> BASE{"bots", "crafting", "gunpowder"};
+
+            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "GP");
+            inline ManagedVar<int> num_stations(BASE, "num_stations", save, 2);
+            inline ManagedVar<int> interval(BASE, "interval", save, 10);
+            inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        }
+    }
 }

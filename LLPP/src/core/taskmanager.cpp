@@ -9,6 +9,7 @@
 #include "../bots/kitchen/cropmanager.h"
 #include "../bots/kitchen/sapmanager.h"
 #include "../bots/paste/pastemanager.h"
+#include "../bots/crafting/craftingmanager.h"
 #include "../bots/suicide/suicidestation.h"
 #include "../config/config.h"
 
@@ -56,6 +57,7 @@ namespace llpp::core
         tasks_.emplace_back("STATE CHECK", player_state_check);
         tasks_.emplace_back("FARMING", farm::run_while_requested);
 
+        tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
 
         for (auto& [key, config] : config::bots::drops::configs) {

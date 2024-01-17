@@ -92,9 +92,6 @@ namespace llpp::gui
         window_class.lpszMenuName = nullptr;
         window_class.lpszClassName = class_name;
         window_class.hIconSm = nullptr;
-        window_class.hIcon = static_cast<HICON>(LoadImageW(
-            nullptr, L"C:/dev/chaos-clicker/assets/gui/SHARD.ico", IMAGE_ICON, 0, 0,
-            LR_LOADFROMFILE | LR_DEFAULTSIZE));
 
         RegisterClassExW(&window_class);
         window = CreateWindowExW(WS_EX_TRANSPARENT, class_name, window_name, WS_POPUP,
@@ -351,12 +348,13 @@ namespace llpp::gui
                 break;
             case CROPS: draw_bots_crops_tabs();
                 break;
+            case CRAFTING: draw_bots_crafting_tabs();
+                break;
             }
             ImGui::EndChild();
             break;
         }
         }
-
         ImGui::End();
     }
 }

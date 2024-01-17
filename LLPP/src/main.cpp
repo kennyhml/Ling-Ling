@@ -16,8 +16,6 @@
 #include "core/recovery.h"
 #include "core/task.h"
 #include "core/taskmanager.h"
-#include "asapp/structures/craftingstation.h"
-#include "bots/crafting/sparkstation.h"
 
 static bool running = false;
 
