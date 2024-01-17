@@ -10,6 +10,9 @@ namespace llpp::gui
 {
     namespace
     {
+        std::string spark_tooltip;
+        std::string gp_tooltip;
+
         int accent_color[4] = {140, 131, 214, 255};
 
         ImColor get_accent_color(float a = 1.f)
@@ -18,6 +21,75 @@ namespace llpp::gui
                 accent_color[0] / 255.f, accent_color[1] / 255.f, accent_color[2] / 255.f,
                 a
             };
+        }
+
+        bool open_folder(std::string& folder_path_out)
+        {
+            // CREATE FILE OBJECT INSTANCE
+            HRESULT f_SysHr = CoInitializeEx(
+                nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+            if (FAILED(f_SysHr)) { return FALSE; }
+
+            // CREATE FileOpenDialog OBJECT
+            IFileOpenDialog* f_FileSystem;
+            f_SysHr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_ALL,
+                                       IID_IFileOpenDialog,
+                                       reinterpret_cast<void**>(&f_FileSystem));
+            if (FAILED(f_SysHr)) {
+                CoUninitialize();
+                return FALSE;
+            }
+
+            // SET OPTIONS FOR FOLDER SELECTION
+            DWORD dwOptions;
+            f_SysHr = f_FileSystem->GetOptions(&dwOptions);
+            if (SUCCEEDED(f_SysHr)) {
+                f_SysHr = f_FileSystem->SetOptions(dwOptions | FOS_PICKFOLDERS);
+            }
+            if (FAILED(f_SysHr)) {
+                f_FileSystem->Release();
+                CoUninitialize();
+                return FALSE;
+            }
+
+            // SHOW OPEN FILE DIALOG WINDOW
+            f_SysHr = f_FileSystem->Show(nullptr);
+            if (FAILED(f_SysHr)) {
+                f_FileSystem->Release();
+                CoUninitialize();
+                return FALSE;
+            }
+
+            // RETRIEVE FOLDER PATH FROM THE SELECTED ITEM
+            IShellItem* f_Folder;
+            f_SysHr = f_FileSystem->GetResult(&f_Folder);
+            if (FAILED(f_SysHr)) {
+                f_FileSystem->Release();
+                CoUninitialize();
+                return FALSE;
+            }
+
+            // STORE AND CONVERT THE FOLDER PATH
+            PWSTR f_Path;
+            f_SysHr = f_Folder->GetDisplayName(SIGDN_FILESYSPATH, &f_Path);
+            if (FAILED(f_SysHr)) {
+                f_Folder->Release();
+                f_FileSystem->Release();
+                CoUninitialize();
+                return FALSE;
+            }
+
+            // FORMAT AND STORE THE FOLDER PATH
+            std::wstring path(f_Path);
+            std::string c(path.begin(), path.end());
+            folder_path_out = c;
+
+            // SUCCESS, CLEAN UP
+            CoTaskMemFree(f_Path);
+            f_Folder->Release();
+            f_FileSystem->Release();
+            CoUninitialize();
+            return TRUE;
         }
     }
 
@@ -165,7 +237,7 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
             if (ImGui::Button("Get")) {
                 std::string selected;
-                openFolder(selected);
+                open_folder(selected);
                 if (!selected.empty()) { config::general::ark::root_dir.set(selected); }
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -220,7 +292,7 @@ namespace llpp::gui
             ImGui::SetCursorPosY(10);
             if (ImGui::Button("Get")) {
                 std::string selected;
-                openFolder(selected);
+                open_folder(selected);
                 if (!selected.empty()) { config::general::bot::assets_dir.set(selected); }
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -1178,6 +1250,137 @@ namespace llpp::gui
             }
             end_child();
         }
+    }
+
+    void draw_bots_crafting_tabs()
+    {
+        begin_child("Sparkpowder",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() * 0.5));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Station prefix:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputText("##spark_prefix",
+                                 config::bots::crafting::spark::prefix.get_ptr())) {
+                config::bots::crafting::spark::prefix.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Specifies the prefix for your spark beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named HELLO SPARK01, while "
+                    "your prefix can still be SPARK.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Station count:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##spark_count",
+                                config::bots::crafting::spark::num_stations.get_ptr(), 1,
+                                5)) {
+                config::bots::crafting::spark::num_stations.save();
+            }
+            int* num_stations = config::bots::crafting::spark::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 100);
+
+            spark_tooltip = std::vformat(
+                "The number of sparkpowder stations you have.\n"
+                "Current processing power:\n"
+                "{} sparkpowder every 6 minutes using {} flint & {} stone",
+                std::make_format_args(*num_stations * 9600, *num_stations * 6400,
+                                      *num_stations * 3200));
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(spark_tooltip.c_str());
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Interval (minutes):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputInt("##spark_interval",
+                                config::bots::crafting::spark::interval.get_ptr(), 1,
+                                5)) { config::bots::crafting::spark::interval.save(); }
+            int* interval = config::bots::crafting::spark::interval.get_ptr();
+            *interval = std::clamp(*interval, 5, 150);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The interval to complete the station at (in minutes).");
+            }
+            ImGui::SetCursorPos({10, 107});
+            if (ImGui::Checkbox("Disabled",
+                                config::bots::crafting::spark::disabled.get_ptr())) {
+                config::bots::crafting::spark::disabled.save();
+            }
+        }
+        end_child();
+        ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
+        begin_child("Gunpowder",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() * 0.5));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Station prefix:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputText("##gunpowder_prefix",
+                                 config::bots::crafting::gunpowder::prefix.get_ptr())) {
+                config::bots::crafting::gunpowder::prefix.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "Specifies the prefix for your gunpowder beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named TEST GP01, while "
+                    "your prefix can still be GP.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Station count:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##gunpowder_count",
+                                config::bots::crafting::gunpowder::num_stations.get_ptr(),
+                                1, 5)) {
+                config::bots::crafting::gunpowder::num_stations.save();
+            }
+            int* num_stations = config::bots::crafting::gunpowder::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 100);
+
+            gp_tooltip = std::vformat(
+                "The number of gunpowder stations you have.\n"
+                "Current processing power:\n"
+                "{} gunpowder every 6 minutes using {} sparkpowder & {} charcoal",
+                std::make_format_args(*num_stations * 6000, *num_stations * 4000,
+                                      *num_stations * 4000));
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(gp_tooltip.c_str());
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Interval (minutes):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputInt("##gunpowder_interval",
+                                config::bots::crafting::gunpowder::interval.get_ptr(), 1,
+                                5)) {
+                config::bots::crafting::gunpowder::interval.save();
+            }
+            int* interval = config::bots::crafting::gunpowder::interval.get_ptr();
+            *interval = std::clamp(*interval, 5, 150);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The interval to complete the station at (in minutes).");
+            }
+            ImGui::SetCursorPos({10, 107});
+            if (ImGui::Checkbox("Disabled",
+                                config::bots::crafting::gunpowder::disabled.get_ptr())) {
+                config::bots::crafting::gunpowder::disabled.save();
+            }
+        }
+        end_child();
     }
 
     void begin_child(const char* name, ImVec2 size)

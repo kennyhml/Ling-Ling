@@ -11,75 +11,6 @@
 
 namespace llpp::gui
 {
-    inline bool openFolder(std::string& folder_path_out)
-    {
-        // CREATE FILE OBJECT INSTANCE
-        HRESULT f_SysHr = CoInitializeEx(
-            nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-        if (FAILED(f_SysHr)) { return FALSE; }
-
-        // CREATE FileOpenDialog OBJECT
-        IFileOpenDialog* f_FileSystem;
-        f_SysHr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_ALL,
-                                   IID_IFileOpenDialog,
-                                   reinterpret_cast<void**>(&f_FileSystem));
-        if (FAILED(f_SysHr)) {
-            CoUninitialize();
-            return FALSE;
-        }
-
-        // SET OPTIONS FOR FOLDER SELECTION
-        DWORD dwOptions;
-        f_SysHr = f_FileSystem->GetOptions(&dwOptions);
-        if (SUCCEEDED(f_SysHr)) {
-            f_SysHr = f_FileSystem->SetOptions(dwOptions | FOS_PICKFOLDERS);
-        }
-        if (FAILED(f_SysHr)) {
-            f_FileSystem->Release();
-            CoUninitialize();
-            return FALSE;
-        }
-
-        // SHOW OPEN FILE DIALOG WINDOW
-        f_SysHr = f_FileSystem->Show(nullptr);
-        if (FAILED(f_SysHr)) {
-            f_FileSystem->Release();
-            CoUninitialize();
-            return FALSE;
-        }
-
-        // RETRIEVE FOLDER PATH FROM THE SELECTED ITEM
-        IShellItem* f_Folder;
-        f_SysHr = f_FileSystem->GetResult(&f_Folder);
-        if (FAILED(f_SysHr)) {
-            f_FileSystem->Release();
-            CoUninitialize();
-            return FALSE;
-        }
-
-        // STORE AND CONVERT THE FOLDER PATH
-        PWSTR f_Path;
-        f_SysHr = f_Folder->GetDisplayName(SIGDN_FILESYSPATH, &f_Path);
-        if (FAILED(f_SysHr)) {
-            f_Folder->Release();
-            f_FileSystem->Release();
-            CoUninitialize();
-            return FALSE;
-        }
-
-        // FORMAT AND STORE THE FOLDER PATH
-        std::wstring path(f_Path);
-        std::string c(path.begin(), path.end());
-        folder_path_out = c;
-
-        // SUCCESS, CLEAN UP
-        CoTaskMemFree(f_Path);
-        f_Folder->Release();
-        f_FileSystem->Release();
-        CoUninitialize();
-        return TRUE;
-    }
-
     enum MainTabs : int
     {
         GENERAL,
@@ -109,6 +40,7 @@ namespace llpp::gui
         DROPS,
         CROPS,
         SAP,
+        CRAFTING,
         BREWS,
     };
 
@@ -136,7 +68,7 @@ namespace llpp::gui
 
     inline BotTabs selected_bot_tab = PASTE;
     inline std::vector<const char*> bot_subtabs{
-        "Paste", "Drops", "Crops", "Sap", "Brews"
+        "Paste", "Crates", "Crops", "Sap", "Crafting", "Brews"
     };
 
     inline std::vector<const char*> main_tab_icons = {
@@ -177,6 +109,7 @@ namespace llpp::gui
     void draw_bots_drops_tab();
     void draw_bots_crops_tabs();
     void draw_bots_sap_tabs();
+    void draw_bots_crafting_tabs();
 
 
     void begin_child(const char* name, ImVec2 size);
