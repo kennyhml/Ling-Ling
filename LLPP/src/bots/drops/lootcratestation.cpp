@@ -62,6 +62,8 @@ namespace llpp::bots::drops
                 MC_ASC_CRAFTED_JM_MC_BP("Paracer Saddle")
                 MC_ASC_CRAFTED_JM_MC_BP("Megalodon Saddle")
                 MC_ASC_CRAFTED_JM_MC_BP("Carbonemys Saddle")
+                MC_ASC_CRAFTED_JM_MC_BP("Woolly Rhino Saddle")
+
 
                 // grindables
                 ANY_CRAFTED("Electric Prod") ANY_CRAFTED("Fabricated Sniper " "Rifle")
@@ -79,7 +81,9 @@ namespace llpp::bots::drops
                 ANY_CRAFTED("Plesi" "osaur" " Plat" "form " "Saddl" "e")
                 ANY_CRAFTED("Ankylo Saddle") ANY_CRAFTED("Tapejara Saddle")
                 ANY_CRAFTED("Kaprosuchus " "Saddle")
-                Item("Metal " "Arrow", false, ItemData::NONE), Item("C4 Detonator"),
+                Item("Metal " "Arrow", false, ItemData::NONE),
+                Item("Rocket Launcher", false, ItemData::NONE), Item("C4 Detonator"),
+                Item("C4 Detonator", true, ItemData::NONE),
                 Item("Advanced Sniper Bullet", false, ItemData::NONE),
                 Item("Simple Bullet", false, ItemData::NONE),
                 Item("Rocket Propelled Grenade", true, ItemData::NONE),
@@ -164,6 +168,7 @@ namespace llpp::bots::drops
                                       std::map<std::string, bool>& cherry_picked_out)
     {
         asa::entities::local_player->access(crate_);
+        crate_.get_inventory()->switch_to(asa::interfaces::CraftingInventory::INVENTORY);
         screenshot_out = asa::window::screenshot({1193, 227, 574, 200});
         std::cout << "\t[-] Loot screenshot has been taken.\n";
 
@@ -173,7 +178,9 @@ namespace llpp::bots::drops
                 got_rerolled_ = true;
                 return loot_crate(screenshot_out, cherry_picked_out);
             }
-            crate_.get_inventory()->make_new_folder("checked");
+            if (!crate_.get_inventory()->slots[0].is_folder()) {
+                crate_.get_inventory()->make_new_folder("checked");
+            }
             asa::core::sleep_for(std::chrono::milliseconds(500));
             crate_.get_inventory()->close();
         }
