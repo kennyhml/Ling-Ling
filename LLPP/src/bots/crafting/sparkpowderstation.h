@@ -8,12 +8,17 @@
 
 namespace llpp::bots::crafting
 {
-    class SparkStation : public core::BaseStation
+    class SparkpowderStation : public core::BaseStation
     {
     public:
-        SparkStation(const std::string& t_name, std::chrono::minutes t_interval);
+        SparkpowderStation(const std::string& t_name, std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
+
+        bool is_ready() const override { return !disabled_ && BaseStation::is_ready(); }
+
+        [[nodiscard]] bool get_disabled() const { return disabled_; }
+        void set_disabled(const bool disabled) { disabled_ = disabled; }
 
     private:
         enum State
@@ -29,6 +34,7 @@ namespace llpp::bots::crafting
 
         std::chrono::system_clock::time_point crafting_start_;
         State state_ = CRAFTING;
+        bool disabled_ = false;
 
         asa::structures::CraftingStation chem_bench_;
         asa::structures::SimpleBed bed_;
