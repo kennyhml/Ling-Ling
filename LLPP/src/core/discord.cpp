@@ -81,6 +81,52 @@ namespace llpp::core::discord
         return true;
     }
 
+    bool handle_unauthorized_command(const dpp::slashcommand_t& event)
+    {
+        if (!is_channel_command_authorized(event.command.channel_id)) {
+            event.reply(
+                dpp::message("You can't use Ling Ling++ commands in this channel.").
+                set_flags(dpp::m_ephemeral));
+            return true;
+        }
+        if (!is_user_command_authorized(event.command.member)) {
+            event.reply(
+                dpp::message("You are not authorized to use commands.").set_flags(
+                    dpp::m_ephemeral));
+            return true;
+        }
+        return false;
+    }
+
+    bool is_user_command_authorized(const dpp::guild_member& user)
+    {
+        using namespace config::discord::authorization;
+
+        // no roles specified, allow any user to use commands.
+        if (users.get_ptr()->empty() && roles.get_ptr()->empty()) { return true; }
+
+        // check if the user has any of the authorized roles
+        if (std::ranges::any_of(user.roles, is_role_command_authorized)) { return true; }
+
+        // check if the user itself is authorized
+        const auto allowed = users.get_ptr();
+        return std::ranges::find(*allowed, user.user_id.str()) != allowed->end();
+    }
+
+    bool is_channel_command_authorized(const dpp::snowflake channel)
+    {
+        using namespace config::discord::authorization;
+
+        return channels.get_ptr()->empty() || std::ranges::find(
+            *channels.get_ptr(), channel.str()) != channels.get_ptr()->end();
+    }
+
+    bool is_role_command_authorized(const dpp::snowflake role)
+    {
+        const auto allowed = config::discord::authorization::roles.get_ptr();
+        return std::ranges::find(*allowed, role.str()) != allowed->end();
+    }
+
     void register_slash_command(const dpp::slashcommand& cmd,
                                 const event_callback_t& callback)
     {

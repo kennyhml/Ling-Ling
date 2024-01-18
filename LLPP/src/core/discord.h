@@ -1,8 +1,6 @@
 #pragma once
-#include <chrono>
 #include <dpp/dpp.h>
 #include <memory>
-#include <stdexcept>
 #include <string>
 
 namespace llpp::core::discord
@@ -12,6 +10,12 @@ namespace llpp::core::discord
     inline std::unique_ptr<dpp::cluster> bot;
 
     bool init();
+
+    bool handle_unauthorized_command(const dpp::slashcommand_t& event);
+    bool is_user_command_authorized(const dpp::guild_member& user);
+
+    bool is_channel_command_authorized(dpp::snowflake channel);
+    bool is_role_command_authorized(dpp::snowflake role);
 
     void register_slash_command(const dpp::slashcommand& command,
                                 const event_callback_t&);

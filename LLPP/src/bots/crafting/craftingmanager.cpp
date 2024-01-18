@@ -71,7 +71,6 @@ namespace llpp::bots::crafting
         }
     }
 
-
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
@@ -90,7 +89,7 @@ namespace llpp::bots::crafting
     {
         if (has_registered_commands_) { return; }
 
-        dpp::slashcommand crafting("crafting", "Controls the crafting manager", 0);
+        dpp::slashcommand crafting("testtest", "Controls the crafting manager", 0);
 
         dpp::command_option enable(dpp::co_sub_command, "enable",
                                    "Enable completion of a managed crafting station.");
@@ -123,6 +122,8 @@ namespace llpp::bots::crafting
 
     void CraftingManager::slashcommand_callback(const dpp::slashcommand_t& event)
     {
+        if (core::discord::handle_unauthorized_command(event)) { return; }
+
         auto cmd_options = event.command.get_command_interaction();
 
         auto subcommand = cmd_options.options[0];

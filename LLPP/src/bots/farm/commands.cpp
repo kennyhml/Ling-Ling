@@ -28,6 +28,8 @@ namespace llpp::bots::farm
 
         void farm_command_callback(const dpp::slashcommand_t& event)
         {
+            if (core::discord::handle_unauthorized_command(event)) { return; }
+
             auto cmd_data = event.command.get_command_interaction();
 
             auto subcommand = cmd_data.options[0];
