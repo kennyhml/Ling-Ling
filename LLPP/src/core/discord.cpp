@@ -144,17 +144,15 @@ namespace llpp::core::discord
                                               std::chrono::system_clock::to_time_t(
                                                   std::chrono::system_clock::now()))).
                                           set_color(dpp::colors::black).
-                                          add_field("Account: ", "5", true).
-                                          add_field("Server: ",
-                                                    config::general::ark::server.get(),
+                                          add_field("Account: ", config::user::name.get(),
                                                     true).add_field(
-                                              "Tasks: ", "...", true).set_thumbnail(
+                                              "Server: ",
+                                              config::general::ark::server.get(),
+                                              true).set_thumbnail(
                                               "https://static.wikia.nocookie.net/"
                                               "arksurvivalevolved_gamepedia/images/b/b9/"
                                               "Whip_%28Scorched_Earth%29.png/revision/latest/"
-                                              "scale-to-width-down/228?cb=20160901213011")
-                                          .set_footer(dpp::embed_footer(
-                                              "Ling Ling++ - please help - @kennyhml"));
+                                              "scale-to-width-down/228?cb=20160901213011");
 
         bot->message_create(dpp::message(config::discord::channels::info.get(),
                                          started_embed));

@@ -89,7 +89,7 @@ namespace llpp::bots::crafting
     {
         if (has_registered_commands_) { return; }
 
-        dpp::slashcommand crafting("testtest", "Controls the crafting manager", 0);
+        dpp::slashcommand crafting("crafting", "Controls the crafting manager", 0);
 
         dpp::command_option enable(dpp::co_sub_command, "enable",
                                    "Enable completion of a managed crafting station.");
