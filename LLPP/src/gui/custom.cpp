@@ -927,10 +927,10 @@ namespace llpp::gui
         }
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
+        begin_child("Advanced / Reroll", ImVec2(280, ImGui::GetWindowHeight()));
         {
-            ImGui::SetCursorPos({10, 14});
-            if (ImGui::Checkbox("Reroll mode",
+            ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Reroll mode enabled",
                                 config::bots::drops::reroll_mode.get_ptr())) {
                 config::bots::drops::reroll_mode.save();
             }
@@ -941,23 +941,23 @@ namespace llpp::gui
             }
 
             if (active) {
-                ImGui::SetCursorPos({10, 45});
-                if (ImGui::Checkbox("Disable completion##crate_manager",
-                                    &active->get_ptr()->disabled)) { active->save(); }
+                ImGui::SetCursorPos({10, 42});
+                if (ImGui::Checkbox("Overrule reroll mode",
+                                    &active->get_ptr()->overrule_reroll_mode)) {
+                    active->save();
+                }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                        "Completely disable this crate manager's " "completion.\n\n"
-                        "Even when disabled, the paste manager "
-                        "is created but remains inactive.\n"
-                        "You can toggle its state at runtime or "
-                        "through the discord bot.");
+                        "Enable to ignore the reroll mode for this crate "
+                        "manager, drops are always looted.");
                 }
-
-                ImGui::SetCursorPos({10, 76});
+                ImGui::SetCursorPos({10, 73});
                 if (ImGui::Checkbox("Allow partial completion",
                                     &active->get_ptr()->allow_partial_completion)) {
                     active->save();
                 }
+
+                ImGui::SetCursorPos({10, 104});
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
                         "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
@@ -974,20 +974,9 @@ namespace llpp::gui
                 }
 
                 ImGui::SetCursorPos({10, 107});
-                if (ImGui::Checkbox("Overrule reroll mode",
-                                    &active->get_ptr()->overrule_reroll_mode)) {
-                    active->save();
-                }
-                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                    ImGui::SetTooltip(
-                        "Enable to ignore the reroll mode for this crate "
-                        "manager, drops are always looted.");
-                }
-
-                ImGui::SetCursorPos({10, 138});
                 ImGui::Text("Render (seconds):");
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-                ImGui::SetCursorPos({150, 135});
+                ImGui::SetCursorPos({150, 104});
                 if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
                                     5)) { active->save(); }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -997,10 +986,10 @@ namespace llpp::gui
                 }
             }
 
-            ImGui::SetCursorPos({10, active ? 169.f : 45.f});
-            ImGui::Text("Max vault slots (%%):");
+            ImGui::SetCursorPos({10, active ? 138.f : 45.f});
+            ImGui::Text("Vault limit (%%):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, active ? 166.f : 42.f});
+            ImGui::SetCursorPos({150, active ? 135.f : 42.f});
             if (ImGui::InputInt("##vault_threshold",
                                 config::bots::drops::vault_alert_threshold.get_ptr(), 5,
                                 10)) {
@@ -1091,6 +1080,18 @@ namespace llpp::gui
                                     &active->get_ptr()->uses_teleporters)) {
                     active->save();
                 }
+
+                ImGui::SameLine();
+                if (ImGui::Checkbox("Disabled##crate_manager2",
+                                    &active->get_ptr()->disabled)) { active->save(); }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "Completely disable this crate manager's " "completion.\n\n"
+                        "Even when disabled, the paste manager "
+                        "is created but remains inactive.\n"
+                        "You can toggle its state at runtime or "
+                        "through the discord bot.");
+                }
             }
         }
         end_child();
@@ -1161,7 +1162,7 @@ namespace llpp::gui
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in hours).\n"
-                    "150 crops take 8 hours to grow on 300/% greenhouse " "effect.");
+                    "150 crops take 8 hours to grow on 300%% greenhouse " "effect.");
             }
         }
         end_child();

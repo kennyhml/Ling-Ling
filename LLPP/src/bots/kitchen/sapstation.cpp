@@ -33,18 +33,19 @@ namespace llpp::bots::kitchen
     {
         asa::entities::local_player->access(tap_);
         if (tap_.get_inventory()->slots[0].is_empty()) {
+            tap_.get_inventory()->close();
             // send a warning, interval too low? no sap in the tap at least
             return false;
         }
 
         tap_.get_inventory()->transfer_all();
         tap_.get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(1));
         return true;
     }
 
     void SapStation::put_away_sap()
     {
+        asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->turn_right();
         asa::entities::local_player->access(storage_box_);
         asa::entities::local_player->get_inventory()->transfer_all();
