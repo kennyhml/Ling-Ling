@@ -63,8 +63,7 @@ LRESULT CALLBACK WindowProcess(const HWND window, const UINT message,
             rect.top += y - llpp::gui::position.y;
 
             if (llpp::gui::position.x >= 0 && llpp::gui::position.x <= llpp::gui::WIDTH &&
-                llpp::gui::position.y >= 0 && llpp::gui::position.y <=
-                llpp::gui::HEIGHT) {
+                llpp::gui::position.y >= 0 && llpp::gui::position.y <= 25) {
                 SetWindowPos(window, HWND_TOPMOST, rect.left, rect.top, 0, 0,
                              SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOZORDER);
             }
@@ -260,7 +259,7 @@ namespace llpp::gui
 
     void render()
     {
-        ImGui::Begin("Ling Ling++", &exit,
+        ImGui::Begin("Ling Ling++ | v1.0.0", &exit,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
