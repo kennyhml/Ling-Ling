@@ -2,16 +2,12 @@
 
 namespace llpp::core
 {
-    BaseStation::BaseStation(
-        std::string t_name, const std::chrono::minutes t_interval)
-        : name_(std::move(t_name)), completion_interval_(t_interval), times_completed_(0),
-          status_(UNKNOWN)
-    {
-    }
+    BaseStation::BaseStation(std::string t_name, const std::chrono::minutes t_interval) :
+        name_(std::move(t_name)), completion_interval_(t_interval) {}
 
     bool BaseStation::is_ready() const
     {
-        return (std::chrono::system_clock::now() - last_completed_) >
+        return !disabled_ && (std::chrono::system_clock::now() - last_completed_) >
             completion_interval_;
     }
 

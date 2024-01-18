@@ -1,4 +1,6 @@
 #include "craftingmanager.h"
+
+#include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
 
@@ -9,6 +11,16 @@ namespace llpp::bots::crafting
     namespace
     {
         CraftingManager* instance = nullptr;
+
+        template <typename T>
+        void create(std::vector<std::unique_ptr<T>>& into, const int num,
+                    const std::string& name, const std::chrono::minutes interval)
+        {
+            for (int i = 0; i < num; i++) {
+                into.push_back(std::make_unique<T>(util::add_num_to_prefix(name, i + 1),
+                                                   std::chrono::minutes(interval)));
+            }
+        }
     }
 
     CraftingManager::CraftingManager()
@@ -16,17 +28,11 @@ namespace llpp::bots::crafting
         instance = this;
         using namespace llpp::config::bots::crafting;
 
-        for (int i = 0; i < spark::num_stations.get(); i++) {
-            spark_stations_.push_back(std::make_unique<SparkpowderStation>(
-                util::add_num_to_prefix(spark::prefix.get(), i + 1),
-                std::chrono::minutes(spark::interval.get())));
-        }
+        create(spark_stations_, spark::num_stations.get(), spark::prefix.get(),
+               std::chrono::minutes(spark::interval.get()));
+        create(gunpowder_stations_, gunpowder::num_stations.get(),
+               gunpowder::prefix.get(), std::chrono::minutes(gunpowder::interval.get()));
 
-        for (int i = 0; i < gunpowder::num_stations.get(); i++) {
-            gunpowder_stations_.push_back(std::make_unique<GunpowderStation>(
-                util::add_num_to_prefix(gunpowder::prefix.get(), i + 1),
-                std::chrono::minutes(gunpowder::interval.get())));
-        }
         register_slash_commands();
     }
 
@@ -35,17 +41,36 @@ namespace llpp::bots::crafting
     bool CraftingManager::run()
     {
         if (!is_ready_to_run()) { return false; }
-        for (const auto& station : spark_stations_) {
-            if (station->is_ready() && !spark::disabled.get()) { station->complete(); }
-        }
-        for (const auto& station : gunpowder_stations_) {
-            if (station->is_ready() && !gunpowder::disabled.get()) {
-                station->complete();
-            }
-        }
+        run_spark();
+        run_gunpowder();
 
         return true;
     }
+
+    void CraftingManager::run_spark() const
+    {
+        if (spark::disabled.get()) { return; }
+        for (const auto& station : spark_stations_) {
+            try { if (station->is_ready()) { station->complete(); } }
+            catch (const StationFullError&) {
+                send_station_capped(station->get_name(), station->get_last_dedi_ss());
+                station->set_disabled(true);
+            }
+        }
+    }
+
+    void CraftingManager::run_gunpowder() const
+    {
+        if (gunpowder::disabled.get()) { return; }
+        for (const auto& station : gunpowder_stations_) {
+            try { if (station->is_ready()) { station->complete(); } }
+            catch (const StationFullError&) {
+                send_station_capped(station->get_name(), station->get_last_dedi_ss());
+                station->set_disabled(true);
+            }
+        }
+    }
+
 
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {

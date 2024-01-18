@@ -95,13 +95,14 @@ namespace llpp::bots::crafting
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::red).
               set_title(std::format("Dedis at '{}' need to be emptied!", station_name)).
-              set_description("The station has been disable automatically.").
-              set_thumbnail(WARNING).set_image("attachment://image.png");
+              set_description(
+                  "- The station has been disable automatically.\n"
+                  "- Re-enable it via command or restart the bot.\n"
+                  "- The overproduction has been put back.").set_thumbnail(WARNING).
+              set_image("attachment://image.png");
 
         embed.set_footer({
-            std::format(
-                "Once emptied, you can re-enable the station using /crafting enable {}",
-                station_name)
+            std::format("Empty the dedis and use /crafting enable {}.", station_name)
         });
         auto message = dpp::message(config::discord::channels::info.get(), embed);
         const auto fdata = util::mat_to_strbuffer(ss);
