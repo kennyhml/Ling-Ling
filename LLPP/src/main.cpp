@@ -4,6 +4,7 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
+#include <asapp/structures/dedicatedstorage.h>
 #include <opencv2/highgui.hpp>
 
 #include "auth/auth.h"
@@ -44,11 +45,12 @@ void llpp_main()
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
+
+
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
-
     asa::entities::local_player->reset_view_angles();
-    
+
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {
