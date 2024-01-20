@@ -47,6 +47,8 @@ void llpp_main()
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
+    asa::entities::local_player->reset_view_angles();
+    
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {

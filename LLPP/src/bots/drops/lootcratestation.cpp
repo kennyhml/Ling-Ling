@@ -108,20 +108,27 @@ namespace llpp::bots::drops
 
     LootCrateStation::LootCrateStation(const std::string& t_name,
                                        CrateManagerConfig& t_config,
-                                       asa::structures::CaveLootCrate t_crate) :
+                                       asa::structures::CaveLootCrate t_crate,
+                                       const bool t_is_first,
+                                       const bool t_is_first_in_group) :
         BaseStation(t_name, std::chrono::minutes(t_config.interval)), config_(t_config),
+        is_first_(t_is_first), is_first_in_group_(t_is_first_in_group),
         crate_(std::move(t_crate)), teleporter_(asa::structures::Teleporter(name_)),
         bed_(asa::structures::SimpleBed(name_)),
-        vault_(asa::structures::Container(name_ + "::VAULT", 350)) {};
+        vault_(asa::structures::Container(name_ + "::VAULT", 350)) {}
 
     core::StationResult LootCrateStation::complete()
     {
         const auto start = std::chrono::system_clock::now();
         go_to();
 
+        if (is_first_) {
+            asa::core::sleep_for(std::chrono::seconds(config_.render_initial_for));
+        }
+
         if (!util::await(
             [this]() -> bool { return asa::entities::local_player->can_access(crate_); },
-            std::chrono::seconds(is_rendered_ ? 0 : config_.render_for))) {
+            std::chrono::seconds(is_first_in_group_ ? config_.render_group_for : 1))) {
             is_crate_up_ = false;
             set_completed();
             return {this, false, std::chrono::seconds(0), {}};

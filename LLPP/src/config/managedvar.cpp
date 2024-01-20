@@ -67,7 +67,14 @@ namespace llpp::config
             value_.grouped_crates_raw = curr[k].value("grouped_crates_raw",
                                                       default_.grouped_crates_raw);
             value_.interval = curr[k].value("interval", default_.interval);
-            value_.render_for = curr[k].value("render_for", default_.render_for);
+
+            value_.render_group_for = curr[k].value("render_group_for",
+                                                    default_.render_group_for);
+            value_.render_align_for = curr[k].value("render_align_for",
+                                                    default_.render_align_for);
+            value_.render_initial_for = curr[k].value("render_initial_for",
+                                                      default_.render_initial_for);
+
             value_.uses_teleporters = curr[k].value("uses_teleporters",
                                                     default_.uses_teleporters);
             value_.overrule_reroll_mode = curr[k].value(
@@ -109,7 +116,11 @@ namespace llpp::config
         curr[k]["prefix"] = value_.prefix;
         curr[k]["grouped_crates_raw"] = value_.grouped_crates_raw;
         curr[k]["interval"] = value_.interval;
-        curr[k]["render_for"] = value_.render_for;
+
+        curr[k]["render_group_for"] = value_.render_group_for;
+        curr[k]["render_align_for"] = value_.render_align_for;
+        curr[k]["render_initial_for"] = value_.render_initial_for;
+
         curr[k]["uses_teleporters"] = value_.uses_teleporters;
         curr[k]["overrule_reroll_mode"] = value_.overrule_reroll_mode;
         curr[k]["allow_partial_completion"] = value_.allow_partial_completion;

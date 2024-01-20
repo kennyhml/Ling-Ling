@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <chrono>
 
 namespace llpp::bots::drops
 {
@@ -10,7 +9,9 @@ namespace llpp::bots::drops
         std::string grouped_crates_raw{"{}"};
 
         int interval{15};
-        int render_for{2};
+        int render_group_for{2};
+        int render_align_for{5};
+        int render_initial_for{3};
 
         bool uses_teleporters{false};
         bool overrule_reroll_mode{false};

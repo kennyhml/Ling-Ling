@@ -11,7 +11,8 @@ namespace llpp::bots::drops
     {
     public:
         explicit LootCrateStation(const std::string& t_name, CrateManagerConfig& t_config,
-                                  asa::structures::CaveLootCrate t_crate);
+                                  asa::structures::CaveLootCrate t_crate, bool t_is_first,
+                                  bool t_is_first_in_group);
 
         core::StationResult complete() override;
 
@@ -38,6 +39,8 @@ namespace llpp::bots::drops
         int times_looted_ = 0;
         int vault_slots_ = 0;
 
+        bool is_first_;
+        bool is_first_in_group_;
         bool is_crate_up_ = false;
         bool is_rendered_ = false;
         bool is_default_dst_ = false;

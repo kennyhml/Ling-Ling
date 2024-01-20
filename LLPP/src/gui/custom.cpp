@@ -927,7 +927,7 @@ namespace llpp::gui
         }
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(270, ImGui::GetWindowHeight() * 0.5));
+        begin_child("Advanced", ImVec2(270, ImGui::GetWindowHeight() * 0.53));
         {
             if (active) {
                 ImGui::SetCursorPos({10, 11});
@@ -951,22 +951,48 @@ namespace llpp::gui
                 }
 
                 ImGui::SetCursorPos({10, 42});
-                ImGui::Text("Render (seconds):");
+                ImGui::Text("Load align (sec):");
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
                 ImGui::SetCursorPos({130, 39});
-                if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
-                                    5)) { active->save(); }
+                if (ImGui::InputInt("##crate_render_align",
+                                    &active->get_ptr()->render_align_for, 1, 5)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip("How long to let the align station render for.");
+                }
+
+                ImGui::SetCursorPos({10, 73});
+                ImGui::Text("Load start (sec):");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({130, 70});
+                if (ImGui::InputInt("##crate_render_start",
+                                    &active->get_ptr()->render_initial_for, 1, 5)) {
+                    active->save();
+                }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                        "How long to let the first crate at each group render, "
-                        "more structures nearby -> longer render time.");
+                        "How long to render the first drop of the entire manager for.");
+                }
+
+                ImGui::SetCursorPos({10, 104});
+                ImGui::Text("Load groups (sec):");
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+                ImGui::SetCursorPos({130, 101});
+                if (ImGui::InputInt("##crate_render_group",
+                                    &active->get_ptr()->render_group_for, 1, 5)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "How long to render the first drop of each group for.");
                 }
             }
 
-            ImGui::SetCursorPos({10, active ? 73.f : 14.f});
+            ImGui::SetCursorPos({10, active ? 135.f : 14.f});
             ImGui::Text("Vault limit (%%):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({130, active ? 70.f : 11.f});
+            ImGui::SetCursorPos({130, active ? 132.f : 11.f});
             if (ImGui::InputInt("##vault_threshold",
                                 config::bots::drops::vault_alert_threshold.get_ptr(), 5,
                                 10)) {
@@ -1073,8 +1099,8 @@ namespace llpp::gui
         }
         end_child();
         ImGui::SameLine();
-        ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
-        begin_child("Rerolling", ImVec2(270, ImGui::GetWindowHeight() * 0.5));
+        ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.53) + 5);
+        begin_child("Rerolling", ImVec2(270, ImGui::GetWindowHeight() * 0.47));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Loot Channel:");

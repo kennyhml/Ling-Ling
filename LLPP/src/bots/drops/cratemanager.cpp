@@ -1,4 +1,8 @@
 #include "cratemanager.h"
+
+#include <asapp/core/config.h>
+#include <asapp/core/state.h>
+
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../core/discord.h"
@@ -58,6 +62,7 @@ namespace llpp::bots::drops
         if (config_.uses_teleporters) {
             teleport_to_dropoff();
             if (any_looted) { dropoff_items(); }
+            else { asa::core::sleep_for(std::chrono::seconds(config_.render_align_for)); }
         }
         else { asa::entities::local_player->fast_travel_to(out_bed_); }
 
@@ -136,6 +141,8 @@ namespace llpp::bots::drops
         asa::entities::local_player->fast_travel_to(align_bed_);
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(20);
+
+        asa::core::sleep_for(std::chrono::seconds(config_.render_align_for));
     }
 
     void CrateManager::parse_groups(std::string groups)
@@ -198,9 +205,12 @@ namespace llpp::bots::drops
                         curr_flag |= asa::structures::CaveLootCrate::Quality::ANY;
                     }
                 }
+                const bool first = num_station == 1;
+                const bool first_in_grp = crate == 0;
                 crates_[group].emplace_back(
                     util::add_num_to_prefix(config_.prefix + "::DROP", num_station++),
-                    config_, asa::structures::CaveLootCrate(curr_flag));
+                    config_, asa::structures::CaveLootCrate(curr_flag), first,
+                    first_in_grp);
             }
             group++;
         }
