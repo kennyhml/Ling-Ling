@@ -4,6 +4,8 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
 #include <asapp/interfaces/hud.h>
+#include <asapp/interfaces/console.h>
+
 #include <asapp/structures/dedicatedstorage.h>
 #include <opencv2/highgui.hpp>
 
@@ -47,10 +49,16 @@ void llpp_main()
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
 
 
+    auto fab = asa::structures::Container("t", 0);
+
+    fab.get_inventory()->popcorn_all();
+    return;
+
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
-    asa::entities::local_player->reset_view_angles();
 
+    asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
+    asa::entities::local_player->reset_view_angles();
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {

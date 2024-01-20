@@ -268,10 +268,11 @@ namespace llpp::gui
 
     inline ImVec4 assets_path_col = ImVec4(1.f, 0.f, 0.f, 1.f);
     inline ImVec4 itemdata_col = ImVec4(1.f, 0.f, 0.f, 1.f);
+    inline ImVec4 tessdata_col = ImVec4(1.f, 0.f, 0.f, 1.f);
 
     void draw_general_bot_tabs()
     {
-        begin_child("Environment", ImVec2(375, ImGui::GetWindowHeight()));
+        begin_child("Environment", ImVec2(375, ImGui::GetWindowHeight() * 0.5));
         {
             // CONFIG FOR THE ARK ROOT DIRECTORY
             ImGui::SetCursorPos({10, 14});
@@ -326,14 +327,53 @@ namespace llpp::gui
             itemdata_col = valid
                                ? ImVec4(0.f, 1.f, 0.f, 1.f)
                                : ImVec4(1.f, 0.f, 0.f, 1.f);
+
+            // CONFIG FOR THE ARK ROOT DIRECTORY
+            ImGui::SetCursorPos({10, 76});
+            ImGui::TextColored(tessdata_col, "Tessdata path:");
+
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({120, 73});
+            if (ImGui::InputText("##tessdata",
+                                 config::general::bot::tessdata_dir.get_ptr())) {
+                config::general::bot::tessdata_dir.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The path to the tessdata shipped with ling ling.");
+            }
+            valid = std::filesystem::exists(config::general::bot::tessdata_dir.get()) ||
+                exists(std::filesystem::current_path() /
+                    config::general::bot::tessdata_dir.get());
+            tessdata_col = valid
+                               ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                               : ImVec4(1.f, 0.f, 0.f, 1.f);
         }
         end_child();
 
         ImGui::SameLine();
-        begin_child("f", ImVec2(205, ImGui::GetWindowHeight()));
+        begin_child("...", ImVec2(205, ImGui::GetWindowHeight())); {}
+        end_child();
+
+        ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
+        begin_child("Additional Configuration",
+                    ImVec2(375, ImGui::GetWindowHeight() * 0.5));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::TextColored(assets_path_col, "Commands:");
+
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({120, 10});
+            if (ImGui::InputText("##commands",
+                                 config::general::bot::commands.get_ptr())) {
+                config::general::bot::commands.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The commands ling ling uses when starting or reconnecting.");
+            }
+        }
         end_child();
     }
-
 
     inline int selected_channel = 0;
     inline int selected_role = 0;

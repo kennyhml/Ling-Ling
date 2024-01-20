@@ -107,7 +107,6 @@ namespace llpp::bots::farm
                 asa::window::press(asa::settings::drop_item);
             }
         }
-
         mount_.get_inventory()->close();
     }
 
