@@ -35,7 +35,7 @@ namespace llpp::bots::kitchen
 
     bool CropManager::run()
     {
-        if (!is_ready_to_run() || config::bots::crops::disabled.get()) { return false; }
+        if (!is_ready_to_run()) { return false; }
 
         for (const auto& station : longrass_stations_) { station->complete(); }
         for (const auto& station : citronal_stations_) { station->complete(); }
@@ -45,7 +45,13 @@ namespace llpp::bots::kitchen
 
     bool CropManager::is_ready_to_run() const
     {
-        return longrass_stations_[0]->is_ready();
+        if (config::bots::crops::disabled.get()) { return false; }
+
+        if (!longrass_stations_.empty()) { return longrass_stations_[0]->is_ready(); }
+        if (!citronal_stations_.empty()) { return citronal_stations_[0]->is_ready(); }
+        if (!rockarrot_stations_.empty()) { return rockarrot_stations_[0]->is_ready(); }
+        if (!savoroot_stations_.empty()) { return savoroot_stations_[0]->is_ready(); }
+        return false;
     }
 
     std::chrono::minutes CropManager::get_time_left_until_ready() const

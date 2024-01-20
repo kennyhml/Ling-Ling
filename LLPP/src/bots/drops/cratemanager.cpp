@@ -70,7 +70,7 @@ namespace llpp::bots::drops
 
     bool CrateManager::is_ready_to_run() const
     {
-        return !is_disabled() && crates_[0][0].is_ready();
+        return !is_disabled() && (!crates_.empty() && crates_[0][0].is_ready());
     }
 
     std::chrono::minutes CrateManager::get_time_left_until_ready() const

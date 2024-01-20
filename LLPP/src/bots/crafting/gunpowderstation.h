@@ -3,7 +3,6 @@
 #include "basepowderstation.h"
 #include "../../core/basestation.h"
 
-
 namespace llpp::bots::crafting
 {
     class GunpowderStation final : public BasePowderStation

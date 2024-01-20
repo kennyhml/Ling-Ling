@@ -100,6 +100,9 @@ namespace llpp::config
                                                      70);
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::drops::CrateManagerConfig>> configs;
+
+        inline ManagedVar<std::string> loot_channel(BASE, "loot_channel", save, "");
+        inline ManagedVar<std::string> reroll_role(BASE, "reroll_role", save, "");
     }
 
     namespace bots::paste

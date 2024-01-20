@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 
 #include "auth/auth.h"
+#include "bots/drops/embeds.h"
 #include "bots/farm/commands.h"
 #include "bots/kitchen/cropmanager.h"
 #include "common/util.h"
@@ -32,7 +33,6 @@ void llpp_main()
     }
 
     auto taskmanager = llpp::core::TaskManager();
-
     try {
         asa::window::get_handle();
         asa::window::set_foreground();
@@ -74,6 +74,11 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     }
 
     if (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0) {
+        // Handle error, if any
+        return false;
+    }
+
+    if (freopen_s(&pFile, "CONERR$", "w", stderr) != 0) {
         // Handle error, if any
         return false;
     }

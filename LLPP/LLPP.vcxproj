@@ -143,7 +143,8 @@
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalDependencies>ASAPPd.lib;opencv_world481d.lib;%(AdditionalDependencies);d3d9.lib</AdditionalDependencies>
+            <AdditionalDependencies>ASAPPd.lib;opencv_world481d.lib;%(AdditionalDependencies);d3d9.lib;authd.lib</AdditionalDependencies>
+            <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;external\keyauth;</AdditionalLibraryDirectories>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,8 +164,8 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalDependencies>ASAPP.lib;opencv_world481.lib;%(AdditionalDependencies);d3d9.lib</AdditionalDependencies>
-            <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link</AdditionalLibraryDirectories>
+            <AdditionalDependencies>ASAPP.lib;opencv_world481.lib;%(AdditionalDependencies);d3d9.lib;auth.lib</AdditionalDependencies>
+            <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib;$(_ZVcpkgCurrentInstalledDir)$(_ZVcpkgConfigSubdir)lib\manual-link;external\keyauth;</AdditionalLibraryDirectories>
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
@@ -176,6 +177,12 @@
         <ClCompile Include="external\imgui\imgui_stdlib.cpp"/>
         <ClCompile Include="external\imgui\imgui_tables.cpp"/>
         <ClCompile Include="external\imgui\imgui_widgets.cpp"/>
+        <ClCompile Include="src\auth\auth.cpp"/>
+        <ClCompile Include="src\bots\crafting\basepowderstation.cpp"/>
+        <ClCompile Include="src\bots\crafting\craftingmanager.cpp"/>
+        <ClCompile Include="src\bots\crafting\embeds.cpp"/>
+        <ClCompile Include="src\bots\crafting\gunpowderstation.cpp"/>
+        <ClCompile Include="src\bots\crafting\sparkpowderstation.cpp"/>
         <ClCompile Include="src\bots\drops\cratemanager.cpp"/>
         <ClCompile Include="src\bots\drops\lootcratestation.cpp"/>
         <ClCompile Include="src\bots\drops\embeds.cpp"/>
@@ -216,6 +223,14 @@
         <ClInclude Include="external\imgui\imstb_rectpack.h"/>
         <ClInclude Include="external\imgui\imstb_textedit.h"/>
         <ClInclude Include="external\imgui\imstb_truetype.h"/>
+        <ClInclude Include="external\keyauth\auth.hpp"/>
+        <ClInclude Include="external\keyauth\skStr.h"/>
+        <ClInclude Include="src\auth\auth.h"/>
+        <ClInclude Include="src\bots\crafting\basepowderstation.h"/>
+        <ClInclude Include="src\bots\crafting\craftingmanager.h"/>
+        <ClInclude Include="src\bots\crafting\embeds.h"/>
+        <ClInclude Include="src\bots\crafting\gunpowderstation.h"/>
+        <ClInclude Include="src\bots\crafting\sparkpowderstation.h"/>
         <ClInclude Include="src\bots\drops\cratemanager.h"/>
         <ClInclude Include="src\bots\drops\lootcratestation.h"/>
         <ClInclude Include="src\bots\drops\embeds.h"/>
@@ -258,6 +273,9 @@
         <None Include="src\config.json"/>
     </ItemGroup>
     <ItemGroup>
+        <Content Include="external\keyauth\auth.lib"/>
+        <Content Include="external\keyauth\authd.lib"/>
+        <Content Include="external\keyauth\libcurl.lib"/>
         <Content Include="src\config\config.json"/>
         <Content Include="src\fonts\Ruda-Bold.ttf"/>
     </ItemGroup>

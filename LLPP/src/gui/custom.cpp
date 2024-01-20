@@ -927,37 +927,14 @@ namespace llpp::gui
         }
 
         ImGui::SameLine();
-        begin_child("Advanced / Reroll", ImVec2(280, ImGui::GetWindowHeight()));
+        begin_child("Advanced", ImVec2(270, ImGui::GetWindowHeight() * 0.5));
         {
-            ImGui::SetCursorPos({10, 11});
-            if (ImGui::Checkbox("Reroll mode enabled",
-                                config::bots::drops::reroll_mode.get_ptr())) {
-                config::bots::drops::reroll_mode.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "[GLOBAL]\nWhen enabled, Ling Ling++ will "
-                    "request a reroll of a found crate.");
-            }
-
             if (active) {
-                ImGui::SetCursorPos({10, 42});
-                if (ImGui::Checkbox("Overrule reroll mode",
-                                    &active->get_ptr()->overrule_reroll_mode)) {
-                    active->save();
-                }
-                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                    ImGui::SetTooltip(
-                        "Enable to ignore the reroll mode for this crate "
-                        "manager, drops are always looted.");
-                }
-                ImGui::SetCursorPos({10, 73});
+                ImGui::SetCursorPos({10, 11});
                 if (ImGui::Checkbox("Allow partial completion",
                                     &active->get_ptr()->allow_partial_completion)) {
                     active->save();
                 }
-
-                ImGui::SetCursorPos({10, 104});
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
                         "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
@@ -973,10 +950,10 @@ namespace llpp::gui
                         "then pick C back up at 4.");
                 }
 
-                ImGui::SetCursorPos({10, 107});
+                ImGui::SetCursorPos({10, 42});
                 ImGui::Text("Render (seconds):");
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-                ImGui::SetCursorPos({150, 104});
+                ImGui::SetCursorPos({130, 39});
                 if (ImGui::InputInt("##crate_render", &active->get_ptr()->render_for, 1,
                                     5)) { active->save(); }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -986,10 +963,10 @@ namespace llpp::gui
                 }
             }
 
-            ImGui::SetCursorPos({10, active ? 138.f : 45.f});
+            ImGui::SetCursorPos({10, active ? 73.f : 14.f});
             ImGui::Text("Vault limit (%%):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, active ? 135.f : 42.f});
+            ImGui::SetCursorPos({130, active ? 70.f : 11.f});
             if (ImGui::InputInt("##vault_threshold",
                                 config::bots::drops::vault_alert_threshold.get_ptr(), 5,
                                 10)) {
@@ -1091,6 +1068,63 @@ namespace llpp::gui
                         "is created but remains inactive.\n"
                         "You can toggle its state at runtime or "
                         "through the discord bot.");
+                }
+            }
+        }
+        end_child();
+        ImGui::SameLine();
+        ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
+        begin_child("Rerolling", ImVec2(270, ImGui::GetWindowHeight() * 0.5));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Loot Channel:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({100, 11});
+            if (ImGui::InputText("##loot_channel",
+                                 config::bots::drops::loot_channel.get_ptr())) {
+                config::bots::drops::loot_channel.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The channel to post the crate loot to, leave empty to post to info channel.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Reroll Role:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.55f);
+            ImGui::SetCursorPos({100, 42});
+            if (ImGui::InputText("##reroll_role",
+                                 config::bots::drops::reroll_role.get_ptr())) {
+                config::bots::drops::reroll_role.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "The role to mention when a drop is ready to be rerolled.\n"
+                    "Leave empty to not mention any role.");
+            }
+
+            ImGui::SetCursorPos({10, 73});
+            if (ImGui::Checkbox("Reroll Mode Enabled",
+                                config::bots::drops::reroll_mode.get_ptr())) {
+                config::bots::drops::reroll_mode.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                    "[GLOBAL]\nWhen enabled, Ling Ling++ will "
+                    "request a reroll of a found crate.");
+            }
+            if (active) {
+                ImGui::SetCursorPos({10, 104});
+                if (ImGui::Checkbox("Overrule reroll mode",
+                                    &active->get_ptr()->overrule_reroll_mode)) {
+                    active->save();
+                }
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                    ImGui::SetTooltip(
+                        "Enable to ignore the reroll mode for this crate "
+                        "manager, drops are always looted.");
                 }
             }
         }

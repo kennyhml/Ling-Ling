@@ -71,6 +71,20 @@ namespace llpp::bots::crafting
         }
     }
 
+    bool CraftingManager::is_spark_ready() const
+    {
+        if (spark::disabled.get() || spark_stations_.empty()) { return false; }
+        // TODO: Allow partial completion by checking if any is ready
+        return spark_stations_[0]->is_ready();
+    }
+
+    bool CraftingManager::is_gunpowder_ready() const
+    {
+        if (gunpowder::disabled.get() || gunpowder_stations_.empty()) { return false; }
+        // TODO: Allow partial completion by checking if any is ready
+        return gunpowder_stations_[0]->is_ready();
+    }
+
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
@@ -79,10 +93,7 @@ namespace llpp::bots::crafting
 
     bool CraftingManager::is_ready_to_run() const
     {
-        using namespace config::bots::crafting;
-
-        return (!spark::disabled.get() && spark_stations_[0]->is_ready()) || (!
-            gunpowder::disabled.get() && gunpowder_stations_[0]->is_ready());
+        return is_spark_ready() || is_gunpowder_ready();
     }
 
     void CraftingManager::register_slash_commands()

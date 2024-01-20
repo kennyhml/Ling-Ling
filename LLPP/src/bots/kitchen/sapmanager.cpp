@@ -1,5 +1,4 @@
 #include "sapmanager.h"
-
 #include "../../common/util.h"
 #include "../../config/config.h"
 
@@ -18,12 +17,16 @@ namespace llpp::bots::kitchen
 
     bool SapManager::run()
     {
-        if (!is_ready_to_run() || config::bots::sap::disabled.get()) { return false; }
+        if (!is_ready_to_run()) { return false; }
         for (const auto& station : stations_) { station->complete(); }
         return true;
     }
 
-    bool SapManager::is_ready_to_run() const { return stations_[0]->is_ready(); }
+    bool SapManager::is_ready_to_run() const
+    {
+        if (config::bots::sap::disabled.get() || stations_.empty()) { return false; }
+        return stations_[0]->is_ready();
+    }
 
     std::chrono::minutes SapManager::get_time_left_until_ready() const
     {

@@ -58,13 +58,11 @@ namespace llpp::core
         tasks_.emplace_back("FARMING", farm::run_while_requested);
 
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
-        tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
-
         for (auto& [key, config] : config::bots::drops::configs) {
             tasks_.emplace_back(
                 key, std::make_unique<drops::CrateManager>(*config.get_ptr()));
         }
-
+        tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());
         tasks_.emplace_back("SAP", std::make_unique<kitchen::SapManager>());
         has_collected_tasks_ = true;
