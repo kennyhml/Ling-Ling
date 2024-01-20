@@ -42,6 +42,8 @@ namespace llpp::config
         inline ManagedVar<std::string> assets_dir(BASE, "assets", save, "assets");
         inline ManagedVar<std::string> itemdata(BASE, "itemdata", save, "itemdata.json");
         inline ManagedVar<std::string> tessdata_dir(BASE, "tessdata", save, "tessdata");
+        inline ManagedVar<std::string> commands(BASE, "commands", save,
+                                                "gamma | debugstructures");
     }
 
     namespace discord

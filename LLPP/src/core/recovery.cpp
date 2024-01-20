@@ -3,6 +3,7 @@
 #include "discord.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/game/window.h>
+#include <asapp/interfaces/console.h>
 #include <asapp/interfaces/mainmenu.h>
 #include <asapp/interfaces/modeselect.h>
 #include <asapp/interfaces/serverselect.h>
@@ -31,10 +32,10 @@ namespace llpp::core
             need_reconnect = true;
         }
 
-        // inform_recovery_initiated(need_restart, need_reconnect);
+        inform_recovery_initiated(need_restart, need_reconnect);
         if (need_restart) { restart_game(); }
         reconnect_to_server();
-        // inform_recovery_successful(util::get_elapsed<std::chrono::seconds>(start));
+        inform_recovery_successful(util::get_elapsed<std::chrono::seconds>(start));
         asa::core::set_crash_aware(false);
 
         if (asa::interfaces::spawn_map->is_open()) {
@@ -82,6 +83,7 @@ namespace llpp::core
         }
 
         std::cout << "[+] Game restarted.\n";
+        asa::interfaces::console->execute(config::general::bot::commands.get());
     }
 
     void exit_game()
