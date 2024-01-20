@@ -1,5 +1,8 @@
 #include <iostream>
 #include "pastestation.h"
+
+#include <asapp/core/config.h>
+#include <asapp/core/state.h>
 #include <asapp/entities/exceptions.h>
 #include <asapp/structures/exceptions.h>
 #include <asapp/entities/localplayer.h>
@@ -12,13 +15,13 @@
 namespace llpp::bots::paste
 {
     PasteStation::PasteStation(std::string name, std::chrono::minutes interval) :
-        BaseStation(name, interval), bed(asa::structures::SimpleBed(name)) {};
+        BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI") {};
 
     core::StationResult PasteStation::complete()
     {
         auto start = std::chrono::system_clock::now();
 
-        asa::entities::local_player->fast_travel_to(bed);
+        asa::entities::local_player->fast_travel_to(bed_);
         empty_all();
         int pasteObtained = deposit_paste();
         set_completed();
@@ -60,6 +63,7 @@ namespace llpp::bots::paste
         asa::entities::local_player->turn_right(90);
         empty(achatinas[5]);
 
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(12, std::chrono::milliseconds(300));
 
@@ -74,7 +78,10 @@ namespace llpp::bots::paste
     int PasteStation::deposit_paste()
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        asa::entities::local_player->turn_left(135, std::chrono::milliseconds(300));
+        asa::entities::local_player->set_yaw(180);
+        asa::core::sleep_for(std::chrono::seconds(1));
+
+        if (!turn_until_deposit()) { return 0; }
 
         int amount = 0;
         try {
@@ -85,6 +92,7 @@ namespace llpp::bots::paste
             else {
                 asa::entities::local_player->deposit_into_dedi(
                     *asa::items::resources::achatina_paste, nullptr);
+                return util::get_elapsed<std::chrono::minutes>(last_completed_).count();
             }
         }
         catch (const asa::structures::StructureError&) {
@@ -93,5 +101,24 @@ namespace llpp::bots::paste
                 *asa::items::resources::achatina_paste, nullptr);
         }
         return amount;
+    }
+
+    bool PasteStation::turn_until_deposit() const
+    {
+        if (dedi_.can_deposit()) { return true; }
+
+        for (int i = 0; i < 3; i++) {
+            asa::entities::local_player->turn_left(45, std::chrono::milliseconds(500));
+            if (dedi_.can_deposit()) { return true; }
+        }
+        // return to where we started turning left and go right instead.
+        asa::entities::local_player->set_yaw(180);
+        asa::core::sleep_for(std::chrono::seconds(1));
+
+        for (int i = 0; i < 3; i++) {
+            asa::entities::local_player->turn_right(45, std::chrono::milliseconds(500));
+            if (dedi_.can_deposit()) { return true; }
+        }
+        return false;
     }
 }
