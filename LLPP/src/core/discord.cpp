@@ -106,7 +106,7 @@ namespace llpp::core::discord
         if (users.get_ptr()->empty() && roles.get_ptr()->empty()) { return true; }
 
         // check if the user has any of the authorized roles
-        if (std::ranges::any_of(user.roles, is_role_command_authorized)) { return true; }
+        if (std::ranges::any_of(user.get_roles(), is_role_command_authorized)) { return true; }
 
         // check if the user itself is authorized
         const auto allowed = users.get_ptr();

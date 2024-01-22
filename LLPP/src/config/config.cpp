@@ -1,7 +1,6 @@
 #include "config.h"
 #include <fstream>
 #include "required.h"
-#include "../bots/drops/config.h"
 #include <ShlObj.h>
 
 namespace llpp::config
@@ -33,7 +32,7 @@ namespace llpp::config
                     std::cerr << "\n\t[!] Failed to create the config files\n";
                 }
                 else {
-                    f << std::setw(4) << json::parse(required_data);
+                    f << std::setw(4) << nlohmann::ordered_json::parse(required_data);
                     std::cout << "Done.\n";
                     f.close();
                 }
@@ -41,7 +40,7 @@ namespace llpp::config
         }
     }
 
-    json& get_data()
+    nlohmann::ordered_json& get_data()
     {
         const auto path = get_appdata_path() / "llpp\\config\\config.json";
         if (!has_passed_initial_check) {
@@ -50,7 +49,7 @@ namespace llpp::config
         }
 
         std::ifstream f(path);
-        static json d = json::parse(f);
+        static nlohmann::ordered_json d = nlohmann::ordered_json::parse(f);
         f.close();
 
         if (!has_loaded_dynamic_maps) {

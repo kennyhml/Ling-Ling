@@ -6,7 +6,7 @@
 
 namespace llpp::config
 {
-    json& get_data();
+    nlohmann::ordered_json& get_data();
     void save();
 
     class BadConfigurationError final : public std::exception

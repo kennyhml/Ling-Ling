@@ -1,6 +1,5 @@
 #include "pastemanager.h"
 #include "../../common/util.h"
-#include "../../core/discord.h"
 #include "../../config/config.h"
 
 namespace llpp::bots::paste

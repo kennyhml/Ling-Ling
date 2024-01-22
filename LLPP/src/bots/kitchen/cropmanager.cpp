@@ -41,6 +41,7 @@ namespace llpp::bots::kitchen
         for (const auto& station : citronal_stations_) { station->complete(); }
         for (const auto& station : rockarrot_stations_) { station->complete(); }
         for (const auto& station : savoroot_stations_) { station->complete(); }
+		return true;
     }
 
     bool CropManager::is_ready_to_run() const

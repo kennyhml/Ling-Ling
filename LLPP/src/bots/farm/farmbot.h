@@ -2,7 +2,7 @@
 #include <asapp/entities/dinoent.h>
 #include <asapp/structures/cavelootcrate.h>
 #include <asapp/structures/simplebed.h>
-#include <dpp/user.h>
+#include "../../core/discord.h"
 
 namespace llpp::bots::farm
 {

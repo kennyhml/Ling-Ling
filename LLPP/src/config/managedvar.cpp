@@ -10,10 +10,10 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-            json& curr = walk_json(get_data());
+			nlohmann::ordered_json& curr = walk_json(get_data());
             value_ = curr.at(path_.back()).get<T>();
         }
-        catch (const json::out_of_range& e) { handle_not_found(e); }
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
         return value_;
     }
 
@@ -24,12 +24,12 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-            json& curr = walk_json(get_data());
+			nlohmann::ordered_json& curr = walk_json(get_data());
             // need to copy the const char to our value, otherwise itll get deleted
             // after we return the pointer to it.
             value_ = _strdup(curr.at(path_.back()).get<std::string>().c_str());
         }
-        catch (const json::out_of_range& e) { handle_not_found(e); }
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
         return value_;
     }
 
@@ -40,7 +40,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-            json& curr = walk_json(get_data());
+			nlohmann::ordered_json& curr = walk_json(get_data());
             // Need to copy each element into our value individually.
             const auto& array = curr.at(path_.back());
             value_.clear();
@@ -48,7 +48,7 @@ namespace llpp::config
                 value_.emplace_back(_strdup(element.get<std::string>().c_str()));
             }
         }
-        catch (const json::out_of_range& e) { handle_not_found(e); }
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
         return value_;
     }
 
@@ -59,7 +59,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-            json& curr = walk_json(get_data());
+			nlohmann::ordered_json& curr = walk_json(get_data());
             const std::string k = path_.back();
 
             if (!curr.contains(k)) { set(default_); }
@@ -84,7 +84,7 @@ namespace llpp::config
 
             value_.disabled = curr[k].value("disabled", default_.disabled);
         }
-        catch (const json::out_of_range& e) { handle_not_found(e); } catch (const
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); } catch (const
             std::exception& e) { std::cerr << "Uknown error " << e.what() << "\n"; }
         return value_;
     }
@@ -100,7 +100,7 @@ namespace llpp::config
     void ManagedVar<T>::save()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-        json& curr = walk_json(get_data(), true);
+		nlohmann::ordered_json& curr = walk_json(get_data(), true);
 
         curr[path_.back()] = value_;
         on_change_();
@@ -110,7 +110,7 @@ namespace llpp::config
     void ManagedVar<bots::drops::CrateManagerConfig>::save()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-        json& curr = walk_json(get_data(), true);
+		nlohmann::ordered_json& curr = walk_json(get_data(), true);
         const std::string k = path_.back();
 
         curr[k]["prefix"] = value_.prefix;
@@ -133,16 +133,16 @@ namespace llpp::config
     void ManagedVar<T>::erase()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-        json& curr = walk_json(get_data(), true);
+		nlohmann::ordered_json& curr = walk_json(get_data(), true);
 
         curr.erase(path_.back());
         on_change_();
     }
 
     template <typename T>
-    json& ManagedVar<T>::walk_json(json& data, const bool create_if_not_exist) const
+	nlohmann::ordered_json& ManagedVar<T>::walk_json(nlohmann::ordered_json& data, const bool create_if_not_exist) const
     {
-        json* curr = &data;
+        nlohmann::ordered_json* curr = &data;
         for (int i = 0; i < path_.size() - 1; i++) {
             if (create_if_not_exist) { curr = &(*curr)[path_[i]]; }
             else { curr = &curr->at(path_[i]); }
@@ -151,7 +151,7 @@ namespace llpp::config
     }
 
     template <typename T>
-    void ManagedVar<T>::handle_not_found(const json::out_of_range& e)
+    void ManagedVar<T>::handle_not_found(const nlohmann::ordered_json::out_of_range& e)
     {
         if (has_inserted_default_) { throw e; }
         std::cout << std::format(

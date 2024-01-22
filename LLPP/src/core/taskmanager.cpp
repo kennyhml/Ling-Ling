@@ -50,8 +50,6 @@ namespace llpp::core
 
     void TaskManager::collect_tasks()
     {
-        assert(!has_collected_tasks(),
-               "TaskManager::collect_tasks called twice on same instance.");
         using namespace llpp::bots;
 
         tasks_.emplace_back("STATE CHECK", player_state_check);

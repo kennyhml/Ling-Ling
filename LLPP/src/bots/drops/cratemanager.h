@@ -3,10 +3,9 @@
 #include "config.h"
 #include "lootcratestation.h"
 #include <asapp/structures/simplebed.h>
-#include <dpp/dpp.h>
+#include "../../core/discord.h"
 
 #define UNDEFINED_TIME std::chrono::system_clock::time_point()
-
 
 namespace llpp::bots::drops
 {
