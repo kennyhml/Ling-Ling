@@ -1,27 +1,37 @@
 #include <iostream>
 #include <asapp/core/exceptions.h>
 #include <asapp/core/init.h>
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
-#include <asapp/items/items.h>
-#include <asapp/interfaces/hud.h>
 #include <asapp/interfaces/console.h>
-
-#include <asapp/structures/dedicatedstorage.h>
-#include <opencv2/highgui.hpp>
+#include <asapp/interfaces/hud.h>
 
 #include "auth/auth.h"
-#include "bots/drops/embeds.h"
 #include "bots/farm/commands.h"
-#include "bots/kitchen/cropmanager.h"
-#include "common/util.h"
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/discord.h"
 #include "core/recovery.h"
-#include "core/task.h"
 #include "core/taskmanager.h"
+#include "common/util.h"
+
 
 static bool running = false;
+
+
+class TerminatedError : public std::exception
+{
+public:
+    using exception::exception;
+};
+
+
+void check_terminated()
+{
+    if (!running) {
+        throw TerminatedError();
+    }
+}
 
 void llpp_main()
 {
@@ -43,35 +53,33 @@ void llpp_main()
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
     }
-    catch (const llpp::config::BadConfigurationError& e) {
+    catch (const llpp::config::BadConfigurationError &e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
-    } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
-
-
-    auto fab = asa::structures::Container("t", 0);
-
-    fab.get_inventory()->popcorn_all();
-    return;
-
+    } catch (const std::exception &e) { std::cerr << e.what() << "\n"; }
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
     asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
     asa::entities::local_player->reset_view_angles();
-    while (running) {
+    while (true) {
         try { taskmanager.execute_next(); }
-        catch (asa::core::ShooterGameError& e) {
+        catch (asa::core::ShooterGameError &e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
-        } catch (const std::exception& e) {
+        } catch (const TerminatedError &) {
+            break;
+        }
+        catch (const std::exception &e) {
             llpp::core::discord::inform_fatal_error(
-                e, taskmanager.get_previous_task()->get_name());
+                    e, taskmanager.get_previous_task()->get_name());
             running = false;
         }
+
     }
 
     llpp::core::discord::bot->shutdown();
+    std::cout << "[+] Ling Ling++ has terminated!" << std::endl;
 }
 
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
@@ -79,7 +87,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 {
     if (!AllocConsole()) { return false; }
 
-    FILE* pFile;
+    FILE *pFile;
     if (freopen_s(&pFile, "CONIN$", "r", stdin) != 0) {
         // Handle error, if any
         return false;
@@ -102,13 +110,16 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     llpp::gui::create_imgui();
 
 
+    asa::core::register_state_callback(check_terminated);
+
     while (llpp::gui::exit) {
         llpp::gui::begin_render();
 
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowSize({
-            ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y
-        });
+                                         ImGui::GetIO().DisplaySize.x,
+                                         ImGui::GetIO().DisplaySize.y
+                                 });
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(620, 420));
@@ -122,7 +133,9 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
             std::thread(llpp_main).detach();
         }
 
-        if ((GetAsyncKeyState(VK_F3) & 0x1) && running) { running = false; }
+        if ((GetAsyncKeyState(VK_F3) & 0x1) && running) {
+            std::cout << "[+] Termination signal sent, please give it a few seconds...\n";
+            running = false; }
     }
 
     llpp::gui::destroy_imgui();
