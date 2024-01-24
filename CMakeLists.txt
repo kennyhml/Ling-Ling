@@ -58,8 +58,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/kitchen/sapstation.h
         LLPP/src/bots/paste/embeds.cpp
         LLPP/src/bots/paste/embeds.h
-        LLPP/src/bots/paste/grindstation.cpp
-        LLPP/src/bots/paste/grindstation.h
+        LLPP/src/bots/crafting/grindstation.cpp
+        LLPP/src/bots/crafting/grindstation.h
         LLPP/src/bots/paste/pastemanager.cpp
         LLPP/src/bots/paste/pastemanager.h
         LLPP/src/bots/paste/pastestation.cpp

@@ -63,18 +63,20 @@ void llpp_main()
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_view_angles();
-        while (true) {
-            try { taskmanager.execute_next(); }
-            catch (asa::core::ShooterGameError& e) {
-                llpp::core::inform_crash_detected(e);
-                llpp::core::recover();
-            } catch (const std::exception& e) {
-                llpp::core::discord::inform_fatal_error(
-                        e, taskmanager.get_previous_task()->get_name());
-                running = false;
-            }
-        }
     } catch (const TerminatedError&) {}
+
+    while (running) {
+        try { taskmanager.execute_next(); }
+        catch (asa::core::ShooterGameError& e) {
+            llpp::core::inform_crash_detected(e);
+            llpp::core::recover();
+        } catch (const TerminatedError&) { break; }
+        catch (const std::exception& e) {
+            llpp::core::discord::inform_fatal_error(
+                    e, taskmanager.get_previous_task()->get_name());
+            running = false;
+        }
+    }
 
     llpp::core::discord::bot->shutdown();
     std::cout << "[+] Ling Ling++ has terminated!" << std::endl;

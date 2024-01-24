@@ -16,8 +16,7 @@ namespace llpp::bots::paste
         const char* PASTE_ICON_URL =
                 "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/0/03/Cementing_Paste.png/revision/latest?cb=20180801020251";
 
-        const char* GRINDER_ICON_URL =
-                "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/f/fe/Industrial_Grinder.png/revision/latest/scale-to-width-down/228?cb=20160728174054";
+
     }
 
     void send_paste_collected(const core::StationResult& data)
@@ -45,28 +44,6 @@ namespace llpp::bots::paste
         if (obtained == "N/A") {
             embed.set_footer({"Amount of paste collected could not be deduced."});
         }
-        auto msg = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(msg);
-    }
-
-    void send_paste_grinded(const core::StationResult& data, const bool grinder_emptied)
-    {
-        auto next = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
-                        get_completion_interval());
-
-        auto embed = dpp::embed();
-        embed.set_color(dpp::colors::white).
-                set_title(std::format("Grind Station '{}' has been completed.",
-                                      data.get_station()->get_name())).set_description(
-                std::format("The station was completed successfully {} times!",
-                            data.get_station()->get_times_completed())).
-                set_thumbnail(GRINDER_ICON_URL).add_field(
-                "Time taken:", std::format("{} seconds", data.get_time_taken().count()),
-                true).add_field("Grinder emptied:", grinder_emptied ? "Yes" : "No",
-                                true).add_field("Next completion:",
-                                                std::format("<t:{}:R>", next), true);
-
         auto msg = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(msg);
     }

@@ -4,8 +4,7 @@
 #include <asapp/structures/simplebed.h>
 #include <asapp/structures/dedicatedstorage.h>
 
-
-namespace llpp::bots::paste
+namespace llpp::bots::crafting
 {
     class GrindStation final : public core::BaseStation
     {

@@ -12,7 +12,7 @@ namespace llpp::bots::crafting
     {
         CraftingManager* instance = nullptr;
 
-        template <typename T>
+        template<typename T>
         void create(std::vector<std::unique_ptr<T>>& into, const int num,
                     const std::string& name, const std::chrono::minutes interval)
         {
@@ -33,6 +33,9 @@ namespace llpp::bots::crafting
         create(gunpowder_stations_, gunpowder::num_stations.get(),
                gunpowder::prefix.get(), std::chrono::minutes(gunpowder::interval.get()));
 
+        create(grinding_stations_, grinding::num_stations.get(),
+               grinding::prefix.get(), std::chrono::minutes(grinding::interval.get()));
+
         register_slash_commands();
     }
 
@@ -43,6 +46,7 @@ namespace llpp::bots::crafting
         if (!is_ready_to_run()) { return false; }
         run_spark();
         run_gunpowder();
+        run_grinding();
 
         return true;
     }
@@ -50,8 +54,8 @@ namespace llpp::bots::crafting
     void CraftingManager::run_spark() const
     {
         if (spark::disabled.get()) { return; }
-        for (const auto& station : spark_stations_) {
-            try { if (station->is_ready()) { station->complete(); } }
+        for (const auto& station: spark_stations_) {
+            try { if (station->is_ready()) { station->complete(); }}
             catch (const StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
                 station->set_disabled(true);
@@ -62,12 +66,20 @@ namespace llpp::bots::crafting
     void CraftingManager::run_gunpowder() const
     {
         if (gunpowder::disabled.get()) { return; }
-        for (const auto& station : gunpowder_stations_) {
-            try { if (station->is_ready()) { station->complete(); } }
+        for (const auto& station: gunpowder_stations_) {
+            try { if (station->is_ready()) { station->complete(); }}
             catch (const StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
                 station->set_disabled(true);
             }
+        }
+    }
+
+    void CraftingManager::run_grinding() const
+    {
+        if (grinding::disabled.get()) { return; }
+        for (const auto& station: grinding_stations_) {
+            if (station->is_ready()) { station->complete(); }
         }
     }
 
@@ -85,15 +97,22 @@ namespace llpp::bots::crafting
         return gunpowder_stations_[0]->is_ready();
     }
 
+    bool CraftingManager::is_grinding_ready() const
+    {
+        if (grinding::disabled.get() || grinding_stations_.empty()) { return false; }
+        // TODO: Allow partial completion by checking if any is ready
+        return gunpowder_stations_[0]->is_ready();
+    }
+
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
-            spark_stations_[0]->get_next_completion());
+                spark_stations_[0]->get_next_completion());
     }
 
     bool CraftingManager::is_ready_to_run() const
     {
-        return is_spark_ready() || is_gunpowder_ready();
+        return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready();
     }
 
     void CraftingManager::register_slash_commands()
@@ -102,22 +121,25 @@ namespace llpp::bots::crafting
 
         dpp::slashcommand crafting("crafting", "Controls the crafting manager", 0);
 
-        dpp::command_option enable(dpp::co_sub_command, "enable",
+        dpp::command_option enable(dpp::co_sub_command,
+                                   "enable",
                                    "Enable completion of a managed crafting station.");
 
-        dpp::command_option enable_field(dpp::co_string, "station",
+        dpp::command_option enable_field(dpp::co_string,
+                                         "station",
                                          "The station to enable", true);
 
-        for (const auto& station : instance->spark_stations_) {
+        for (const auto& station: instance->spark_stations_) {
             std::cout << station->get_name();
             enable_field.add_choice({station->get_name(), station->get_name()});
         }
-        for (const auto& station : instance->gunpowder_stations_) {
+        for (const auto& station: instance->gunpowder_stations_) {
             std::cout << station->get_name();
             enable_field.add_choice({station->get_name(), station->get_name()});
         }
 
-        dpp::command_option disable(dpp::co_sub_command, "disable",
+        dpp::command_option disable(dpp::co_sub_command,
+                                    "disable",
                                     "Disable completion of a managed crafting station.");
 
         auto disable_field = enable_field;
@@ -141,27 +163,28 @@ namespace llpp::bots::crafting
         if (subcommand.name == "enable") {
             auto station_name = subcommand.get_value<std::string>(0);
 
-            for (const auto& station : instance->spark_stations_) {
+            for (const auto& station: instance->spark_stations_) {
                 if (station->get_name() == station_name) {
                     if (!station->get_disabled()) {
                         return event.reply(std::format(
-                            "Sparkpowder Station '{}' is already enabled.",
-                            station_name));
+                                "Sparkpowder Station '{}' is already enabled.",
+                                station_name));
                     }
                     station->set_disabled(false);
                     return event.reply(std::format(
-                        "Sparkpowder Station '{}' has been enabled.", station_name));
+                            "Sparkpowder Station '{}' has been enabled.", station_name));
                 }
             }
-            for (const auto& station : instance->gunpowder_stations_) {
+            for (const auto& station: instance->gunpowder_stations_) {
                 if (station->get_name() == station_name) {
                     if (!station->get_disabled()) {
                         return event.reply(std::format(
-                            "Gunpowder Station '{}' is already enabled.", station_name));
+                                "Gunpowder Station '{}' is already enabled.",
+                                station_name));
                     }
                     station->set_disabled(false);
                     return event.reply(std::format(
-                        "Gunpowder Station '{}' has been enabled.", station_name));
+                            "Gunpowder Station '{}' has been enabled.", station_name));
                 }
             }
             return event.reply(std::format("No station named '{}' was found.",
@@ -170,26 +193,28 @@ namespace llpp::bots::crafting
         if (subcommand.name == "disable") {
             auto name = subcommand.get_value<std::string>(0);
 
-            for (const auto& station : instance->spark_stations_) {
+            for (const auto& station: instance->spark_stations_) {
                 if (station->get_name() == name) {
                     if (station->get_disabled()) {
                         return event.reply(std::format(
-                            "Sparkpowder Station '{}' is already disabled.", name));
+                                "Sparkpowder Station '{}' is already disabled.", name));
                     }
                     station->set_disabled(true);
                     return event.reply(
-                        std::format("Sparkpowder Station '{}' has been disabled.", name));
+                            std::format("Sparkpowder Station '{}' has been disabled.",
+                                        name));
                 }
             }
-            for (const auto& station : instance->gunpowder_stations_) {
+            for (const auto& station: instance->gunpowder_stations_) {
                 if (station->get_name() == name) {
                     if (station->get_disabled()) {
                         return event.reply(std::format(
-                            "Gunpowder Station '{}' is already disabled.", name));
+                                "Gunpowder Station '{}' is already disabled.", name));
                     }
                     station->set_disabled(true);
                     return event.reply(
-                        std::format("Gunpowder Station '{}' has been disabled.", name));
+                            std::format("Gunpowder Station '{}' has been disabled.",
+                                        name));
                 }
             }
             return event.reply(std::format("No station named '{}' was found.", name));

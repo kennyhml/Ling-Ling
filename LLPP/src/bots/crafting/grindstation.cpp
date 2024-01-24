@@ -4,12 +4,11 @@
 #include "embeds.h"
 #include "asapp/entities/localplayer.h"
 
-namespace llpp::bots::paste
+namespace llpp::bots::crafting
 {
     GrindStation::GrindStation(std::string name, const std::chrono::minutes interval) :
         BaseStation(std::move(name), interval), bed_(name_),
         grinder_(name_ + "::GRINDER", 120), paste_dedi_(name_ + "::PASTE") {}
-
 
     core::StationResult GrindStation::complete()
     {

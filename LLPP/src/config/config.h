@@ -176,5 +176,35 @@ namespace llpp::config
             inline ManagedVar<int> interval(BASE, "interval", save, 10);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
         }
+
+        namespace grinding
+        {
+            inline const std::vector<std::string> BASE{"bots", "crafting", "grinding"};
+
+            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "GRIND");
+            inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
+            inline ManagedVar<int> interval(BASE, "interval", save, 5);
+            inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        }
+
+        namespace forges
+        {
+            inline const std::vector<std::string> BASE{"bots", "crafting", "forges"};
+
+            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "FORGE");
+            inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
+            inline ManagedVar<int> interval(BASE, "interval", save, 5);
+            inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        }
+
+        namespace arb
+        {
+            inline const std::vector<std::string> BASE{"bots", "crafting", "arb"};
+
+            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "ARB");
+            inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
+            inline ManagedVar<int> interval(BASE, "interval", save, 15);
+            inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+        }
     }
 }

@@ -4,8 +4,6 @@
 #include "pastestation.h"
 #include <memory>
 
-#include "grindstation.h"
-
 namespace llpp::bots::paste
 {
     class PasteManager final : public core::IStationManager
@@ -20,7 +18,6 @@ namespace llpp::bots::paste
 
     private:
         std::vector<std::unique_ptr<PasteStation>> paste_stations_;
-        std::vector<std::unique_ptr<GrindStation>> grind_stations_;
 
         render::RenderStation render_station_{
             "PASTE::RENDER::SRC", std::chrono::seconds(10)
