@@ -259,7 +259,7 @@ namespace llpp::gui
 
     void render()
     {
-        ImGui::Begin("Ling Ling++ | v1.2.5", &exit,
+        ImGui::Begin("Ling Ling++ | v1.2.7", &exit,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
