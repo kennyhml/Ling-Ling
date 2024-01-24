@@ -53,30 +53,28 @@ void llpp_main()
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
     }
-    catch (const llpp::config::BadConfigurationError &e) {
+    catch (const llpp::config::BadConfigurationError& e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
-    } catch (const std::exception &e) { std::cerr << e.what() << "\n"; }
+    } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
-    asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
-    asa::entities::local_player->reset_view_angles();
-    while (true) {
-        try { taskmanager.execute_next(); }
-        catch (asa::core::ShooterGameError &e) {
-            llpp::core::inform_crash_detected(e);
-            llpp::core::recover();
-        } catch (const TerminatedError &) {
-            break;
+    try {
+        asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
+        asa::entities::local_player->reset_view_angles();
+        while (true) {
+            try { taskmanager.execute_next(); }
+            catch (asa::core::ShooterGameError& e) {
+                llpp::core::inform_crash_detected(e);
+                llpp::core::recover();
+            } catch (const std::exception& e) {
+                llpp::core::discord::inform_fatal_error(
+                        e, taskmanager.get_previous_task()->get_name());
+                running = false;
+            }
         }
-        catch (const std::exception &e) {
-            llpp::core::discord::inform_fatal_error(
-                    e, taskmanager.get_previous_task()->get_name());
-            running = false;
-        }
-
-    }
+    } catch (const TerminatedError&) {}
 
     llpp::core::discord::bot->shutdown();
     std::cout << "[+] Ling Ling++ has terminated!" << std::endl;
@@ -87,7 +85,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 {
     if (!AllocConsole()) { return false; }
 
-    FILE *pFile;
+    FILE* pFile;
     if (freopen_s(&pFile, "CONIN$", "r", stdin) != 0) {
         // Handle error, if any
         return false;
@@ -136,7 +134,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 
         if ((GetAsyncKeyState(VK_F3) & 0x1) && running) {
             std::cout << "[+] Termination signal sent, please give it a few seconds...\n";
-            running = false; }
+            running = false;
+        }
     }
 
     llpp::gui::destroy_imgui();
