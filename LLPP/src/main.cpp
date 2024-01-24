@@ -14,7 +14,7 @@
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include "common/util.h"
-
+#include "bots/crafting/forgestation.h"
 
 static bool running = false;
 
@@ -63,6 +63,7 @@ void llpp_main()
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_view_angles();
+        asa::core::sleep_for(std::chrono::seconds(1));
     } catch (const TerminatedError&) {}
 
     while (running) {

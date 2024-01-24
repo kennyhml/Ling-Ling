@@ -35,7 +35,8 @@ namespace llpp::bots::crafting
 
         create(grinding_stations_, grinding::num_stations.get(),
                grinding::prefix.get(), std::chrono::minutes(grinding::interval.get()));
-
+        create(forge_stations_, forges::num_stations.get(),
+               forges::prefix.get(), std::chrono::minutes(forges::interval.get()));
         register_slash_commands();
     }
 
@@ -47,6 +48,7 @@ namespace llpp::bots::crafting
         run_spark();
         run_gunpowder();
         run_grinding();
+        run_forges();
 
         return true;
     }
@@ -83,6 +85,14 @@ namespace llpp::bots::crafting
         }
     }
 
+    void CraftingManager::run_forges() const
+    {
+        if (forges::disabled.get()) { return; }
+        for (const auto& station: forge_stations_) {
+            if (station->is_ready()) { station->complete(); }
+        }
+    }
+
     bool CraftingManager::is_spark_ready() const
     {
         if (spark::disabled.get() || spark_stations_.empty()) { return false; }
@@ -104,6 +114,13 @@ namespace llpp::bots::crafting
         return gunpowder_stations_[0]->is_ready();
     }
 
+    bool CraftingManager::is_forges_ready() const
+    {
+        if (forges::disabled.get() || forge_stations_.empty()) { return false; }
+        // TODO: Allow partial completion by checking if any is ready
+        return forge_stations_[0]->is_ready();
+    }
+
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
@@ -112,7 +129,8 @@ namespace llpp::bots::crafting
 
     bool CraftingManager::is_ready_to_run() const
     {
-        return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready();
+        return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready() ||
+               is_forges_ready();
     }
 
     void CraftingManager::register_slash_commands()

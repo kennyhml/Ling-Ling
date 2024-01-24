@@ -100,6 +100,8 @@ add_executable(LLPP WIN32
         LLPP/src/gui/gui.cpp
         LLPP/src/gui/gui.h
         LLPP/src/main.cpp
+        LLPP/src/bots/crafting/forgestation.cpp
+        LLPP/src/bots/crafting/forgestation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
