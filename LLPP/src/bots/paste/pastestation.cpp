@@ -1,13 +1,10 @@
 #include <iostream>
 #include "pastestation.h"
-
-#include <asapp/core/config.h>
 #include <asapp/core/state.h>
 #include <asapp/entities/exceptions.h>
 #include <asapp/structures/exceptions.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/items/items.h>
-
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
@@ -15,7 +12,8 @@
 namespace llpp::bots::paste
 {
     PasteStation::PasteStation(std::string name, std::chrono::minutes interval) :
-        BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI") {};
+            BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI")
+    {};
 
     core::StationResult PasteStation::complete()
     {
@@ -23,15 +21,14 @@ namespace llpp::bots::paste
 
         asa::entities::local_player->fast_travel_to(bed_);
         empty_all();
-        int pasteObtained = deposit_paste();
+        int obtained = deposit_paste();
         set_completed();
 
         auto duration = util::get_elapsed<std::chrono::seconds>(start);
-        core::StationResult resultData(this, true, duration,
-                                       {{"Achatina Paste", pasteObtained}});
+        core::StationResult res(this, true, duration, {{"Achatina Paste", obtained}});
 
-        send_paste_collected(resultData);
-        return resultData;
+        send_paste_collected(res);
+        return res;
     }
 
     bool PasteStation::empty(asa::entities::DinoEnt& achatina)
@@ -81,24 +78,27 @@ namespace llpp::bots::paste
         asa::entities::local_player->set_yaw(180);
         asa::core::sleep_for(std::chrono::seconds(1));
 
-        if (!turn_until_deposit()) { return 0; }
+        if (!turn_until_deposit()) {
+            send_paste_not_deposited(name_);
+            return 0;
+        }
 
         int amount = 0;
         try {
             if (config::bots::paste::ocr_amount.get()) {
                 asa::entities::local_player->deposit_into_dedi(
-                    *asa::items::resources::achatina_paste, &amount);
-            }
-            else {
+                        *asa::items::resources::achatina_paste, &amount);
+            } else {
                 asa::entities::local_player->deposit_into_dedi(
-                    *asa::items::resources::achatina_paste, nullptr);
-                return util::get_elapsed<std::chrono::minutes>(last_completed_).count();
+                        *asa::items::resources::achatina_paste, nullptr);
+                return util::get_elapsed<std::chrono::minutes>(last_completed_).count() *
+                       6;
             }
         }
         catch (const asa::structures::StructureError&) {
             std::cerr << "[!] Depositing & OCR failed, trying without...\n";
             asa::entities::local_player->deposit_into_dedi(
-                *asa::items::resources::achatina_paste, nullptr);
+                    *asa::items::resources::achatina_paste, nullptr);
         }
         return amount;
     }
