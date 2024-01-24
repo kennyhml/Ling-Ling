@@ -96,25 +96,25 @@ namespace llpp::bots::paste
     void GrindStation::deposit_items()
     {
         asa::entities::local_player->crouch();
-        asa::entities::local_player->turn_down(20, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_down(20, std::chrono::milliseconds(600));
 
-        asa::entities::local_player->turn_left(20, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_left(20, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
-        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
         asa::entities::local_player->stand_up();
-        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
-        asa::entities::local_player->turn_left(40, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_left(40, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
-        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
-        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(300));
+        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(600));
         asa::controls::press(asa::settings::use);
 
         asa::entities::local_player->set_yaw(0);

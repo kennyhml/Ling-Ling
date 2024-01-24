@@ -128,6 +128,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         ImGui::PopStyleVar(2);
         llpp::gui::end_render();
 
+
         if ((GetAsyncKeyState(VK_F1) & 0x1) && !running) {
             running = true;
             std::thread(llpp_main).detach();

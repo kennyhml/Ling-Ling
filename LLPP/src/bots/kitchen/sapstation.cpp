@@ -52,6 +52,7 @@ namespace llpp::bots::kitchen
         asa::core::sleep_for(std::chrono::seconds(2));
         storage_box_slots_ = storage_box_.get_current_slots();
         asa::entities::local_player->get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(2));
+        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::entities::local_player->crouch();
     }
 }

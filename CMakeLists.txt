@@ -114,8 +114,10 @@ link_directories(${OpenCV_LIB_DIR})
 
 # asapp
 include_directories("C:/dev/ASAPP/ASAPP/include")
-target_link_libraries(LLPP PRIVATE "C:/dev/ASAPP/build/debug/asapp.lib")
-
+target_link_libraries(LLPP PRIVATE
+        $<$<CONFIG:Debug>: "C:/dev/ASAPP/build/debug/asapp.lib">
+        $<$<CONFIG:Release>: "C:/dev/ASAPP/build/release/asapp.lib">
+)
 
 # tesseract
 find_package(Tesseract CONFIG REQUIRED)
@@ -125,5 +127,8 @@ target_link_libraries(LLPP PRIVATE Tesseract::libtesseract)
 target_link_libraries(LLPP PRIVATE d3d9.lib)
 
 # auth
-target_link_libraries(LLPP PRIVATE "C:/dev/LLPP/LLPP/external/keyauth/authd.lib")
+target_link_libraries(LLPP PRIVATE
+        $<$<CONFIG:Debug>: "C:/dev/LLPP/LLPP/external/keyauth/authd.lib">
+        $<$<CONFIG:Release>: "C:/dev/LLPP/LLPP/external/keyauth/auth.lib">
+)
 target_link_libraries(LLPP PRIVATE "C:/dev/LLPP/LLPP/external/keyauth/libcurl.lib")
