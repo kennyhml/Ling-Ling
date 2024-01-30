@@ -5,11 +5,11 @@
 
 namespace llpp::bots::crafting
 {
-    void send_spark_crafted(const core::StationResult& data);
+    void send_spark_crafted(const core::StationResult& data, bool was_crafting);
 
-    void send_gunpowder_crafted(const core::StationResult& data);
+    void send_gunpowder_crafted(const core::StationResult& data, bool was_crafting);
 
-    void send_arb_crafted(const core::StationResult& data);
+    void send_arb_crafted(const core::StationResult& data, bool was_crafting);
 
     void send_paste_grinded(const core::StationResult& data, bool grinder_emptied);
 

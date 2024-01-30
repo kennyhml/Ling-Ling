@@ -14,7 +14,7 @@
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include "common/util.h"
-#include "bots/crafting/forgestation.h"
+#include "bots/crafting/arbstation.h"
 
 static bool running = false;
 
@@ -59,6 +59,10 @@ void llpp_main()
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
+
+    while (true) {
+        std::cout << asa::interfaces::hud->detected_enemy() << std::endl;
+    }
 
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
@@ -105,6 +109,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     }
 
     llpp::auth::login();
+
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

@@ -26,70 +26,86 @@ namespace llpp::bots::crafting
                 "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/c/c5/Industrial_Forge.png/revision/latest?cb=20151126023709";
     }
 
-    void send_spark_crafted(const core::StationResult& data)
+    void send_spark_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
                 std::chrono::system_clock::now() + data.get_station()->
                         get_completion_interval());
 
         auto embed = dpp::embed();
-        embed.set_color(dpp::colors::orange).
-                set_title(std::format("Sparkpowder Station '{}' has been looted!",
-                                      data.get_station()->get_name())).set_description(
-                std::format("Crafted spark successfully {} times!",
-                            data.get_station()->get_times_completed())).
-                     set_thumbnail(SPARK_ICON_URL).add_field("Time taken:",
-                                                             std::format(
-                                                                     "{} seconds",
-                                                                     data.get_time_taken().count()),
-                                                             true).add_field(
-                "Next completion:", std::format("<t:{}:R>", next_completion), true);
+        embed.set_color(dpp::colors::orange)
+             .set_title(std::format("Sparkpowder Station '{}' has been looted!",
+                                    data.get_station()->get_name()))
+             .set_description(
+                     std::format("Crafted spark successfully {} times!",
+                                 data.get_station()->get_times_completed()))
+             .set_thumbnail(SPARK_ICON_URL)
+             .add_field("Time taken:",
+                        std::format("{} seconds", data.get_time_taken().count()),
+                        true)
+             .add_field(
+                     "Next completion:", std::format("<t:{}:R>", next_completion), true);
+
+        if (was_crafting) {
+            embed.set_footer({"Items were still queued, higher interval recommended."});
+        }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(message);
     }
 
-    void send_gunpowder_crafted(const core::StationResult& data)
+    void send_gunpowder_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
                 std::chrono::system_clock::now() + data.get_station()->
                         get_completion_interval());
 
         auto embed = dpp::embed();
-        embed.set_color(dpp::colors::black).
-                set_title(std::format("Gunpowder Station '{}' has been looted!",
-                                      data.get_station()->get_name())).set_description(
-                std::format("Crafted gunpowder successfully {} times!",
-                            data.get_station()->get_times_completed())).
-                     set_thumbnail(GP_ICON_URL).add_field("Time taken:",
-                                                          std::format(
-                                                                  "{} seconds",
-                                                                  data.get_time_taken().count()),
-                                                          true).add_field(
-                "Next completion:", std::format("<t:{}:R>", next_completion), true);
+        embed.set_color(dpp::colors::black)
+             .set_title(std::format("Gunpowder Station '{}' has been looted!",
+                                    data.get_station()->get_name()))
+             .set_description(
+                     std::format("Crafted gunpowder successfully {} times!",
+                                 data.get_station()->get_times_completed()))
+             .set_thumbnail(GP_ICON_URL)
+             .add_field("Time taken:",
+                        std::format("{} seconds", data.get_time_taken().count()),
+                        true)
+             .add_field(
+                     "Next completion:", std::format("<t:{}:R>", next_completion), true);
+
+        if (was_crafting) {
+            embed.set_footer({"Items were still queued, higher interval recommended."});
+        }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(message);
     }
 
-    void send_arb_crafted(const core::StationResult& data)
+    void send_arb_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
                 std::chrono::system_clock::now() + data.get_station()->
                         get_completion_interval());
 
+        const int produced = data.get_obtained_items().at("Advanced Rifle Bullet");
+
         auto embed = dpp::embed();
-        embed.set_color(dpp::colors::black).
-                set_title(std::format("ARB Station '{}' has been looted!",
-                                      data.get_station()->get_name())).set_description(
-                std::format("Crafted ARB successfully {} times!",
-                            data.get_station()->get_times_completed())).
-                     set_thumbnail(ARB_ICON_URL).add_field("Time taken:",
-                                                           std::format(
-                                                                   "{} seconds",
-                                                                   data.get_time_taken().count()),
-                                                           true).add_field(
-                "Next completion:", std::format("<t:{}:R>", next_completion), true);
+        embed.set_color(0xC59A7B)
+             .set_title(std::format("ARB Station '{}' has been completed!",
+                                    data.get_station()->get_name()))
+             .set_description(std::format("Crafted ARB successfully {} times!",
+                                          data.get_station()->get_times_completed()))
+             .set_thumbnail(ARB_ICON_URL)
+             .add_field("Time taken:",
+                        std::format("{} seconds", data.get_time_taken().count()), true)
+             .add_field("Produced:", "~" + std::to_string(produced), true)
+             .add_field("Next completion:", std::format("<t:{}:R>", next_completion),
+                        true);
+
+        if (was_crafting) {
+            embed.set_footer({"Items were still queued, higher interval recommended."});
+        }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
         core::discord::bot->message_create(message);

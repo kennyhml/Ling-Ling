@@ -9,8 +9,8 @@ namespace llpp::bots::crafting
                                          const std::chrono::minutes t_interval,
                                          const asa::items::Item& t_to_craft,
                                          const int t_amount_per_queue) :
-        BaseStation(t_name, t_interval), amount_to_queue_(t_amount_per_queue),
-        to_craft_(t_to_craft), chem_bench_(name_ + "::CHEMBENCH", 100), bed_(name_) {}
+            BaseStation(t_name, t_interval), amount_to_queue_(t_amount_per_queue),
+            to_craft_(t_to_craft), chem_bench_(name_ + "::CHEMBENCH", 100), bed_(name_) {}
 
     void BasePowderStation::await_deposited()
     {
@@ -19,13 +19,7 @@ namespace llpp::bots::crafting
 
         if (!util::await([&slot]() { return slot.is_empty(); },
                          std::chrono::seconds(10))) {
-            asa::entities::local_player->get_inventory()->close();
-            asa::core::sleep_for(std::chrono::seconds(1));
-            asa::entities::local_player->set_yaw(0);
-            asa::entities::local_player->access(chem_bench_);
-            asa::entities::local_player->get_inventory()->transfer_all();
-            chem_bench_.get_inventory()->close();
-            asa::core::sleep_for(std::chrono::seconds(1));
+            put_overproduce_back();
             set_completed();
             throw StationFullError(std::format("Station '{}' is full.", name_));
         }
@@ -33,9 +27,18 @@ namespace llpp::bots::crafting
         asa::core::sleep_for(std::chrono::milliseconds(500));
     }
 
-    void BasePowderStation::empty_into_dedis()
+    void BasePowderStation::empty()
     {
         asa::entities::local_player->access(chem_bench_);
+
+        // check if theres anything to even empty.
+        if (!util::await([this]() -> bool { return chem_bench_.get_current_slots() > 5; },
+                         std::chrono::seconds(1))) {
+            chem_bench_.get_inventory()->close();
+            asa::core::sleep_for(std::chrono::seconds(1));
+            return;
+        }
+
         chem_bench_.get_inventory()->transfer_all();
         chem_bench_.get_inventory()->close();
 
@@ -63,11 +66,24 @@ namespace llpp::bots::crafting
         asa::entities::local_player->set_yaw(0);
     }
 
-    void BasePowderStation::requeue_crafts()
+    void BasePowderStation::requeue()
     {
         asa::entities::local_player->access(chem_bench_);
+        was_still_crafting_ = chem_bench_.get_inventory()->is_crafting();
         chem_bench_.get_inventory()->craft(to_craft_, amount_to_queue_);
-        chem_bench_.get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(2));
+        asa::core::sleep_for(std::chrono::seconds(1));
     }
+
+    void BasePowderStation::put_overproduce_back()
+    {
+        asa::entities::local_player->get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::entities::local_player->set_yaw(0);
+        asa::entities::local_player->access(chem_bench_);
+        asa::entities::local_player->get_inventory()->transfer_all();
+        chem_bench_.get_inventory()->cancel_craft();
+        chem_bench_.get_inventory()->close();
+        asa::core::sleep_for(std::chrono::seconds(1));
+    }
+
 }

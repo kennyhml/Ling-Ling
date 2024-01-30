@@ -63,6 +63,8 @@ namespace llpp::bots::farm
         void drop_trash();
         void help_popcorn(asa::items::Item& item);
 
+        void mount_farm_tame();
+
         inline static FarmBot* inst_ = nullptr;
 
         bool stop_requested_ = false;

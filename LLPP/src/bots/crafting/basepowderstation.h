@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <chrono>
 #include "asapp/structures/craftingstation.h"
@@ -31,11 +32,16 @@ namespace llpp::bots::crafting
         }
 
     protected:
-        void empty_into_dedis();
-        void requeue_crafts();
+        void empty();
+
+        void requeue();
+
         void await_deposited();
 
+        void put_overproduce_back();
+
         int amount_to_queue_;
+        bool was_still_crafting_ = false;
 
         asa::items::Item to_craft_;
         cv::Mat last_dedi_screenshot_;
@@ -45,9 +51,9 @@ namespace llpp::bots::crafting
         asa::structures::SimpleBed bed_;
 
         std::array<asa::structures::Container, 3> dedis_{
-            asa::structures::Container("DEDI01", 1800),
-            asa::structures::Container("DEDI02", 1800),
-            asa::structures::Container("DEDI03", 1800),
+                asa::structures::Container("DEDI01", 1800),
+                asa::structures::Container("DEDI02", 1800),
+                asa::structures::Container("DEDI03", 1800),
         };
     };
 }

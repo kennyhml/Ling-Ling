@@ -102,6 +102,9 @@ add_executable(LLPP WIN32
         LLPP/src/main.cpp
         LLPP/src/bots/crafting/forgestation.cpp
         LLPP/src/bots/crafting/forgestation.h
+        LLPP/src/bots/crafting/arbstation.cpp
+        LLPP/src/bots/crafting/arbstation.h
+        LLPP/src/bots/crafting/arbstation.cpp
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
