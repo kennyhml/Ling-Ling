@@ -80,6 +80,8 @@ namespace llpp::config
 
             inline role helper_access(BASE, "helper_access", save, "");
             inline role helper_no_access(BASE, "helper_no_access", save, "");
+
+            inline role alert(BASE, "alert", save, "");
         }
 
         namespace channels
@@ -89,6 +91,8 @@ namespace llpp::config
 
             inline channel info(BASE, "info", save, "");
             inline channel error(BASE, "error", save, "");
+            inline channel alert(BASE, "alert", save, "");
+            inline channel logs(BASE, "logs", save, "");
         }
     }
 
