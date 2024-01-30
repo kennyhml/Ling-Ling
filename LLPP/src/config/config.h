@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include "managedvar.h"
 #include <filesystem>
@@ -7,13 +8,14 @@
 namespace llpp::config
 {
     nlohmann::ordered_json& get_data();
+
     void save();
 
     class BadConfigurationError final : public std::exception
     {
     public:
         explicit BadConfigurationError(std::string t_message) : message_(
-            std::move(t_message)) {}
+                std::move(t_message)) {}
 
         const char* what() const override { return message_.c_str(); }
 
@@ -58,11 +60,11 @@ namespace llpp::config
             inline const std::vector<std::string> BASE{"discord", "authorization"};
 
             inline ManagedVar<std::vector<const char*>> roles(
-                BASE, "authorized_roles", save, {});
+                    BASE, "authorized_roles", save, {});
             inline ManagedVar<std::vector<const char*>> channels(
-                BASE, "command_channels", save, {});
+                    BASE, "command_channels", save, {});
             inline ManagedVar<std::vector<const char*>> users(
-                BASE, "authorized_users", save, {});
+                    BASE, "authorized_users", save, {});
         }
 
         namespace advanced
@@ -94,30 +96,45 @@ namespace llpp::config
             inline channel alert(BASE, "alert", save, "");
             inline channel logs(BASE, "logs", save, "");
         }
+
+        namespace alert_rules
+        {
+            inline const std::vector<std::string> BASE{"discord", "alert_rules"};
+
+            using filter = ManagedVar<std::vector<const char*>>;
+
+            inline ManagedVar<int> ping_cooldown(BASE, "ping_cooldown", save, 60);
+            inline ManagedVar<int> ping_min_events(BASE, "ping_min_events", save, 1);
+
+            inline filter ignore_filter(BASE, "ignore_filter", save, {"Baby", "C4"});
+            inline filter ping_filter(BASE, "ping_filter", save, {"MAIN", "Pin Coded"});
+        }
+
     }
 
     namespace bots::drops
     {
         inline const std::vector<std::string> BASE{"bots", "drops"};
 
-        inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+        inline ManagedVar <std::vector<const char*>> managers(BASE, "managers", save, {});
         inline ManagedVar<bool> reroll_mode(BASE, "reroll_mode", save, false);
         inline ManagedVar<int> vault_alert_threshold(BASE, "vault_alert_threshold", save,
                                                      70);
-        inline std::unordered_map<std::string, ManagedVar<
-                                      llpp::bots::drops::CrateManagerConfig>> configs;
+        inline std::unordered_map<std::string, ManagedVar <
+                                               llpp::bots::drops::CrateManagerConfig>>
+        configs;
 
-        inline ManagedVar<std::string> loot_channel(BASE, "loot_channel", save, "");
-        inline ManagedVar<std::string> reroll_role(BASE, "reroll_role", save, "");
+        inline ManagedVar <std::string> loot_channel(BASE, "loot_channel", save, "");
+        inline ManagedVar <std::string> reroll_role(BASE, "reroll_role", save, "");
     }
 
     namespace bots::paste
     {
         inline const std::vector<std::string> BASE{"bots", "paste"};
 
-        inline ManagedVar<std::string> prefix(BASE, "prefix", save, "PASTE");
-        inline ManagedVar<std::string> render_prefix(BASE, "render_prefix", save,
-                                                     "PASTE::RENDER");
+        inline ManagedVar <std::string> prefix(BASE, "prefix", save, "PASTE");
+        inline ManagedVar <std::string> render_prefix(BASE, "render_prefix", save,
+                                                      "PASTE::RENDER");
 
         inline ManagedVar<int> num_stations(BASE, "num_stations", save, 16);
         inline ManagedVar<int> interval(BASE, "interval", save, 5);
@@ -127,8 +144,8 @@ namespace llpp::config
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
 
-        inline ManagedVar<std::string> grind_prefix(BASE, "grind_prefix", save,
-                                                    "PASTE::GRINDING");
+        inline ManagedVar <std::string> grind_prefix(BASE, "grind_prefix", save,
+                                                     "PASTE::GRINDING");
         inline ManagedVar<int> num_grind_stations(BASE, "num_grind_stations", save, 2);
         inline ManagedVar<int> grind_interval(BASE, "grind_interval", save, 5);
         inline ManagedVar<bool> grind_disabled(BASE, "grind_disabled", save, false);
@@ -138,7 +155,7 @@ namespace llpp::config
     {
         inline const std::vector<std::string> BASE{"bots", "sap"};
 
-        inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SAP");
+        inline ManagedVar <std::string> prefix(BASE, "prefix", save, "SAP");
         inline ManagedVar<int> num_stations(BASE, "num_stations", save, 12);
         inline ManagedVar<int> interval(BASE, "interval", save, 5);
 
@@ -165,7 +182,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"bots", "crafting", "spark"};
 
-            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SPARK");
+            inline ManagedVar <std::string> prefix(BASE, "prefix", save, "SPARK");
             inline ManagedVar<int> num_stations(BASE, "num_stations", save, 2);
             inline ManagedVar<int> interval(BASE, "interval", save, 10);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
@@ -175,7 +192,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"bots", "crafting", "gunpowder"};
 
-            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "GP");
+            inline ManagedVar <std::string> prefix(BASE, "prefix", save, "GP");
             inline ManagedVar<int> num_stations(BASE, "num_stations", save, 2);
             inline ManagedVar<int> interval(BASE, "interval", save, 10);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
@@ -185,7 +202,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"bots", "crafting", "grinding"};
 
-            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "GRIND");
+            inline ManagedVar <std::string> prefix(BASE, "prefix", save, "GRIND");
             inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
             inline ManagedVar<int> interval(BASE, "interval", save, 5);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
@@ -195,7 +212,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"bots", "crafting", "forges"};
 
-            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "FORGE");
+            inline ManagedVar <std::string> prefix(BASE, "prefix", save, "FORGE");
             inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
             inline ManagedVar<int> interval(BASE, "interval", save, 5);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
@@ -205,7 +222,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"bots", "crafting", "arb"};
 
-            inline ManagedVar<std::string> prefix(BASE, "prefix", save, "ARB");
+            inline ManagedVar <std::string> prefix(BASE, "prefix", save, "ARB");
             inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
             inline ManagedVar<int> interval(BASE, "interval", save, 15);
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
