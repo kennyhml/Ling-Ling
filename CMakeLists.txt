@@ -105,6 +105,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/crafting/arbstation.cpp
         LLPP/src/bots/crafting/arbstation.h
         LLPP/src/bots/crafting/arbstation.cpp
+        LLPP/src/bots/alert/parasaurstation.cpp
+        LLPP/src/bots/alert/parasaurstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
@@ -136,4 +138,3 @@ target_link_libraries(LLPP PRIVATE
         $<$<CONFIG:Debug>: "C:/dev/LLPP/LLPP/external/keyauth/authd.lib">
         $<$<CONFIG:Release>: "C:/dev/LLPP/LLPP/external/keyauth/auth.lib">
 )
-target_link_libraries(LLPP PRIVATE "C:/dev/LLPP/LLPP/external/keyauth/libcurl.lib")

@@ -303,7 +303,7 @@ namespace llpp::gui
             bool valid = std::filesystem::exists(config::general::bot::assets_dir.get())
                          || exists(
                     std::filesystem::current_path() / config::general::bot::assets_dir.
-                            get());
+                                                                                              get());
             assets_path_col = valid
                               ? ImVec4(0.f, 1.f, 0.f, 1.f)
                               : ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -564,7 +564,7 @@ namespace llpp::gui
                 ImGui::SetCursorPos({10, 11});
                 if (ImGui::Checkbox("Use ephemeral replies",
                                     config::discord::advanced::ephemeral_replies.
-                                            get_ptr())) {
+                                                                                        get_ptr())) {
                     config::discord::advanced::ephemeral_replies.save();
                 }
             }
@@ -657,6 +657,189 @@ namespace llpp::gui
         }
         end_child();
     }
+
+    inline int selected_ignore_filter = 0;
+    inline int selected_ping_filter = 0;
+
+    inline bool new_ignore_popup = false;
+    inline bool new_ping_popup = false;
+
+    void draw_discord_alert_tabs()
+    {
+        begin_child("Configuration",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+        {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Ping cooldown (s):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputInt("##ping_cooldown",
+                                config::discord::alert_rules::ping_cooldown.get_ptr())) {
+                config::discord::alert_rules::ping_cooldown.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The cooldown between any sort of alert pings.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Ping min. events:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##ping_min_events",
+                                config::discord::alert_rules::ping_min_events.get_ptr())) {
+                config::discord::alert_rules::ping_min_events.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The minimum amount of events within one update to allow pings.");
+            }
+
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Suppress filter:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.31f);
+            ImGui::SetCursorPos({150, 73});
+            auto* ignore_data = config::discord::alert_rules::ignore_filter.get_ptr();
+            ImGui::Combo("##ignore_filter", &selected_ignore_filter, ignore_data->data(),
+                         ignore_data->size());
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "An alert message containing any of these terms will be ignored.");
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(" - ##ignore_filter") && !ignore_data->empty()) {
+                ignore_data->erase(ignore_data->begin() + selected_ignore_filter);
+                config::discord::alert_rules::ignore_filter.save();
+                selected_ignore_filter = max(0, selected_ignore_filter - 1);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(" + ##ignore_filter")) { new_ignore_popup = true; }
+
+            if (new_ignore_popup) {
+                ImGui::OpenPopup("Add an ignore filter");
+                if (ImGui::BeginPopupModal("Add an ignore filter",
+                                           &new_ignore_popup,
+                                           ImGuiWindowFlags_AlwaysAutoResize)) {
+                    static char name_buffer[256] = {};
+                    if (ImGui::IsWindowAppearing()) {
+                        memset(name_buffer, 0, sizeof(name_buffer));
+                    }
+
+                    ImGui::InputText("##input_ignore_filter", name_buffer,
+                                     IM_ARRAYSIZE(name_buffer));
+                    if (ImGui::Button("OK")) {
+                        new_ignore_popup = false;
+                        ignore_data->push_back(_strdup(name_buffer));
+                        config::discord::alert_rules::ignore_filter.save();
+                        selected_ignore_filter = ignore_data->size() - 1;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+
+            ImGui::SetCursorPos({10, 107});
+            ImGui::Text("@everyone filter:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.31f);
+            ImGui::SetCursorPos({150, 104});
+            auto* ping_data = config::discord::alert_rules::ping_filter.get_ptr();
+            ImGui::Combo("##ping_filter", &selected_ping_filter, ping_data->data(),
+                         ping_data->size());
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "An alert message containing any of these terms will @everyone instead of @alert");
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(" - ##ping_filter") && !ping_data->empty()) {
+                ping_data->erase(ping_data->begin() + selected_ping_filter);
+                config::discord::alert_rules::ping_filter.save();
+                selected_ping_filter = max(0, selected_ping_filter - 1);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(" + ##ping_filter")) { new_ping_popup = true; }
+
+            if (new_ping_popup) {
+                ImGui::OpenPopup("Add a ping filter");
+                if (ImGui::BeginPopupModal("Add a ping filter",
+                                           &new_ping_popup,
+                                           ImGuiWindowFlags_AlwaysAutoResize)) {
+                    static char name_buffer[256] = {};
+                    if (ImGui::IsWindowAppearing()) {
+                        memset(name_buffer, 0, sizeof(name_buffer));
+                    }
+
+                    ImGui::InputText("##input_ping_filter", name_buffer,
+                                     IM_ARRAYSIZE(name_buffer));
+                    if (ImGui::Button("OK")) {
+                        new_ping_popup = false;
+                        ping_data->push_back(_strdup(name_buffer));
+                        config::discord::alert_rules::ping_filter.save();
+                        selected_ping_filter = ping_data->size() - 1;
+                    }
+                    ImGui::EndPopup();
+                }
+            }
+        }
+        end_child();
+        ImGui::SameLine();
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
+        {
+
+        }
+        end_child();
+
+        ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
+        begin_child("Roles & Channels",
+                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+        {
+
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Logs channel:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputText("##log_channel",
+                                 config::discord::channels::logs.get_ptr())) {
+                config::discord::channels::logs.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The channel to post regular logs to.");
+            }
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Alert channel:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputText("##alert_channel",
+                                 config::discord::channels::alert.get_ptr())) {
+                config::discord::channels::alert.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The channel to post alerts to. If empty logs channel is used.");
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Alert role:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputText("##alert_role",
+                                 config::discord::roles::alert.get_ptr())) {
+                config::discord::roles::alert.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The role to be mentioned for parasaur or tribelog alerts.\n"
+                        "If empty, @everyone will always be used.");
+            }
+        }
+        end_child();
+    }
+
 
     void draw_bots_paste_tabs()
     {

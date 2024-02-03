@@ -4,11 +4,103 @@
 
 #include "../config/config.h"
 
+enum AnsiTextColor_
+{
+    TEXT_GRAY = 30,
+    TEXT_RED,
+    TEXT_GREEN,
+    TEXT_YELLOW,
+    TEXT_BLUE,
+    TEXT_PINK,
+    TEXT_CYAN,
+    TEXT_WHITE,
+};
+
+enum AnsiBackgroundColor_
+{
+    BACKGROUND_FIREFLY_DARK_BLUE = 40,
+    BACKGROUND_ORANGE,
+    BACKGROUND_MARBLE_BLUE,
+    BACKGROUND_GREYISH_TURQUOISE,
+    BACKGROUND_GRAY,
+    BACKGROUND_INDIGO,
+    BACKGROUND_LIGHT_GRAY,
+    BACKGROUND_WHITE
+};
+
+namespace
+{
+    using asa::interfaces::components::TribeLogMessage;
+
+    AnsiTextColor_ get_text_color_for(const TribeLogMessage::EventType event)
+    {
+        switch (event) {
+        case TribeLogMessage::EventType::TRIBE_DESTROYED:
+        case TribeLogMessage::EventType::TRIBE_PLAYER_KILLED:
+        case TribeLogMessage::EventType::TRIBE_DINO_KILLED:
+        case TribeLogMessage::EventType::DEMOTED:
+        case TribeLogMessage::EventType::PLAYER_REMOVED:
+            return TEXT_RED;
+        case TribeLogMessage::EventType::DINO_CRYOD:
+        case TribeLogMessage::EventType::DINO_STARVED:
+        case TribeLogMessage::EventType::TRIBE_GROUP_UPDATED:
+            return TEXT_WHITE;
+        case TribeLogMessage::EventType::ENEMY_DINO_KILLED:
+        case TribeLogMessage::EventType::ENEMY_PLAYER_KILLED:
+        case TribeLogMessage::EventType::CLAIMED:
+            return TEXT_PINK;
+        case TribeLogMessage::EventType::DEMOLISHED:
+        case TribeLogMessage::EventType::UNCLAIMED:
+        case TribeLogMessage::EventType::ENEMY_DESTROYED:
+            return TEXT_YELLOW;
+        case TribeLogMessage::EventType::PROMOTED:
+            return TEXT_BLUE;
+        case TribeLogMessage::EventType::PLAYER_ADDED:
+            return TEXT_CYAN;
+        case TribeLogMessage::EventType::DINO_TAMED:
+            return TEXT_GREEN;
+        default:
+            return TEXT_GRAY;
+        }
+    }
+
+    std::vector<std::string> format(const asa::interfaces::TribeManager::LogEntries& log)
+    {
+        std::vector<std::string> result;
+        for (int i = log.size() - 1; i >= 0; i--) {
+            switch (log[i].event) {
+            case TribeLogMessage::EventType::ENEMY_DINO_KILLED:
+            case TribeLogMessage::EventType::ENEMY_PLAYER_KILLED:
+            {
+                // if we find )! (, there is a turret name.
+                if (size_t pos = log[i].content.find(")! ("); pos != std::string::npos) {
+                    std::string killed = log[i].content.substr(0, pos + 3);
+                    std::string where = log[i].content.substr(pos + 3);
+
+                    result.push_back(std::format("{}: \u001b[1;35m{}\u001b[0m{}\n",
+                                                 log[i].timestamp.to_string(), killed,
+                                                 where));
+                    break;
+                }
+            }
+            default:
+            {
+                int color_code = get_text_color_for(log[i].event);
+                result.push_back(std::format("{}: \u001b[1;{}m{}\u001b[0m\n",
+                                             log[i].timestamp.to_string(), color_code,
+                                             log[i].content));
+            }
+            }
+        }
+        return result;
+
+    }
+}
+
 namespace llpp::core::discord
 {
     std::unordered_map<std::string, event_callback_t> event_callbacks;
     std::vector<dpp::slashcommand> commands;
-
 
     namespace
     {
@@ -106,7 +198,9 @@ namespace llpp::core::discord
         if (users.get_ptr()->empty() && roles.get_ptr()->empty()) { return true; }
 
         // check if the user has any of the authorized roles
-        if (std::ranges::any_of(user.get_roles(), is_role_command_authorized)) { return true; }
+        if (std::ranges::any_of(user.get_roles(), is_role_command_authorized)) {
+            return true;
+        }
 
         // check if the user itself is authorized
         const auto allowed = users.get_ptr();
@@ -183,5 +277,60 @@ namespace llpp::core::discord
         message.add_file("image.png", file_data, "image/png ").add_embed(embed);
 
         bot->message_create(message);
+    }
+
+    void handle_tribelogs(const asa::interfaces::TribeManager::LogEntries& all_,
+                          const asa::interfaces::TribeManager::LogEntries& new_)
+    {
+        // Initialize here to avoid the configuration changing mid function.
+        // If we flush the previous messages we want all events, otherwise we
+        // only care about the new ones.
+        const bool flush = config::discord::advanced::flush_logs.get();
+        const std::vector<std::string> fmt_messages = format(flush ? all_ : new_);
+
+        const auto channel = config::discord::channels::logs.get();
+        std::vector<dpp::message> messages;
+
+        const dpp::command_completion_event_t callback = [fmt_messages
+            ](const dpp::confirmation_callback_t& confirmation)-> void {
+            std::vector<dpp::snowflake> msg_ids;
+            const dpp::message_map map = std::get<dpp::message_map>(confirmation.value);
+
+            int message_iter = 0;
+            for (const auto& id : std::views::keys(map)) { msg_ids.push_back(id); }
+
+            if (!config::discord::advanced::flush_logs.get() && !msg_ids.empty()) {
+                auto last_msg = map.at(msg_ids.front());
+
+                std::string original_content = last_msg.content;
+
+                while (last_msg.content.length() < 1900) {
+                    if (message_iter >= fmt_messages.size()) { break; }
+
+                    const std::string& line = fmt_messages[message_iter++];
+                    last_msg.content.insert(last_msg.content.length() - 3, line);
+                }
+                if (message_iter) { bot->message_edit(last_msg); }
+            }
+            else if (config::discord::advanced::flush_logs.get()) {
+                const auto channel = config::discord::channels::logs.get();
+                if (msg_ids.size() == 1) { bot->message_delete(msg_ids[0], channel); }
+                else if (!msg_ids.empty()) { bot->message_delete_bulk(msg_ids, channel); }
+            }
+
+            dpp::message new_message(config::discord::channels::logs.get(), "```ansi\n");
+            while (message_iter < fmt_messages.size()) {
+                if (new_message.content.length() > 1900) {
+                    new_message.content += "```";
+                    bot->message_create(new_message);
+                    new_message.content = "```ansi\n";
+                }
+                new_message.content += fmt_messages[message_iter++];
+            }
+            new_message.content += "```";
+            if (new_message.content.length() > 15) { bot->message_create(new_message); }
+        };
+
+        bot->messages_get(channel, 0, 0, 0, 100, callback);
     }
 }

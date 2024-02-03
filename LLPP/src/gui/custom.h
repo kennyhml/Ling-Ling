@@ -31,7 +31,7 @@ namespace llpp::gui
     {
         BOT_CONFIG,
         INFO,
-        ALERTS,
+        LOGS_AND_ALERTS,
     };
 
     enum BotTabs : int
@@ -64,7 +64,7 @@ namespace llpp::gui
     inline std::vector<const char*> general_subtabs{"Ark", "Bot"};
 
     inline DiscordTabs selected_discord_tab = BOT_CONFIG;
-    inline std::vector<const char*> discord_subtabs{"Bot Config", "Info", "Alerts"};
+    inline std::vector<const char*> discord_subtabs{"Bot Config", "Info", "Logs & Alerts"};
 
     inline BotTabs selected_bot_tab = PASTE;
     inline std::vector<const char*> bot_subtabs{
@@ -104,6 +104,7 @@ namespace llpp::gui
 
     void draw_discord_bot_config();
     void draw_discord_info_tabs();
+    void draw_discord_alert_tabs();
 
     void draw_bots_paste_tabs();
     void draw_bots_drops_tab();
