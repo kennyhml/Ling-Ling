@@ -1,6 +1,8 @@
 #include "renderstation.h"
 #include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
+#include <asapp/interfaces/tribemanager.h>
+#include "../../core/discord.h"
 
 namespace llpp::bots::render
 {
@@ -15,10 +17,18 @@ namespace llpp::bots::render
 	{
 		auto start = std::chrono::system_clock::now();
 
-		asa::entities::local_player->fast_travel_to(src_bed);
+        asa::entities::local_player->fast_travel_to(src_bed, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs,
+                                                         std::chrono::seconds(3));
 		std::this_thread::sleep_for(render_duration);
 
-		asa::entities::local_player->fast_travel_to(gateway_bed);
+        asa::entities::local_player->fast_travel_to(gateway_bed, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs,
+                                                         std::chrono::seconds(0));
 		set_completed();
 
 		auto duration = util::get_elapsed<std::chrono::seconds>(start);

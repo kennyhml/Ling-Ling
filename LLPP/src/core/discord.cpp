@@ -30,7 +30,52 @@ enum AnsiBackgroundColor_
 
 namespace
 {
+    const char* const SENSOR_ICON =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/1/16/Tek_Sensor_%28Genesis_Part_1%29.png/revision/latest?cb=20200226080818";
+
+    const char* const C4_ICON =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/4/46/C4_Charge.png/revision/latest/scale-to-width-down/228?cb=20150615094656";
+
+    const char* const DINO_ICON =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/6/61/Condition_DinoDanger.png/revision/latest/scale-to-width-down/120?cb=20180810161035";
+
+    const char* const SKULL_WHITE =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/4/42/Tranquilized.png/revision/latest/scale-to-width-down/120?cb=20181217015317";
+
+
+    const char* const SKULL_RED =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/c/c8/Mega_Rabies.png/revision/latest/scale-to-width-down/120?cb=20181217020536";
+
+    const char* const TURRET =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/7/7f/Heavy_Auto_Turret.png/revision/latest/scale-to-width-down/120?cb=20171130105250";
+
     using asa::interfaces::components::TribeLogMessage;
+
+    std::string get_event_icon(const TribeLogMessage::EventType event)
+    {
+        switch (event) {
+        case TribeLogMessage::TRIBE_DINO_KILLED: return DINO_ICON;
+        case TribeLogMessage::TRIBE_PLAYER_KILLED: return SKULL_WHITE;
+        case TribeLogMessage::TRIBE_DESTROYED: return C4_ICON;
+        case TribeLogMessage::ENEMY_DINO_KILLED: return TURRET;
+        case TribeLogMessage::ENEMY_PLAYER_KILLED: return SKULL_RED;
+        default:
+            return "";
+        }
+    }
+
+    std::string get_event_title(const TribeLogMessage::EventType event)
+    {
+        switch (event) {
+        case TribeLogMessage::TRIBE_DINO_KILLED: return "Dinosaur was killed!";
+        case TribeLogMessage::TRIBE_PLAYER_KILLED: return "Tribemember was killed!";
+        case TribeLogMessage::TRIBE_DESTROYED: return "Something was destroyed!";
+        case TribeLogMessage::ENEMY_DINO_KILLED: return "Killed a dinosaur!";
+        case TribeLogMessage::ENEMY_PLAYER_KILLED: return "Killed an enemy player!";
+        default:
+            return "";
+        }
+    }
 
     AnsiTextColor_ get_text_color_for(const TribeLogMessage::EventType event)
     {
@@ -93,7 +138,6 @@ namespace
             }
         }
         return result;
-
     }
 }
 
@@ -101,6 +145,8 @@ namespace llpp::core::discord
 {
     std::unordered_map<std::string, event_callback_t> event_callbacks;
     std::vector<dpp::slashcommand> commands;
+
+    auto last_ping = std::chrono::system_clock::now();
 
     namespace
     {
@@ -150,6 +196,72 @@ namespace llpp::core::discord
         {
             auto& fn = event_callbacks.at(event.command.get_command_name());
             fn(event);
+        }
+
+        bool has_ignored_term(const TribeLogMessage& msg)
+        {
+            auto ignored = config::discord::alert_rules::ignore_filter.get();
+            return std::ranges::any_of(ignored, [&msg](const std::string& term) -> bool {
+                return msg.content.find(term) != std::string::npos;
+            });
+        }
+
+        bool has_alert_term(const TribeLogMessage& msg)
+        {
+            auto alert = config::discord::alert_rules::ping_filter.get();
+            return std::ranges::any_of(alert, [&msg](const std::string& term) -> bool {
+                return msg.content.find(term) != std::string::npos;
+            });
+        }
+
+        void handle_alerts(const asa::interfaces::TribeManager::LogEntries& logs)
+        {
+            std::vector<dpp::embed> embeds;
+            bool tag_everyone = false;
+            bool tag_tribe = false;
+
+            for (const auto& message : logs) {
+                if (has_ignored_term(message)) { continue; }
+
+                if ((message.event == TribeLogMessage::TRIBE_PLAYER_KILLED || message.
+                        event == TribeLogMessage::TRIBE_DINO_KILLED) && message.content.
+                    find("by") == std::string::npos) { continue; }
+
+                const std::string icon_url = get_event_icon(message.event);
+                if (icon_url.empty()) { continue; }
+                tag_everyone |= has_alert_term(message);
+
+                dpp::embed embed;
+                embed.set_title(get_event_title(message.event));
+                embed.set_color(0xFF0000);
+                embed.set_description(message.timestamp.to_string());
+
+                embed.add_field(message.content, "");
+                embed.set_thumbnail(icon_url);
+                embed.set_timestamp(std::chrono::system_clock::to_time_t(
+                    std::chrono::system_clock::now()));
+
+                embeds.emplace_back(embed);
+            }
+
+            if (embeds.empty()) { return; }
+
+            std::chrono::seconds cooldown(
+                config::discord::alert_rules::ping_cooldown.get());
+            int min_events = config::discord::alert_rules::ping_min_events.get();
+
+            dpp::message message(config::discord::channels::alert.get(), "");
+            for (const auto& embed : embeds) { message.add_embed(embed); }
+
+            if (util::timedout(last_ping, cooldown) && embeds.size() >= min_events) {
+                if (tag_everyone) { message.set_content("@everyone"); }
+                else if (tag_tribe) {
+                    const std::string role = config::discord::roles::alert.get();
+                    message.set_content(util::get_role_mention(role));
+                }
+            }
+            message.set_allowed_mentions(false, true, true, false, {}, {});
+            bot->message_create(message);
         }
     }
 
@@ -282,6 +394,14 @@ namespace llpp::core::discord
     void handle_tribelogs(const asa::interfaces::TribeManager::LogEntries& all_,
                           const asa::interfaces::TribeManager::LogEntries& new_)
     {
+        std::cout << "[+] New log entries:" << std::endl;
+
+        for (const auto& log : new_) {
+            std::cout << "-- " << log.to_string() << std::endl;
+        }
+
+        handle_alerts(new_);
+
         // Initialize here to avoid the configuration changing mid function.
         // If we flush the previous messages we want all events, otherwise we
         // only care about the new ones.

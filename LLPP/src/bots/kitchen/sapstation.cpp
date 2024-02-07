@@ -2,7 +2,8 @@
 #include <asapp/core/state.h>
 #include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
-
+#include <asapp/interfaces/tribemanager.h>
+#include "../../core/discord.h"
 #include "embeds.h"
 
 namespace llpp::bots::kitchen
@@ -14,7 +15,10 @@ namespace llpp::bots::kitchen
     core::StationResult SapStation::complete()
     {
         const auto start = std::chrono::system_clock::now();
-        asa::entities::local_player->fast_travel_to(spawn_bed_);
+        asa::entities::local_player->fast_travel_to(spawn_bed_, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::core::sleep_for(std::chrono::seconds(1));
 
         if (!take_sap()) {
             set_completed();

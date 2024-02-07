@@ -17,6 +17,7 @@ namespace llpp::bots::farm
         {
             METAL,
             WOOD,
+            OBSIDIAN,
         };
 
     public:

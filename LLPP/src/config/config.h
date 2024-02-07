@@ -74,7 +74,7 @@ namespace llpp::config
             inline ManagedVar<bool> ephemeral_replies(BASE, "ephemeral_replies", save,
                                                       false);
 
-            inline ManagedVar<bool> flush_logs(BASE, "flush_logs", save, true);
+            inline ManagedVar<bool> flush_logs(BASE, "flush_logs", save, false);
         }
 
         namespace roles
@@ -108,8 +108,8 @@ namespace llpp::config
             inline ManagedVar<int> ping_cooldown(BASE, "ping_cooldown", save, 60);
             inline ManagedVar<int> ping_min_events(BASE, "ping_min_events", save, 1);
 
-            inline filter ignore_filter(BASE, "ignore_filter", save, {"Baby", "C4"});
-            inline filter ping_filter(BASE, "ping_filter", save, {"MAIN", "Pin Coded"});
+            inline filter ignore_filter(BASE, "ignore_filter", save, {"Baby", "Decay"});
+            inline filter ping_filter(BASE, "ping_filter", save, {"Pin Coded"});
         }
     }
 

@@ -19,7 +19,7 @@ namespace llpp::core
     namespace
     {
         std::chrono::system_clock::time_point last_inv_check;
-        std::chrono::seconds inv_check_interval(120);
+        std::chrono::seconds inv_check_interval(60);
 
         bots::suicide::SuicideStation suicide("SUICIDE DEATH", "SUICIDE RESPAWN");
 
@@ -33,7 +33,7 @@ namespace llpp::core
 
             auto& info = p->get_inventory()->info;
             p->get_inventory()->open();
-            const bool ret = info.get_health_level() < 0.5f || info.get_water_level() <
+            const bool ret = info.get_health_level() < 0.7f || info.get_water_level() <
                 0.5f || info.get_food_level() < 0.5f;
             asa::entities::local_player->get_inventory()->close();
             asa::core::sleep_for(std::chrono::seconds(1));

@@ -3,21 +3,24 @@
 #include <asapp/core/init.h>
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
+
 #include <asapp/interfaces/console.h>
-#include <asapp/interfaces/hud.h>
+#include <asapp/interfaces/tribemanager.h>
+#include <asapp/network/queries.h>
+
+#include "bots/farm/commands.h"
+
+
 
 #include "auth/auth.h"
-#include "bots/farm/commands.h"
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/discord.h"
 #include "core/recovery.h"
 #include "core/taskmanager.h"
-#include "common/util.h"
-#include "bots/crafting/arbstation.h"
+#include <curl/curl.h>
 
 static bool running = false;
-
 
 class TerminatedError : public std::exception
 {
@@ -25,13 +28,10 @@ public:
     using exception::exception;
 };
 
+void check_terminated() { if (!running) { throw TerminatedError(); } }
 
-void check_terminated()
-{
-    if (!running) {
-        throw TerminatedError();
-    }
-}
+#include <opencv2/core/utils/logger.hpp>
+
 
 void llpp_main()
 {
@@ -60,25 +60,23 @@ void llpp_main()
     llpp::core::discord::bot->start(dpp::st_return);
     llpp::core::discord::inform_started();
 
-    while (true) {
-        std::cout << asa::interfaces::hud->detected_enemy() << std::endl;
-    }
-
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_view_angles();
-        asa::core::sleep_for(std::chrono::seconds(1));
-    } catch (const TerminatedError&) {}
+
+        asa::interfaces::tribe_manager->update_tribelogs(
+            llpp::core::discord::handle_tribelogs, std::chrono::seconds(3));
+    }
+    catch (const TerminatedError&) {}
 
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
-        } catch (const TerminatedError&) { break; }
-        catch (const std::exception& e) {
+        } catch (const TerminatedError&) { break; } catch (const std::exception& e) {
             llpp::core::discord::inform_fatal_error(
-                    e, taskmanager.get_previous_task()->get_name());
+                e, taskmanager.get_previous_task()->get_name());
             running = false;
         }
     }
@@ -90,6 +88,9 @@ void llpp_main()
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
                    _In_ PSTR cmd_line, _In_ int cmd_show)
 {
+    // Then the logging level can be set with the following function
+    cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
+
     if (!AllocConsole()) { return false; }
 
     FILE* pFile;
@@ -103,18 +104,16 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    if (freopen_s(&pFile, "CONERR$", "w", stderr) != 0) {
+    if (freopen_s(&pFile, "CONOUT$", "w", stderr) != 0) {
         // Handle error, if any
         return false;
     }
 
     llpp::auth::login();
 
-
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
     llpp::gui::create_imgui();
-
 
     asa::core::register_state_callback(check_terminated);
 
@@ -123,9 +122,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowSize({
-                                         ImGui::GetIO().DisplaySize.x,
-                                         ImGui::GetIO().DisplaySize.y
-                                 });
+            ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y
+        });
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(620, 420));

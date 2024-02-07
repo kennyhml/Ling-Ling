@@ -137,7 +137,7 @@ namespace llpp::bots::crafting
     {
         if (grinding::disabled.get() || grinding_stations_.empty()) { return false; }
         // TODO: Allow partial completion by checking if any is ready
-        return gunpowder_stations_[0]->is_ready();
+        return grinding_stations_[0]->is_ready();
     }
 
     bool CraftingManager::is_forges_ready() const

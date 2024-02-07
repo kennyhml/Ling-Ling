@@ -12,6 +12,7 @@ namespace llpp::bots::farm
         {
             if (type == "metal") { return FarmBot::METAL; }
             if (type == "wood") { return FarmBot::WOOD; }
+            if (type == "obsidian") { return FarmBot::OBSIDIAN; }
 
             throw std::runtime_error("Cannot get the enum");
         }
@@ -21,8 +22,8 @@ namespace llpp::bots::farm
             switch (type) {
             case FarmBot::METAL: return "metal";
             case FarmBot::WOOD: return "wood";
+            case FarmBot::OBSIDIAN: return "obsidian";
             }
-
             throw std::runtime_error("Cannot stringify enum");
         }
 
@@ -76,9 +77,10 @@ namespace llpp::bots::farm
                 dpp::command_option(dpp::co_string, "type",
                                     "What resource are we farming?",
                                     true).add_choice({"Metal", "metal"}).
-                                          add_choice({"Wood", "wood"})).add_option(
-                dpp::command_option(dpp::co_string, "where",
-                                    "Where should I spawn to mount?", true)));
+                                          add_choice({"Wood", "wood"}).add_choice({
+                                              "Obsidian", "obsidian"
+                                          })).add_option(dpp::command_option(
+                dpp::co_string, "where", "Where should I spawn to mount?", true)));
 
         farm.add_option(dpp::command_option(dpp::co_sub_command, "end",
                                             "End an active farming session. Ling Ling++ will go back to regular tasks."));

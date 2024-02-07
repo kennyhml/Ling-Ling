@@ -8,18 +8,24 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
+#include <asapp/interfaces/tribemanager.h>
+#include "../../core/discord.h"
 
 namespace llpp::bots::paste
 {
     PasteStation::PasteStation(std::string name, std::chrono::minutes interval) :
-            BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI")
-    {};
+            BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI") {};
 
     core::StationResult PasteStation::complete()
     {
         auto start = std::chrono::system_clock::now();
 
-        asa::entities::local_player->fast_travel_to(bed_);
+        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::core::sleep_for(std::chrono::seconds(1));
+
         empty_all();
         int obtained = deposit_paste();
         set_completed();
@@ -96,9 +102,8 @@ namespace llpp::bots::paste
             }
         }
         catch (const asa::structures::StructureError&) {
-            std::cerr << "[!] Depositing & OCR failed, trying without...\n";
-            asa::entities::local_player->deposit_into_dedi(
-                    *asa::items::resources::achatina_paste, nullptr);
+            std::cerr << "[!] Depositing failed" << std::endl;
+            send_paste_not_deposited(name_);
         }
         return amount;
     }
@@ -108,7 +113,7 @@ namespace llpp::bots::paste
         if (dedi_.can_deposit()) { return true; }
 
         for (int i = 0; i < 3; i++) {
-            asa::entities::local_player->turn_left(45, std::chrono::milliseconds(500));
+            asa::entities::local_player->turn_left(45, std::chrono::milliseconds(900));
             if (dedi_.can_deposit()) { return true; }
         }
         // return to where we started turning left and go right instead.

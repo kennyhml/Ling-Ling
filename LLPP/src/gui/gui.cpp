@@ -15,7 +15,7 @@
 #define NO_ALPHA ( ImGuiColorEditFlags_NoTooltip    | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoBorder )
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
-    HWND window, UINT message, WPARAM wide_param, LPARAM long_param);
+        HWND window, UINT message, WPARAM wide_param, LPARAM long_param);
 
 
 LRESULT CALLBACK WindowProcess(const HWND window, const UINT message,
@@ -27,48 +27,46 @@ LRESULT CALLBACK WindowProcess(const HWND window, const UINT message,
     }
 
     switch (message) {
-    // resize message
-    case WM_SIZE:
-    {
-        if (llpp::gui::device && wide_param != SIZE_MINIMIZED) {
-            llpp::gui::present_parameters.BackBufferWidth = LOWORD(long_param);
-            llpp::gui::present_parameters.BackBufferHeight = HIWORD(long_param);
-            llpp::gui::reset_device();
-        }
-        return 0;
-    }
-    // disables alt application menu
-    case WM_SYSCOMMAND:
-    {
-        if ((wide_param & 0xfff0) == SC_KEYMENU) { return 0; }
-        break;
-    }
-    case WM_DESTROY:
-    {
-        PostQuitMessage(0);
-        return 0;
-    }
-    case WM_LBUTTONDOWN:
-    {
-        llpp::gui::position = MAKEPOINTS(long_param);
-        return 0;
-    }
-    case WM_MOUSEMOVE: if (wide_param == MK_LBUTTON) {
-            const auto [x, y]{MAKEPOINTS(long_param)};
-            auto rect = RECT{};
-
-            GetWindowRect(window, &rect);
-
-            rect.left += x - llpp::gui::position.x;
-            rect.top += y - llpp::gui::position.y;
-
-            if (llpp::gui::position.x >= 0 && llpp::gui::position.x <= llpp::gui::WIDTH &&
-                llpp::gui::position.y >= 0 && llpp::gui::position.y <= 25) {
-                SetWindowPos(window, HWND_TOPMOST, rect.left, rect.top, 0, 0,
-                             SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOZORDER);
+        // resize message
+        case WM_SIZE: {
+            if (llpp::gui::device && wide_param != SIZE_MINIMIZED) {
+                llpp::gui::present_parameters.BackBufferWidth = LOWORD(long_param);
+                llpp::gui::present_parameters.BackBufferHeight = HIWORD(long_param);
+                llpp::gui::reset_device();
             }
+            return 0;
         }
-        break;
+            // disables alt application menu
+        case WM_SYSCOMMAND: {
+            if ((wide_param & 0xfff0) == SC_KEYMENU) { return 0; }
+            break;
+        }
+        case WM_DESTROY: {
+            PostQuitMessage(0);
+            return 0;
+        }
+        case WM_LBUTTONDOWN: {
+            llpp::gui::position = MAKEPOINTS(long_param);
+            return 0;
+        }
+        case WM_MOUSEMOVE:
+            if (wide_param == MK_LBUTTON) {
+                const auto [x, y]{MAKEPOINTS(long_param)};
+                auto rect = RECT{};
+
+                GetWindowRect(window, &rect);
+
+                rect.left += x - llpp::gui::position.x;
+                rect.top += y - llpp::gui::position.y;
+
+                if (llpp::gui::position.x >= 0 &&
+                    llpp::gui::position.x <= llpp::gui::WIDTH &&
+                    llpp::gui::position.y >= 0 && llpp::gui::position.y <= 25) {
+                    SetWindowPos(window, HWND_TOPMOST, rect.left, rect.top, 0, 0,
+                                 SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOZORDER);
+                }
+            }
+            break;
     }
 
 
@@ -251,7 +249,7 @@ namespace llpp::gui
 
         const auto result = device->Present(nullptr, nullptr, nullptr, nullptr);
         if (result == D3DERR_DEVICELOST && device->TestCooperativeLevel() ==
-            D3DERR_DEVICENOTRESET) { reset_device(); }
+                                           D3DERR_DEVICENOTRESET) { reset_device(); }
     }
 
     inline float test_float = 0.f;
@@ -259,7 +257,7 @@ namespace llpp::gui
 
     void render()
     {
-        ImGui::Begin("Ling Ling++ | v1.3.9", &exit,
+        ImGui::Begin("Ling Ling++ | v1.4.10", &exit,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
@@ -283,76 +281,82 @@ namespace llpp::gui
         });
 
         switch (selected_main_tab) {
-        case GENERAL:
-        {
-            render_subtab_buttons<GeneralTabs>(general_subtabs, selected_general_tab);
-            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
-            ImGui::BeginChild("##general_children",
-                              ImVec2(ImGui::GetWindowWidth() - 20,
-                                     ImGui::GetWindowHeight() - 80));
+            case GENERAL: {
+                render_subtab_buttons<GeneralTabs>(general_subtabs, selected_general_tab);
+                ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+                ImGui::BeginChild("##general_children",
+                                  ImVec2(ImGui::GetWindowWidth() - 20,
+                                         ImGui::GetWindowHeight() - 80));
 
-            switch (selected_general_tab) {
-            case ARK:
-            {
-                draw_general_ark_tabs();
+                switch (selected_general_tab) {
+                    case ARK: {
+                        draw_general_ark_tabs();
+                        break;
+                    }
+                    case BOT: {
+                        draw_general_bot_tabs();
+                        break;
+                    }
+                }
+
+                ImGui::EndChild();
+
+
                 break;
             }
-            case BOT:
-            {
-                draw_general_bot_tabs();
+            case DISCORD: {
+                render_subtab_buttons<DiscordTabs>(discord_subtabs, selected_discord_tab);
+                ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+                ImGui::BeginChild("##info_children",
+                                  ImVec2(ImGui::GetWindowWidth() - 20,
+                                         ImGui::GetWindowHeight() - 80));
+                switch (selected_discord_tab) {
+                    case BOT_CONFIG: {
+                        draw_discord_bot_config();
+                        break;
+                    }
+                    case INFO: {
+                        draw_discord_info_tabs();
+                        break;
+                    }
+                    case LOGS_AND_ALERTS: {
+                        draw_discord_alert_tabs();
+                        break;
+                    }
+                }
+                ImGui::EndChild();
+
                 break;
             }
-            }
+            case BOTS: {
+                render_subtab_buttons<BotTabs>(bot_subtabs, selected_bot_tab);
+                ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
+                ImGui::BeginChild("##bots_children",
+                                  ImVec2(ImGui::GetWindowWidth() - 20,
+                                         ImGui::GetWindowHeight() - 80));
 
-            ImGui::EndChild();
+                switch (selected_bot_tab) {
+                    case PASTE:
+                        draw_bots_paste_tabs();
+                        break;
 
+                    case DROPS:
+                        draw_bots_drops_tab();
+                        break;
 
-            break;
-        }
-        case DISCORD:
-        {
-            render_subtab_buttons<DiscordTabs>(discord_subtabs, selected_discord_tab);
-            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
-            ImGui::BeginChild("##info_children",
-                              ImVec2(ImGui::GetWindowWidth() - 20,
-                                     ImGui::GetWindowHeight() - 80));
-            switch (selected_discord_tab) {
-            case BOT_CONFIG: draw_discord_bot_config();
-                break;
-            case INFO: draw_discord_info_tabs();
-                break;
-
-            case ALERTS: { break; }
-            }
-            ImGui::EndChild();
-
-            break;
-        }
-        case BOTS:
-        {
-            render_subtab_buttons<BotTabs>(bot_subtabs, selected_bot_tab);
-            ImGui::SetCursorPos(ImVec2(maintabs_data.width + 5, 75));
-            ImGui::BeginChild("##bots_children",
-                              ImVec2(ImGui::GetWindowWidth() - 20,
-                                     ImGui::GetWindowHeight() - 80));
-
-            switch (selected_bot_tab) {
-            case PASTE: draw_bots_paste_tabs();
-                break;
-
-            case DROPS: draw_bots_drops_tab();
-                break;
-
-            case SAP: draw_bots_sap_tabs();
-                break;
-            case CROPS: draw_bots_crops_tabs();
-                break;
-            case CRAFTING: draw_bots_crafting_tabs();
+                    case SAP:
+                        draw_bots_sap_tabs();
+                        break;
+                    case CROPS:
+                        draw_bots_crops_tabs();
+                        break;
+                    case CRAFTING:
+                        draw_bots_crafting_tabs();
+                        break;
+                }
+                ImGui::EndChild();
                 break;
             }
-            ImGui::EndChild();
-            break;
-        }
         }
         ImGui::End();
     }

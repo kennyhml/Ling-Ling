@@ -3,6 +3,8 @@
 #include <asapp/items/items.h>
 #include "embeds.h"
 #include "asapp/entities/localplayer.h"
+#include <asapp/interfaces/tribemanager.h>
+#include "../../core/discord.h"
 
 namespace llpp::bots::crafting
 {
@@ -13,7 +15,10 @@ namespace llpp::bots::crafting
     core::StationResult GrindStation::complete()
     {
         const auto start = std::chrono::system_clock::now();
-        asa::entities::local_player->fast_travel_to(bed_);
+        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::core::sleep_for(std::chrono::seconds(1));
         bool was_emptied = false;
 
         if (state_ == GRINDING) {
@@ -57,6 +62,7 @@ namespace llpp::bots::crafting
     void GrindStation::put_paste_and_grind()
     {
         std::cout << "[+] Putting paste away..\n";
+        asa::entities::local_player->stand_up();
         asa::entities::local_player->turn_left(90);
         asa::entities::local_player->access(grinder_);
         asa::core::sleep_for(std::chrono::seconds(1));

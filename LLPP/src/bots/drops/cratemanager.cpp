@@ -138,7 +138,11 @@ namespace llpp::bots::drops
 
     void CrateManager::spawn_on_align_bed()
     {
-        asa::entities::local_player->fast_travel_to(align_bed_);
+        asa::entities::local_player->fast_travel_to(align_bed_, AccessFlags_Default,
+                                                    TravelFlags_NoTravelAnimation);
+
+        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(20);
 

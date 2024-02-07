@@ -12,8 +12,8 @@ namespace llpp::bots::farm
         bool should_drop_items(const std::chrono::system_clock::time_point last_drop)
         {
             return asa::interfaces::hud->is_mount_capped() || (
-                    util::timedout(last_drop, std::chrono::seconds(15)) && !
-                            asa::interfaces::HUD::item_added({37, 521, 85, 90}));
+                util::timedout(last_drop, std::chrono::seconds(15)) && !
+                asa::interfaces::HUD::item_added({37, 521, 85, 90}));
         }
     }
 
@@ -38,12 +38,12 @@ namespace llpp::bots::farm
 
         const auto start = std::chrono::system_clock::now();
         asa::entities::local_player->fast_travel_to(spawn_at_);
+        mount_farm_tame();
 
-
-        const auto item = resource_ == METAL
-                          ? asa::items::resources::metal
-                          : asa::items::resources::wood;
-
+        asa::items::Item* item = nullptr;
+        if (resource_ == METAL) {item = asa::items::resources::metal; }
+        if (resource_ == WOOD) {item = asa::items::resources::wood; }
+        if (resource_ == OBSIDIAN) {item = asa::items::resources::obsidian; }
 
         asa::entities::local_player->set_pitch(90);
         auto last_dropped = std::chrono::system_clock::now();
@@ -58,7 +58,8 @@ namespace llpp::bots::farm
                 last_dropped = std::chrono::system_clock::now();
             }
 
-            if (util::timedout(last_rm_check, std::chrono::seconds(1))) {
+            if (util::timedout(last_rm_check, std::chrono::seconds(1)) &&
+                util::timedout(last_dropped, std::chrono::seconds(5))) {
                 last_rm_check = std::chrono::system_clock::now();
                 if (asa::entities::local_player->deposited_item(*item)) {
                     help_popcorn(*item);
@@ -91,17 +92,24 @@ namespace llpp::bots::farm
         mount_.open_inventory();
 
         switch (resource_) {
-            case METAL: {
-                mount_.get_inventory()->drop_all("o"); // stone, obsidian, wood
-                mount_.get_inventory()->drop_all("ry"); // crystal, berry
-                mount_.get_inventory()->drop_all("h"); // thatch
-                break;
-            }
-            case WOOD: {
-                mount_.get_inventory()->drop_all("h"); // Thatch
-                mount_.get_inventory()->drop_all("e"); // berry
-                break;
-            }
+        case METAL:
+        {
+            mount_.get_inventory()->drop_all("o"); // stone, obsidian, wood
+            mount_.get_inventory()->drop_all("y"); // crystal, berry
+            break;
+        }
+        case WOOD:
+        {
+            mount_.get_inventory()->drop_all("h"); // Thatch
+            mount_.get_inventory()->drop_all("e"); // berry
+            break;
+        }
+        case OBSIDIAN:
+        {
+            mount_.get_inventory()->drop_all("st"); // Stone, Crystal
+            mount_.get_inventory()->drop_all("r"); // berries
+            break;
+        }
         }
         mount_.get_inventory()->close();
     }
@@ -133,24 +141,6 @@ namespace llpp::bots::farm
 
         while (!mount_.get_inventory()->slots[0].is_empty()) {
             std::cout << "Waiting for items to transfer.." << std::endl;
-        }
-
-        asa::entities::local_player->get_inventory()->select_info_tab();
-
-        for (int i = 5; i > 0; i--) {
-            auto& slot = asa::entities::local_player->get_inventory()->slots[i];
-            if (slot.is_empty()) { continue; }
-
-            auto item = slot.get_item();
-            std::cout << i << ": " << (item ? item->get_name() : "?") << std::endl;
-            if (item && item->get_name().find("Fur") != std::string::npos) {
-                asa::entities::local_player->get_inventory()->select_slot(i);
-
-                do {
-                    asa::window::press(asa::settings::use);
-                } while (!util::await([&slot]() -> bool { return !slot.is_hovered(); },
-                                      std::chrono::seconds(5)));
-            }
         }
         asa::entities::local_player->get_inventory()->close();
         asa::entities::local_player->mount(mount_);

@@ -787,7 +787,14 @@ namespace llpp::gui
         ImGui::SameLine();
         begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
         {
-
+            ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Flush tribelogs",
+                                config::discord::advanced::flush_logs.get_ptr())) {
+                config::discord::advanced::flush_logs.save();
+                                }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("Enable to keep the previous 50 events in the log channel only.");
+            }
         }
         end_child();
 
