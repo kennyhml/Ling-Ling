@@ -164,8 +164,6 @@ namespace llpp::bots::drops
         if (lefts.size() != rights.size()) {
             throw std::exception("Num left brackets does not match num right brackets");
         }
-
-        std::cout << "[+] Allocating for " << lefts.size() << " groups...\n";
         crates_.resize(lefts.size());
         stats_per_group.resize(lefts.size());
 
@@ -178,9 +176,6 @@ namespace llpp::bots::drops
                 if (roi.at(j) == ',') { commas.push_back(j); }
             }
 
-            std::cout << "Parsing " << roi << ", expecting " << commas.size() + 1 <<
-                " crates\n";
-
             for (int crate = 0; crate < commas.size() + 1; crate++) {
                 int prev = crate > 0 ? commas[crate - 1] + 1 : 0;
                 int end = commas.empty() || crate >= commas.size()
@@ -189,8 +184,6 @@ namespace llpp::bots::drops
 
                 QualityFlags curr_flag = 0;
                 std::string color = roi.substr(prev, end);
-                std::cout << "Parsing color of '" << color << "'\n";
-
                 std::vector<std::string> tokens;
                 std::istringstream stream(color);
                 std::string token;

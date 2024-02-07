@@ -228,4 +228,13 @@ namespace llpp::config
             inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
         }
     }
+
+    namespace bots::parasaur
+    {
+        inline const std::vector<std::string> BASE{"bots", "parasaur"};
+
+        inline ManagedVar<std::vector<const char*>> stations(BASE, "stations", save, {});
+
+    }
+
 }

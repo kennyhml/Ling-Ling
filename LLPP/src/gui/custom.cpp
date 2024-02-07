@@ -6,94 +6,16 @@
 
 #include "../config/config.h"
 
+#include "util.h"
+#include "common.h"
+
 namespace llpp::gui
 {
     namespace
     {
         std::string spark_tooltip;
         std::string gp_tooltip;
-
-        int accent_color[4] = {140, 131, 214, 255};
-
-        ImColor get_accent_color(float a = 1.f)
-        {
-            return {
-                    accent_color[0] / 255.f, accent_color[1] / 255.f,
-                    accent_color[2] / 255.f,
-                    a
-            };
-        }
-
-        bool open_folder(std::string& folder_path_out)
-        {
-            // CREATE FILE OBJECT INSTANCE
-            HRESULT f_SysHr = CoInitializeEx(
-                    nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-            if (FAILED(f_SysHr)) { return FALSE; }
-
-            // CREATE FileOpenDialog OBJECT
-            IFileOpenDialog* f_FileSystem;
-            f_SysHr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_ALL,
-                                       IID_IFileOpenDialog,
-                                       reinterpret_cast<void**>(&f_FileSystem));
-            if (FAILED(f_SysHr)) {
-                CoUninitialize();
-                return FALSE;
-            }
-
-            // SET OPTIONS FOR FOLDER SELECTION
-            DWORD dwOptions;
-            f_SysHr = f_FileSystem->GetOptions(&dwOptions);
-            if (SUCCEEDED(f_SysHr)) {
-                f_SysHr = f_FileSystem->SetOptions(dwOptions | FOS_PICKFOLDERS);
-            }
-            if (FAILED(f_SysHr)) {
-                f_FileSystem->Release();
-                CoUninitialize();
-                return FALSE;
-            }
-
-            // SHOW OPEN FILE DIALOG WINDOW
-            f_SysHr = f_FileSystem->Show(nullptr);
-            if (FAILED(f_SysHr)) {
-                f_FileSystem->Release();
-                CoUninitialize();
-                return FALSE;
-            }
-
-            // RETRIEVE FOLDER PATH FROM THE SELECTED ITEM
-            IShellItem* f_Folder;
-            f_SysHr = f_FileSystem->GetResult(&f_Folder);
-            if (FAILED(f_SysHr)) {
-                f_FileSystem->Release();
-                CoUninitialize();
-                return FALSE;
-            }
-
-            // STORE AND CONVERT THE FOLDER PATH
-            PWSTR f_Path;
-            f_SysHr = f_Folder->GetDisplayName(SIGDN_FILESYSPATH, &f_Path);
-            if (FAILED(f_SysHr)) {
-                f_Folder->Release();
-                f_FileSystem->Release();
-                CoUninitialize();
-                return FALSE;
-            }
-
-            // FORMAT AND STORE THE FOLDER PATH
-            std::wstring path(f_Path);
-            std::string c(path.begin(), path.end());
-            folder_path_out = c;
-
-            // SUCCESS, CLEAN UP
-            CoTaskMemFree(f_Path);
-            f_Folder->Release();
-            f_FileSystem->Release();
-            CoUninitialize();
-            return TRUE;
-        }
     }
-
 
     bool tab_button(const char* icon, const char* label, const bool selected,
                     const float rounding, const ImDrawFlags flags)
@@ -105,7 +27,7 @@ namespace llpp::gui
         // get the size of the buttons text and icon
         const ImVec2 label_size = ImGui::CalcTextSize(label, nullptr, true);
         const ImVec2 icon_size = font->CalcTextSizeA(
-                font->FontSize - 2, FLT_MAX, 0, icon);
+            font->FontSize - 2, FLT_MAX, 0, icon);
 
         const ImVec2 start = window->DC.CursorPos;
         // Draw from the top left to the full width and 45 down
@@ -169,7 +91,7 @@ namespace llpp::gui
         anim = ImLerp(anim, (selected ? 1.f : 0.f), 0.035f);
 
         window->DrawList->AddText(rect.Min,
-                                  ImGui::GetColorU32(ImGuiCol_Text, max(anim, 0.4f)),
+                                  ImGui::GetColorU32(ImGuiCol_Text, std::max(anim, 0.4f)),
                                   label);
 
         window->DrawList->AddLine(ImVec2(rect.Min.x - 2, rect.Max.y + 10),
@@ -182,7 +104,7 @@ namespace llpp::gui
     void render_main_tab_area(const std::string& name, const ImVec2 size,
                               const std::function<void()>& render_content)
     {
-        auto& [is_hovered, expand, width] = maintabs_data;
+        auto& [is_hovered, expand, width] = state::maintabs_data;
 
         // adjust the with depending on whether we are expanding or collapsing
         width = ImLerp(width, expand ? size.x + 60 : size.x, 0.08f);
@@ -193,7 +115,7 @@ namespace llpp::gui
 
         is_hovered = ImGui::IsMouseHoveringRect(ImGui::GetCurrentWindow()->Pos,
                                                 ImGui::GetCurrentWindow()->Pos + ImVec2(
-                                                        width, size.y));
+                                                    width, size.y));
 
         ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCurrentWindow()->Pos,
                                                   ImGui::GetCurrentWindow()->Pos +
@@ -238,14 +160,14 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.3f);
             if (ImGui::Button("Get")) {
                 std::string selected;
-                open_folder(selected);
+                util::get_folder_path(selected);
                 if (!selected.empty()) { config::general::ark::root_dir.set(selected); }
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("Select the directory.");
             }
             const bool valid = exists(
-                    std::filesystem::path(config::general::ark::root_dir.get()));
+                std::filesystem::path(config::general::ark::root_dir.get()));
             path_color = valid ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f);
 
             // CONFIG FOR THE ARK ROOT DIRECTORY
@@ -294,19 +216,19 @@ namespace llpp::gui
             ImGui::SetCursorPosY(10);
             if (ImGui::Button("Get")) {
                 std::string selected;
-                open_folder(selected);
+                util::get_folder_path(selected);
                 if (!selected.empty()) { config::general::bot::assets_dir.set(selected); }
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("Select the directory.");
             }
             bool valid = std::filesystem::exists(config::general::bot::assets_dir.get())
-                         || exists(
+                || exists(
                     std::filesystem::current_path() / config::general::bot::assets_dir.
-                                                                                              get());
+                    get());
             assets_path_col = valid
-                              ? ImVec4(0.f, 1.f, 0.f, 1.f)
-                              : ImVec4(1.f, 0.f, 0.f, 1.f);
+                                  ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                                  : ImVec4(1.f, 0.f, 0.f, 1.f);
 
 
             // CONFIG FOR THE ARK ROOT DIRECTORY
@@ -323,11 +245,11 @@ namespace llpp::gui
                 ImGui::SetTooltip("The path to the itemdata shipped with ling ling.");
             }
             valid = std::filesystem::exists(config::general::bot::itemdata.get()) ||
-                    exists(std::filesystem::current_path() /
-                           config::general::bot::itemdata.get());
+                exists(std::filesystem::current_path() /
+                    config::general::bot::itemdata.get());
             itemdata_col = valid
-                           ? ImVec4(0.f, 1.f, 0.f, 1.f)
-                           : ImVec4(1.f, 0.f, 0.f, 1.f);
+                               ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                               : ImVec4(1.f, 0.f, 0.f, 1.f);
 
             // CONFIG FOR THE ARK ROOT DIRECTORY
             ImGui::SetCursorPos({10, 76});
@@ -343,17 +265,16 @@ namespace llpp::gui
                 ImGui::SetTooltip("The path to the tessdata shipped with ling ling.");
             }
             valid = std::filesystem::exists(config::general::bot::tessdata_dir.get()) ||
-                    exists(std::filesystem::current_path() /
-                           config::general::bot::tessdata_dir.get());
+                exists(std::filesystem::current_path() /
+                    config::general::bot::tessdata_dir.get());
             tessdata_col = valid
-                           ? ImVec4(0.f, 1.f, 0.f, 1.f)
-                           : ImVec4(1.f, 0.f, 0.f, 1.f);
+                               ? ImVec4(0.f, 1.f, 0.f, 1.f)
+                               : ImVec4(1.f, 0.f, 0.f, 1.f);
         }
         end_child();
 
         ImGui::SameLine();
-        begin_child("...", ImVec2(205, ImGui::GetWindowHeight()));
-        {}
+        begin_child("...", ImVec2(205, ImGui::GetWindowHeight())); {}
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
@@ -371,7 +292,7 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The commands ling ling uses when starting or reconnecting.");
+                    "The commands ling ling uses when starting or reconnecting.");
             }
         }
         end_child();
@@ -387,7 +308,7 @@ namespace llpp::gui
     void draw_discord_bot_config()
     {
         begin_child("Bot settings",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
         {
             // TOKEN SHITS
             ImGui::SetCursorPos({10, 14});
@@ -401,8 +322,8 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The token for your discord bot, you must create it "
-                        "yourself.\nDO NOT SHARE THIS WITH ANYONE.");
+                    "The token for your discord bot, you must create it "
+                    "yourself.\nDO NOT SHARE THIS WITH ANYONE.");
             }
 
 
@@ -425,10 +346,10 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "A list of channel IDs where bot commands are permitted; "
-                        "roles and users are still respected.\n"
-                        "Leave this field empty to allow bot commands to be used "
-                        "in any channel.");
+                    "A list of channel IDs where bot commands are permitted; "
+                    "roles and users are still respected.\n"
+                    "Leave this field empty to allow bot commands to be used "
+                    "in any channel.");
             }
 
             ImGui::SameLine();
@@ -437,7 +358,7 @@ namespace llpp::gui
             if (ImGui::Button("-##channel") && !channel_data->empty()) {
                 channel_data->erase(channel_data->begin() + selected_channel);
                 config::discord::authorization::channels.save();
-                selected_channel = max(0, selected_channel - 1);
+                selected_channel = std::max(0, selected_channel - 1);
             }
 
             if (new_channel_popup) {
@@ -475,7 +396,7 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "A list of role IDs authorized to execute bot commands.\n");
+                    "A list of role IDs authorized to execute bot commands.\n");
             }
 
             ImGui::SameLine();
@@ -484,7 +405,7 @@ namespace llpp::gui
             if (ImGui::Button("-##role") && !roles_data->empty()) {
                 roles_data->erase(roles_data->begin() + selected_role);
                 config::discord::authorization::roles.save();
-                selected_role = max(0, selected_role - 1);
+                selected_role = std::max(0, selected_role - 1);
             }
 
             if (new_role_popup) {
@@ -520,9 +441,9 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "A list of user IDs authorized to execute bot commands.\n"
-                        "Takes priority over roles; for example, a specified user "
-                        "does not require an authorized role.");
+                    "A list of user IDs authorized to execute bot commands.\n"
+                    "Takes priority over roles; for example, a specified user "
+                    "does not require an authorized role.");
             }
 
             ImGui::SameLine();
@@ -531,7 +452,7 @@ namespace llpp::gui
             if (ImGui::Button("-##user") && !user_data->empty()) {
                 user_data->erase(user_data->begin() + selected_user);
                 config::discord::authorization::users.save();
-                selected_user = max(0, selected_user - 1);
+                selected_user = std::max(0, selected_user - 1);
             }
 
             if (new_user_popup) {
@@ -564,7 +485,7 @@ namespace llpp::gui
                 ImGui::SetCursorPos({10, 11});
                 if (ImGui::Checkbox("Use ephemeral replies",
                                     config::discord::advanced::ephemeral_replies.
-                                                                                        get_ptr())) {
+                                    get_ptr())) {
                     config::discord::advanced::ephemeral_replies.save();
                 }
             }
@@ -575,7 +496,8 @@ namespace llpp::gui
     void draw_discord_info_tabs()
     {
         begin_child("Roles / People",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+                    ImVec2(475 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() / 2));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Helpers [No Access]:");
@@ -588,12 +510,12 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "This role will be mentioned for any problems ling ling "
-                        "encounters\nthat can be fixed by someone without direct "
-                        "access to ling ling.\n"
-                        "Examples:\n-An Achatina is missing or inaccessible.\n-The "
-                        "bed/teleporter of a task is missing.\n-The vault of a "
-                        "task is capped / close to cap.");
+                    "This role will be mentioned for any problems ling ling "
+                    "encounters\nthat can be fixed by someone without direct "
+                    "access to ling ling.\n"
+                    "Examples:\n-An Achatina is missing or inaccessible.\n-The "
+                    "bed/teleporter of a task is missing.\n-The vault of a "
+                    "task is capped / close to cap.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -607,22 +529,22 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "This role will be mentioned for any fatal problems ling "
-                        "ling encounters\n and require direct access to be fixed."
-                        "Examples:\n-An unexpected error at any task.\n-Failure to "
-                        "reconnect / restart .\n-Upcoming game update.");
+                    "This role will be mentioned for any fatal problems ling "
+                    "ling encounters\n and require direct access to be fixed."
+                    "Examples:\n-An unexpected error at any task.\n-Failure to "
+                    "reconnect / restart .\n-Upcoming game update.");
             }
         }
         end_child();
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
-        {}
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight())); {}
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
         begin_child("Channels",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+                    ImVec2(475 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() / 2));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Info Channel:");
@@ -635,8 +557,8 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "[REQUIRED] - General info will be posted "
-                        "here (stations completed, times taken...)");
+                    "[REQUIRED] - General info will be posted "
+                    "here (stations completed, times taken...)");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -650,9 +572,9 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "[OPTIONAL] - Errors and warnings will be posted here "
-                        "(game crashed, vaults full..)\nIf empty these messages "
-                        "will fall back to the info channel.");
+                    "[OPTIONAL] - Errors and warnings will be posted here "
+                    "(game crashed, vaults full..)\nIf empty these messages "
+                    "will fall back to the info channel.");
             }
         }
         end_child();
@@ -667,7 +589,8 @@ namespace llpp::gui
     void draw_discord_alert_tabs()
     {
         begin_child("Configuration",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+                    ImVec2(475 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() / 2));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Ping cooldown (s):");
@@ -686,12 +609,13 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 42});
             if (ImGui::InputInt("##ping_min_events",
-                                config::discord::alert_rules::ping_min_events.get_ptr())) {
+                                config::discord::alert_rules::ping_min_events.
+                                get_ptr())) {
                 config::discord::alert_rules::ping_min_events.save();
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The minimum amount of events within one update to allow pings.");
+                    "The minimum amount of events within one update to allow pings.");
             }
 
 
@@ -705,22 +629,21 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "An alert message containing any of these terms will be ignored.");
+                    "An alert message containing any of these terms will be ignored.");
             }
 
             ImGui::SameLine();
             if (ImGui::Button(" - ##ignore_filter") && !ignore_data->empty()) {
                 ignore_data->erase(ignore_data->begin() + selected_ignore_filter);
                 config::discord::alert_rules::ignore_filter.save();
-                selected_ignore_filter = max(0, selected_ignore_filter - 1);
+                selected_ignore_filter = std::max(0, selected_ignore_filter - 1);
             }
             ImGui::SameLine();
             if (ImGui::Button(" + ##ignore_filter")) { new_ignore_popup = true; }
 
             if (new_ignore_popup) {
                 ImGui::OpenPopup("Add an ignore filter");
-                if (ImGui::BeginPopupModal("Add an ignore filter",
-                                           &new_ignore_popup,
+                if (ImGui::BeginPopupModal("Add an ignore filter", &new_ignore_popup,
                                            ImGuiWindowFlags_AlwaysAutoResize)) {
                     static char name_buffer[256] = {};
                     if (ImGui::IsWindowAppearing()) {
@@ -749,22 +672,21 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "An alert message containing any of these terms will @everyone instead of @alert");
+                    "An alert message containing any of these terms will @everyone instead of @alert");
             }
 
             ImGui::SameLine();
             if (ImGui::Button(" - ##ping_filter") && !ping_data->empty()) {
                 ping_data->erase(ping_data->begin() + selected_ping_filter);
                 config::discord::alert_rules::ping_filter.save();
-                selected_ping_filter = max(0, selected_ping_filter - 1);
+                selected_ping_filter = std::max(0, selected_ping_filter - 1);
             }
             ImGui::SameLine();
             if (ImGui::Button(" + ##ping_filter")) { new_ping_popup = true; }
 
             if (new_ping_popup) {
                 ImGui::OpenPopup("Add a ping filter");
-                if (ImGui::BeginPopupModal("Add a ping filter",
-                                           &new_ping_popup,
+                if (ImGui::BeginPopupModal("Add a ping filter", &new_ping_popup,
                                            ImGuiWindowFlags_AlwaysAutoResize)) {
                     static char name_buffer[256] = {};
                     if (ImGui::IsWindowAppearing()) {
@@ -791,18 +713,19 @@ namespace llpp::gui
             if (ImGui::Checkbox("Flush tribelogs",
                                 config::discord::advanced::flush_logs.get_ptr())) {
                 config::discord::advanced::flush_logs.save();
-                                }
+            }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip("Enable to keep the previous 50 events in the log channel only.");
+                ImGui::SetTooltip(
+                    "Enable to keep the previous 50 events in the log channel only.");
             }
         }
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
         begin_child("Roles & Channels",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() / 2));
+                    ImVec2(475 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() / 2));
         {
-
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Logs channel:");
             ImGui::SameLine();
@@ -826,7 +749,7 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The channel to post alerts to. If empty logs channel is used.");
+                    "The channel to post alerts to. If empty logs channel is used.");
             }
 
             ImGui::SetCursorPos({10, 76});
@@ -840,8 +763,8 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The role to be mentioned for parasaur or tribelog alerts.\n"
-                        "If empty, @everyone will always be used.");
+                    "The role to be mentioned for parasaur or tribelog alerts.\n"
+                    "If empty, @everyone will always be used.");
             }
         }
         end_child();
@@ -851,7 +774,8 @@ namespace llpp::gui
     void draw_bots_paste_tabs()
     {
         begin_child("Station Configuration",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight() * 0.52));
+                    ImVec2(475 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() * 0.52));
         {
             ImGui::SetCursorPos({10, 5});
             ImGui::Text("Station prefix:");
@@ -863,10 +787,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the prefix for your paste beds. The prefix must "
-                        "be included in your bed name but may not be identical.\n"
-                        "For instance, your bed could be named COOL SPOT // "
-                        "PASTE00, while your prefix can still be PASTE.");
+                    "Specifies the prefix for your paste beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named COOL SPOT // "
+                    "PASTE00, while your prefix can still be PASTE.");
             }
 
             ImGui::SetCursorPos({10, 36});
@@ -879,16 +803,16 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the prefix for the render bed. For more "
-                        "details, please refer to the explanation below.\n\n"
-                        "Why is a render bed needed?\n"
-                        "When the snail is loaded before the structure it's on, it "
-                        "visually glitches into it.\n"
-                        "To resolve this issue, you need to render the structure, "
-                        "leave the render of the dino, and then move back to it.\n"
-                        "To achieve this, you'll require a source bed close to the "
-                        "snails named [PREFIX]::SRC\n"
-                        "and a gateway bed out of snail render named " "[PREFIX]::GATEWAY.");
+                    "Specifies the prefix for the render bed. For more "
+                    "details, please refer to the explanation below.\n\n"
+                    "Why is a render bed needed?\n"
+                    "When the snail is loaded before the structure it's on, it "
+                    "visually glitches into it.\n"
+                    "To resolve this issue, you need to render the structure, "
+                    "leave the render of the dino, and then move back to it.\n"
+                    "To achieve this, you'll require a source bed close to the "
+                    "snails named [PREFIX]::SRC\n"
+                    "and a gateway bed out of snail render named " "[PREFIX]::GATEWAY.");
             }
 
             ImGui::SetCursorPos({10, 67});
@@ -919,7 +843,7 @@ namespace llpp::gui
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
 
 
@@ -933,10 +857,10 @@ namespace llpp::gui
             *load_for = std::clamp(*load_for, 5, 100);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the duration for stations to render at the "
-                        "source render bed (in seconds).\n"
-                        "The rendering time increases with more structures; "
-                        "additional structures require a longer rendering time.");
+                    "Specifies the duration for stations to render at the "
+                    "source render bed (in seconds).\n"
+                    "The rendering time increases with more structures; "
+                    "additional structures require a longer rendering time.");
             }
         }
         end_child();
@@ -951,10 +875,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Completely disable the paste manager's completion.\n\n"
-                        "Even when disabled, the paste manager is created but "
-                        "remains inactive.\n"
-                        "You can toggle its state at runtime or through the " "discord bot.");
+                    "Completely disable the paste manager's completion.\n\n"
+                    "Even when disabled, the paste manager is created but "
+                    "remains inactive.\n"
+                    "You can toggle its state at runtime or through the " "discord bot.");
             }
 
             if (ImGui::Checkbox("Allow partial completion",
@@ -963,18 +887,18 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Enables the bot to pause its operation after reaching a "
-                        "specific station and resume afterward.\n\n"
-                        "For example:\nSuppose there are Task A, Task B, and Task "
-                        "C in order of priority. Task C represents\n"
-                        "a PasteManager instance handling paste stations. If both "
-                        "Task A and B are on cooldown and C is initiated,\n"
-                        "A and B will be temporarily ignored until C completes. In "
-                        "cases of partial completion, C might finish\n"
-                        "station 3, execute Task A/B, and then resume C at station " "4.\n\n"
-                        "Not recommended if there will be frequent partial "
-                        "completions and rendering takes a considerable amount of "
-                        "time.\n");
+                    "Enables the bot to pause its operation after reaching a "
+                    "specific station and resume afterward.\n\n"
+                    "For example:\nSuppose there are Task A, Task B, and Task "
+                    "C in order of priority. Task C represents\n"
+                    "a PasteManager instance handling paste stations. If both "
+                    "Task A and B are on cooldown and C is initiated,\n"
+                    "A and B will be temporarily ignored until C completes. In "
+                    "cases of partial completion, C might finish\n"
+                    "station 3, execute Task A/B, and then resume C at station " "4.\n\n"
+                    "Not recommended if there will be frequent partial "
+                    "completions and rendering takes a considerable amount of "
+                    "time.\n");
             }
 
 
@@ -984,10 +908,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Enable to use OCR to determine how much paste was put "
-                        "into the dedi per station.\n"
-                        "This info is sent to the completion embed on discord, it "
-                        "has no other purpose as of now.");
+                    "Enable to use OCR to determine how much paste was put "
+                    "into the dedi per station.\n"
+                    "This info is sent to the completion embed on discord, it "
+                    "has no other purpose as of now.");
             }
 
             end_child();
@@ -1004,7 +928,8 @@ namespace llpp::gui
     void draw_bots_drops_tab()
     {
         begin_child("Crate Managers",
-                    ImVec2(425 - maintabs_data.width, ImGui::GetWindowHeight() * 0.33));
+                    ImVec2(425 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() * 0.33));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Selected Manager:");
@@ -1063,7 +988,7 @@ namespace llpp::gui
                         map[name].erase();
                         map.erase(name);
                         config::bots::drops::managers.save();
-                        selected_manager = max(0, selected_manager - 1);
+                        selected_manager = std::max(0, selected_manager - 1);
                     }
 
                     ImGui::SameLine();
@@ -1083,13 +1008,14 @@ namespace llpp::gui
 
         if (!config::bots::drops::managers.get_ptr()->empty()) {
             const std::string selected = (*config::bots::drops::managers.get_ptr())[
-                    selected_manager];
+                selected_manager];
             if (config::bots::drops::configs.contains(selected)) {
                 active = &config::bots::drops::configs[selected];
-            } else {
+            }
+            else {
                 config::bots::drops::configs[selected] = config::ManagedVar(
-                        {"bots", "drops", selected}, config::save,
-                        bots::drops::CrateManagerConfig());
+                    {"bots", "drops", selected}, config::save,
+                    bots::drops::CrateManagerConfig());
             }
         }
 
@@ -1104,17 +1030,17 @@ namespace llpp::gui
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
-                            "Allow the bot to break after a certain station and "
-                            "pick back up after that.\n\n"
-                            "Example:\nConsider we have Task A, Task B and Task C "
-                            "where the order is their priority and C is\n"
-                            "our CrateManager instance managing the crates.\nIf "
-                            "Task A and B are both on cooldown and C is started, A "
-                            "and B will be disregarded\n"
-                            "until C completes. With partial completion, C may go "
-                            "to complete station 3, complete task A/B,\n"
-                            "then pick C back up at 4.");
+                        "[ONLY SUPPORTED FOR BED STATIONS]\n\n"
+                        "Allow the bot to break after a certain station and "
+                        "pick back up after that.\n\n"
+                        "Example:\nConsider we have Task A, Task B and Task C "
+                        "where the order is their priority and C is\n"
+                        "our CrateManager instance managing the crates.\nIf "
+                        "Task A and B are both on cooldown and C is started, A "
+                        "and B will be disregarded\n"
+                        "until C completes. With partial completion, C may go "
+                        "to complete station 3, complete task A/B,\n"
+                        "then pick C back up at 4.");
                 }
 
                 ImGui::SetCursorPos({10, 42});
@@ -1139,7 +1065,7 @@ namespace llpp::gui
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "How long to render the first drop of the entire manager for.");
+                        "How long to render the first drop of the entire manager for.");
                 }
 
                 ImGui::SetCursorPos({10, 104});
@@ -1152,7 +1078,7 @@ namespace llpp::gui
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "How long to render the first drop of each group for.");
+                        "How long to render the first drop of each group for.");
                 }
             }
 
@@ -1170,17 +1096,18 @@ namespace llpp::gui
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "[GLOBAL]\nThe maximum %% of slots the vaults the items "
-                        "are dumped into is allowed to have.\n"
-                        "When the threshold is exceeded, the 'helper [no access]' "
-                        "role will be tagged to empty it.");
+                    "[GLOBAL]\nThe maximum %% of slots the vaults the items "
+                    "are dumped into is allowed to have.\n"
+                    "When the threshold is exceeded, the 'helper [no access]' "
+                    "role will be tagged to empty it.");
             }
         }
         end_child();
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.33) + 5);
         begin_child("Configuration",
-                    ImVec2(425 - maintabs_data.width, ImGui::GetWindowHeight() * 0.66));
+                    ImVec2(425 - state::maintabs_data.width,
+                           ImGui::GetWindowHeight() * 0.66));
         {
             if (active) {
                 ImGui::SetCursorPos({10, 14});
@@ -1192,15 +1119,15 @@ namespace llpp::gui
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "The prefix of this crate manager.\n\n"
-                            "The following structure instances will be created "
-                            "with the prefix:\n"
-                            "-[PREFIX]::ALIGN - The initial bed to spawn on for "
-                            "teleporter mode\n"
-                            "-[PREFIX]::DROPXX - The teleporter / bed per drop "
-                            "where XX is it's index\n"
-                            "-[PREFIX]::DROPOFF - The vault the items will be "
-                            "stored in for teleporter mode\n");
+                        "The prefix of this crate manager.\n\n"
+                        "The following structure instances will be created "
+                        "with the prefix:\n"
+                        "-[PREFIX]::ALIGN - The initial bed to spawn on for "
+                        "teleporter mode\n"
+                        "-[PREFIX]::DROPXX - The teleporter / bed per drop "
+                        "where XX is it's index\n"
+                        "-[PREFIX]::DROPOFF - The vault the items will be "
+                        "stored in for teleporter mode\n");
                 }
 
                 ImGui::SetCursorPos({10, 45});
@@ -1215,23 +1142,23 @@ namespace llpp::gui
 
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "An array of arrays where each array represents one "
-                            "group of crates.\n"
-                            "Each group corresponds to crates that share the same "
-                            "uptime,\n"
-                            "meaning only one of them will be active at any given "
-                            "time (e.g., Swamp Cave big room).\n\n" "Guidelines:\n"
-                            " - Enclose each group in curly braces { and }.\n"
-                            " - Separate elements within a group with commas.\n"
-                            " - For each crate 'j' per crates[i], provide one bed "
-                            "or tp with the corresponding name.\n"
-                            " - Define each crate with its color options: BLUE, "
-                            "YELLOW, RED.\n"
-                            " - Use a pipe '|' to separate multiple options for a "
-                            "crate (e.g., YELLOW | RED).\n"
-                            " - 'ANY' can be used to represent multiple color "
-                            "options for a crate.\n\n" "Example for Island Swamp Cave:\n"
-                            "{RED, RED}, {YELLOW, YELLOW, ANY}, {BLUE}");
+                        "An array of arrays where each array represents one "
+                        "group of crates.\n"
+                        "Each group corresponds to crates that share the same "
+                        "uptime,\n"
+                        "meaning only one of them will be active at any given "
+                        "time (e.g., Swamp Cave big room).\n\n" "Guidelines:\n"
+                        " - Enclose each group in curly braces { and }.\n"
+                        " - Separate elements within a group with commas.\n"
+                        " - For each crate 'j' per crates[i], provide one bed "
+                        "or tp with the corresponding name.\n"
+                        " - Define each crate with its color options: BLUE, "
+                        "YELLOW, RED.\n"
+                        " - Use a pipe '|' to separate multiple options for a "
+                        "crate (e.g., YELLOW | RED).\n"
+                        " - 'ANY' can be used to represent multiple color "
+                        "options for a crate.\n\n" "Example for Island Swamp Cave:\n"
+                        "{RED, RED}, {YELLOW, YELLOW, ANY}, {BLUE}");
                 }
 
                 ImGui::SetCursorPos({10, 76});
@@ -1242,7 +1169,7 @@ namespace llpp::gui
                                     5)) { active->save(); }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "The interval to complete the stations " "at (in minutes).");
+                        "The interval to complete the stations " "at (in minutes).");
                 }
 
                 ImGui::SetCursorPos({10, 107});
@@ -1256,11 +1183,11 @@ namespace llpp::gui
                                     &active->get_ptr()->disabled)) { active->save(); }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "Completely disable this crate manager's " "completion.\n\n"
-                            "Even when disabled, the paste manager "
-                            "is created but remains inactive.\n"
-                            "You can toggle its state at runtime or "
-                            "through the discord bot.");
+                        "Completely disable this crate manager's " "completion.\n\n"
+                        "Even when disabled, the paste manager "
+                        "is created but remains inactive.\n"
+                        "You can toggle its state at runtime or "
+                        "through the discord bot.");
                 }
             }
         }
@@ -1280,7 +1207,7 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The channel to post the crate loot to, leave empty to post to info channel.");
+                    "The channel to post the crate loot to, leave empty to post to info channel.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -1294,8 +1221,8 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The role to mention when a drop is ready to be rerolled.\n"
-                        "Leave empty to not mention any role.");
+                    "The role to mention when a drop is ready to be rerolled.\n"
+                    "Leave empty to not mention any role.");
             }
 
             ImGui::SetCursorPos({10, 73});
@@ -1305,8 +1232,8 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "[GLOBAL]\nWhen enabled, Ling Ling++ will "
-                        "request a reroll of a found crate.");
+                    "[GLOBAL]\nWhen enabled, Ling Ling++ will "
+                    "request a reroll of a found crate.");
             }
             if (active) {
                 ImGui::SetCursorPos({10, 104});
@@ -1316,8 +1243,8 @@ namespace llpp::gui
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                     ImGui::SetTooltip(
-                            "Enable to ignore the reroll mode for this crate "
-                            "manager, drops are always looted.");
+                        "Enable to ignore the reroll mode for this crate "
+                        "manager, drops are always looted.");
                 }
             }
         }
@@ -1327,7 +1254,7 @@ namespace llpp::gui
     void draw_bots_crops_tabs()
     {
         begin_child("Station Configuration",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Longrass stations:");
@@ -1388,8 +1315,8 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in hours).\n"
-                        "150 crops take 8 hours to grow on 300%% greenhouse " "effect.");
+                    "The interval to complete the station at (in hours).\n"
+                    "150 crops take 8 hours to grow on 300%% greenhouse " "effect.");
             }
         }
         end_child();
@@ -1404,10 +1331,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Completely disable the crop manager's completion.\n\n"
-                        "Even when disabled, crop sap manager is created but "
-                        "remains inactive.\n"
-                        "You can toggle its state at runtime or through the " "discord bot.");
+                    "Completely disable the crop manager's completion.\n\n"
+                    "Even when disabled, crop sap manager is created but "
+                    "remains inactive.\n"
+                    "You can toggle its state at runtime or through the " "discord bot.");
             }
             end_child();
         }
@@ -1416,7 +1343,7 @@ namespace llpp::gui
     void draw_bots_sap_tabs()
     {
         begin_child("Station Configuration",
-                    ImVec2(475 - maintabs_data.width, ImGui::GetWindowHeight()));
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Station prefix:");
@@ -1427,10 +1354,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the prefix for your sap beds. The prefix must "
-                        "be included in your bed name but may not be identical.\n"
-                        "For instance, your bed could be named COOL MYSAP01, while "
-                        "your prefix can still be SAP.");
+                    "Specifies the prefix for your sap beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named COOL MYSAP01, while "
+                    "your prefix can still be SAP.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -1456,7 +1383,7 @@ namespace llpp::gui
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
         }
         end_child();
@@ -1471,10 +1398,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Completely disable the sap manager's completion.\n\n"
-                        "Even when disabled, the sap manager is created but "
-                        "remains inactive.\n"
-                        "You can toggle its state at runtime or through the " "discord bot.");
+                    "Completely disable the sap manager's completion.\n\n"
+                    "Even when disabled, the sap manager is created but "
+                    "remains inactive.\n"
+                    "You can toggle its state at runtime or through the " "discord bot.");
             }
             end_child();
         }
@@ -1496,10 +1423,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the prefix for your spark beds. The prefix must "
-                        "be included in your bed name but may not be identical.\n"
-                        "For instance, your bed could be named HELLO SPARK01, while "
-                        "your prefix can still be SPARK.");
+                    "Specifies the prefix for your spark beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named HELLO SPARK01, while "
+                    "your prefix can still be SPARK.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -1515,11 +1442,11 @@ namespace llpp::gui
             *num_stations = std::clamp(*num_stations, 1, 100);
 
             spark_tooltip = std::vformat(
-                    "The number of sparkpowder stations you have.\n"
-                    "Current processing power:\n"
-                    "{} sparkpowder every 6 minutes using {} flint & {} stone",
-                    std::make_format_args(*num_stations * 9600, *num_stations * 6400,
-                                          *num_stations * 3200));
+                "The number of sparkpowder stations you have.\n"
+                "Current processing power:\n"
+                "{} sparkpowder every 6 minutes using {} flint & {} stone",
+                std::make_format_args(*num_stations * 9600, *num_stations * 6400,
+                                      *num_stations * 3200));
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(spark_tooltip.c_str());
@@ -1536,7 +1463,7 @@ namespace llpp::gui
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
             ImGui::SetCursorPos({10, 107});
             if (ImGui::Checkbox("Disabled",
@@ -1560,10 +1487,10 @@ namespace llpp::gui
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "Specifies the prefix for your gunpowder beds. The prefix must "
-                        "be included in your bed name but may not be identical.\n"
-                        "For instance, your bed could be named TEST GP01, while "
-                        "your prefix can still be GP.");
+                    "Specifies the prefix for your gunpowder beds. The prefix must "
+                    "be included in your bed name but may not be identical.\n"
+                    "For instance, your bed could be named TEST GP01, while "
+                    "your prefix can still be GP.");
             }
 
             ImGui::SetCursorPos({10, 45});
@@ -1579,11 +1506,11 @@ namespace llpp::gui
             *num_stations = std::clamp(*num_stations, 1, 100);
 
             gp_tooltip = std::vformat(
-                    "The number of gunpowder stations you have.\n"
-                    "Current processing power:\n"
-                    "{} gunpowder every 6 minutes using {} sparkpowder & {} charcoal",
-                    std::make_format_args(*num_stations * 6000, *num_stations * 4000,
-                                          *num_stations * 4000));
+                "The number of gunpowder stations you have.\n"
+                "Current processing power:\n"
+                "{} gunpowder every 6 minutes using {} sparkpowder & {} charcoal",
+                std::make_format_args(*num_stations * 6000, *num_stations * 4000,
+                                      *num_stations * 4000));
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(gp_tooltip.c_str());
@@ -1602,7 +1529,7 @@ namespace llpp::gui
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
             ImGui::SetCursorPos({10, 107});
             if (ImGui::Checkbox("Disabled",
@@ -1649,14 +1576,12 @@ namespace llpp::gui
             ImGui::SetCursorPos({120, 73});
             if (ImGui::InputInt("##grinding_interval",
                                 config::bots::crafting::grinding::interval.get_ptr(), 1,
-                                5)) {
-                config::bots::crafting::grinding::interval.save();
-            }
+                                5)) { config::bots::crafting::grinding::interval.save(); }
             int* interval = config::bots::crafting::grinding::interval.get_ptr();
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
             ImGui::SetCursorPos({10, 107});
             if (ImGui::Checkbox("Disabled",
@@ -1687,10 +1612,8 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 42});
             if (ImGui::InputInt("##bullets_count",
-                                config::bots::crafting::arb::num_stations.get_ptr(),
-                                1, 5)) {
-                config::bots::crafting::arb::num_stations.save();
-            }
+                                config::bots::crafting::arb::num_stations.get_ptr(), 1,
+                                5)) { config::bots::crafting::arb::num_stations.save(); }
             int* num_stations = config::bots::crafting::arb::num_stations.get_ptr();
             *num_stations = std::clamp(*num_stations, 1, 100);
 
@@ -1703,15 +1626,14 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 73});
             if (ImGui::InputInt("##bullets_interval",
-                                config::bots::crafting::arb::interval.get_ptr(), 1,
-                                5)) {
+                                config::bots::crafting::arb::interval.get_ptr(), 1, 5)) {
                 config::bots::crafting::arb::interval.save();
             }
             int* interval = config::bots::crafting::arb::interval.get_ptr();
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
             ImGui::SetCursorPos({10, 107});
             if (ImGui::Checkbox("Disabled",
@@ -1741,8 +1663,8 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 42});
             if (ImGui::InputInt("##forges_count",
-                                config::bots::crafting::forges::num_stations.get_ptr(),
-                                1, 5)) {
+                                config::bots::crafting::forges::num_stations.get_ptr(), 1,
+                                5)) {
                 config::bots::crafting::forges::num_stations.save();
             }
             int* num_stations = config::bots::crafting::forges::num_stations.get_ptr();
@@ -1758,14 +1680,12 @@ namespace llpp::gui
             ImGui::SetCursorPos({120, 73});
             if (ImGui::InputInt("##forges_interval",
                                 config::bots::crafting::forges::interval.get_ptr(), 1,
-                                5)) {
-                config::bots::crafting::forges::interval.save();
-            }
+                                5)) { config::bots::crafting::forges::interval.save(); }
             int* interval = config::bots::crafting::forges::interval.get_ptr();
             *interval = std::clamp(*interval, 5, 150);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
-                        "The interval to complete the station at (in minutes).");
+                    "The interval to complete the station at (in minutes).");
             }
             ImGui::SetCursorPos({10, 107});
             if (ImGui::Checkbox("Disabled",
@@ -1774,39 +1694,5 @@ namespace llpp::gui
             }
         }
         end_child();
-    }
-
-    void begin_child(const char* name, ImVec2 size)
-    {
-        const ImGuiWindow* window = ImGui::GetCurrentWindow();
-        const ImVec2 pos = window->DC.CursorPos;
-
-        ImGui::BeginChild(std::string(name).append(".main").c_str(), size, false,
-                          ImGuiWindowFlags_NoScrollbar);
-
-        // draw the name of this tab
-        ImGui::GetWindowDrawList()->AddRectFilled(pos, pos + size,
-                                                  ImColor(28 / 255.f, 30 / 255.f,
-                                                          36 / 255.f, animation), 4);
-        ImGui::GetWindowDrawList()->AddText(pos + ImVec2(10, 5),
-                                            get_accent_color(animation), name,
-                                            ImGui::FindRenderedTextEnd(name));
-
-        ImGui::SetCursorPosY(30);
-        ImGui::BeginChild(name, {size.x, size.y - 30});
-        ImGui::SetCursorPosX(10);
-
-        ImGui::BeginGroup();
-
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, animation);
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {8, 8});
-    }
-
-    void end_child()
-    {
-        ImGui::PopStyleVar(2);
-        ImGui::EndGroup();
-        ImGui::EndChild();
-        ImGui::EndChild();
     }
 }
