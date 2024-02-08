@@ -109,7 +109,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    llpp::auth::login();
+    // llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

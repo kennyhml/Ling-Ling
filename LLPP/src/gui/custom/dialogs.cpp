@@ -6,7 +6,7 @@ namespace llpp::gui::custom
 {
     namespace
     {
-        char element_buffer[256] = {};
+        char text_buffer[256] = {};
     }
 
     bool simple_add_dialog(bool* active, const char* text, std::string& new_out)
@@ -18,18 +18,15 @@ namespace llpp::gui::custom
         }
 
         // Clear the allocated buffer while the active is being created.
-        if (ImGui::IsWindowAppearing()) {
-            memset(element_buffer, 0, sizeof(element_buffer));
-        }
+        if (ImGui::IsWindowAppearing()) { memset(text_buffer, 0, sizeof(text_buffer)); }
 
-        ImGui::InputText("##simple_add_dialog", element_buffer,
-                         IM_ARRAYSIZE(element_buffer));
+        ImGui::InputText("##simple_add_dialog", text_buffer, IM_ARRAYSIZE(text_buffer));
 
         bool done = false;
         if (ImGui::Button("OK##simple_add_dialog")) {
             done = true;
             *active = false;
-            new_out = element_buffer;
+            new_out = text_buffer;
         }
         ImGui::EndPopup();
         return done;
@@ -42,7 +39,7 @@ namespace llpp::gui::custom
             return false;
         }
         ImGui::Text(
-            "Are you absolutely sure you want to do this?\nThis action is irreversible!");
+            "Are you absolutely sure you want to do this?\nThis action is irreversible!##delete");
 
         const bool ok_clicked = ImGui::Button("OK##simple_delete_dialog", ImVec2(80, 0));
         ImGui::SameLine();
@@ -51,6 +48,37 @@ namespace llpp::gui::custom
         if (ok_clicked || cancel_clicked) {
             *active = false;
             confirmed = ok_clicked;
+        }
+
+        ImGui::EndPopup();
+        return ok_clicked || cancel_clicked;
+    }
+
+    bool simple_rename_dialog(bool* active, const char* text, bool& confirmed,
+                              std::string& new_name_out)
+    {
+        ImGui::OpenPopup(text);
+        if (!ImGui::BeginPopupModal(text, active, ImGuiWindowFlags_AlwaysAutoResize)) {
+            return false;
+        }
+
+        // Clear the allocated buffer while the active is being created.
+        if (ImGui::IsWindowAppearing()) { memset(text_buffer, 0, sizeof(text_buffer)); }
+
+        ImGui::Text("New name:");
+        ImGui::SameLine();
+        ImGui::InputText("##simple_add_dialog", text_buffer,
+                         IM_ARRAYSIZE(text_buffer));
+        ImGui::Text("Are you sure you want to do this?");
+
+        const bool ok_clicked = ImGui::Button("OK##simple_rename_dialog", ImVec2(80, 0));
+        ImGui::SameLine();
+        const bool cancel_clicked = ImGui::Button("Cancel##simple_rename_dialog");
+
+        if (ok_clicked || cancel_clicked) {
+            *active = false;
+            confirmed = ok_clicked;
+            confirmed ? new_name_out = text_buffer : "";
         }
 
         ImGui::EndPopup();

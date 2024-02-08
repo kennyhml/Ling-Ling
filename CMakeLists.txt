@@ -105,8 +105,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/crafting/arbstation.cpp
         LLPP/src/bots/crafting/arbstation.h
         LLPP/src/bots/crafting/arbstation.cpp
-        LLPP/src/bots/alert/parasaurstation.cpp
-        LLPP/src/bots/alert/parasaurstation.h
+        LLPP/src/bots/parasaur/parasaurstation.cpp
+        LLPP/src/bots/parasaur/parasaurstation.h
         LLPP/src/gui/parasaur.cpp
         LLPP/src/gui/parasaur.h
         LLPP/src/gui/common.cpp
@@ -119,6 +119,7 @@ add_executable(LLPP WIN32
         LLPP/src/gui/custom/combo_dynamic.h
         LLPP/src/gui/custom/dialogs.cpp
         LLPP/src/gui/custom/dialogs.h
+        LLPP/src/bots/parasaur/config.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

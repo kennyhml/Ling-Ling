@@ -1,5 +1,8 @@
 #include "managedvar.h"
 #include "../bots/drops/config.h"
+#include "../bots/parasaur/config.h"
+
+#include <iostream>
 
 namespace llpp::config
 {
@@ -10,7 +13,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-			nlohmann::ordered_json& curr = walk_json(get_data());
+            nlohmann::ordered_json& curr = walk_json(get_data());
             value_ = curr.at(path_.back()).get<T>();
         }
         catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
@@ -24,7 +27,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-			nlohmann::ordered_json& curr = walk_json(get_data());
+            nlohmann::ordered_json& curr = walk_json(get_data());
             // need to copy the const char to our value, otherwise itll get deleted
             // after we return the pointer to it.
             value_ = _strdup(curr.at(path_.back()).get<std::string>().c_str());
@@ -40,7 +43,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-			nlohmann::ordered_json& curr = walk_json(get_data());
+            nlohmann::ordered_json& curr = walk_json(get_data());
             // Need to copy each element into our value individually.
             const auto& array = curr.at(path_.back());
             value_.clear();
@@ -59,7 +62,7 @@ namespace llpp::config
         initial_loaded_ = true;
 
         try {
-			nlohmann::ordered_json& curr = walk_json(get_data());
+            nlohmann::ordered_json& curr = walk_json(get_data());
             const std::string k = path_.back();
 
             if (!curr.contains(k)) { set(default_); }
@@ -84,10 +87,36 @@ namespace llpp::config
 
             value_.disabled = curr[k].value("disabled", default_.disabled);
         }
-        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); } catch (const
-            std::exception& e) { std::cerr << "Uknown error " << e.what() << "\n"; }
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
+        catch (const std::exception& e) {
+            std::cerr << "Uknown error " << e.what() << "\n";
+        }
         return value_;
     }
+
+    template <>
+    bots::parasaur::ParasaurConfig ManagedVar<bots::parasaur::ParasaurConfig>::get()
+    {
+        if (initial_loaded_) { return value_; }
+        initial_loaded_ = true;
+
+        try {
+            nlohmann::ordered_json& curr = walk_json(get_data());
+            const std::string k = path_.back();
+
+            if (!curr.contains(k)) { set(default_); }
+            value_.name = curr[k].value("name", default_.name);
+            value_.interval = curr[k].value("interval", default_.interval);
+            value_.is_teleporter = curr[k].value("is_teleporter", default_.is_teleporter);
+            value_.disabled = curr[k].value("disabled", default_.disabled);
+        }
+        catch (const nlohmann::ordered_json::out_of_range& e) { handle_not_found(e); }
+        catch (const std::exception& e) {
+            std::cerr << "Uknown error " << e.what() << "\n";
+        }
+        return value_;
+    }
+
 
     template <typename T>
     void ManagedVar<T>::set(const T& value)
@@ -100,7 +129,7 @@ namespace llpp::config
     void ManagedVar<T>::save()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-		nlohmann::ordered_json& curr = walk_json(get_data(), true);
+        nlohmann::ordered_json& curr = walk_json(get_data(), true);
 
         curr[path_.back()] = value_;
         on_change_();
@@ -110,7 +139,7 @@ namespace llpp::config
     void ManagedVar<bots::drops::CrateManagerConfig>::save()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-		nlohmann::ordered_json& curr = walk_json(get_data(), true);
+        nlohmann::ordered_json& curr = walk_json(get_data(), true);
         const std::string k = path_.back();
 
         curr[k]["prefix"] = value_.prefix;
@@ -128,19 +157,33 @@ namespace llpp::config
         on_change_();
     }
 
+    template <>
+    void ManagedVar<bots::parasaur::ParasaurConfig>::save()
+    {
+        std::lock_guard<std::mutex> guard(save_mutex);
+        nlohmann::ordered_json& curr = walk_json(get_data(), true);
+        const std::string k = path_.back();
+
+        curr[k]["name"] = value_.name;
+        curr[k]["interval"] = value_.interval;
+        curr[k]["is_teleporter"] = value_.is_teleporter;
+        curr[k]["disabled"] = value_.disabled;
+        on_change_();
+    }
 
     template <typename T>
     void ManagedVar<T>::erase()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
-		nlohmann::ordered_json& curr = walk_json(get_data(), true);
+        nlohmann::ordered_json& curr = walk_json(get_data(), true);
 
         curr.erase(path_.back());
         on_change_();
     }
 
     template <typename T>
-	nlohmann::ordered_json& ManagedVar<T>::walk_json(nlohmann::ordered_json& data, const bool create_if_not_exist) const
+    nlohmann::ordered_json& ManagedVar<T>::walk_json(nlohmann::ordered_json& data,
+                                                     const bool create_if_not_exist) const
     {
         nlohmann::ordered_json* curr = &data;
         for (int i = 0; i < path_.size() - 1; i++) {
@@ -166,6 +209,7 @@ namespace llpp::config
     template struct ManagedVar<std::vector<std::string>>;
     template struct ManagedVar<std::vector<const char*>>;
     template struct ManagedVar<bots::drops::CrateManagerConfig>;
+    template struct ManagedVar<bots::parasaur::ParasaurConfig>;
 
     template struct ManagedVar<std::string>;
     template struct ManagedVar<const char*>;

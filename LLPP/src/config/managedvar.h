@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <dpp/json.h>
 #include <mutex>
 
@@ -14,7 +13,7 @@ namespace llpp::config
 {
     inline std::mutex save_mutex;
 
-	nlohmann::ordered_json& get_data();
+    nlohmann::ordered_json& get_data();
 
     template <typename T>
     struct ManagedVar
@@ -34,17 +33,26 @@ namespace llpp::config
         ~ManagedVar() = default;
 
         T get();
+
         T* get_ptr()
         {
             if (!initial_loaded_) { get(); }
             return &value_;
         }
 
+        const T& get_ref()
+        {
+            if (!initial_loaded_) { get(); }
+            return value_;
+        }
+
         void set(const T& value);
         void save();
         void erase();
 
-    private :
+        void set_path(const std::vector<std::string>& path) { path_ = path; }
+
+    private:
         T value_;
         T default_;
         bool has_inserted_default_ = false;
@@ -52,7 +60,8 @@ namespace llpp::config
         std::vector<std::string> path_;
         std::function<void()> on_change_;
 
-		nlohmann::ordered_json& walk_json(nlohmann::ordered_json& data, bool create_if_not_exist = false) const;
+        nlohmann::ordered_json& walk_json(nlohmann::ordered_json& data,
+                                          bool create_if_not_exist = false) const;
         void handle_not_found(const nlohmann::ordered_json::out_of_range& e);
     };
 }

@@ -2,6 +2,7 @@
 #include <fstream>
 #include "required.h"
 #include <ShlObj.h>
+#include <iostream>
 
 namespace llpp::config
 {
@@ -49,6 +50,7 @@ namespace llpp::config
         }
 
         std::ifstream f(path);
+        // NOTE: The object is static, it is only loaded ONCE.
         static nlohmann::ordered_json d = nlohmann::ordered_json::parse(f);
         f.close();
 
@@ -56,10 +58,17 @@ namespace llpp::config
             has_loaded_dynamic_maps = true;
             for (auto& manager : bots::drops::managers.get()) {
                 if (!bots::drops::configs.contains(manager)) {
-                    bots::drops::configs[manager] = config::ManagedVar<
-                        llpp::bots::drops::CrateManagerConfig>(
+                    bots::drops::configs[manager] = ManagedVar(
                         {"bots", "drops", manager}, save,
                         llpp::bots::drops::CrateManagerConfig());
+                }
+            }
+
+            for (auto& station : bots::parasaur::stations.get()) {
+                if (!bots::parasaur::configs.contains(station)) {
+                    bots::parasaur::configs[station] = ManagedVar(
+                        {"bots", "parasaur", station}, save,
+                        llpp::bots::parasaur::ParasaurConfig());
                 }
             }
         }

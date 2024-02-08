@@ -4,6 +4,7 @@
 #include "managedvar.h"
 #include <filesystem>
 #include "../bots/drops/config.h"
+#include "../bots/parasaur/config.h"
 
 namespace llpp::config
 {
@@ -235,6 +236,14 @@ namespace llpp::config
 
         inline ManagedVar<std::vector<const char*>> stations(BASE, "stations", save, {});
 
-    }
+        inline ManagedVar start_criteria(BASE, "start_criteria", save, "");
+        inline ManagedVar start_interval(BASE, "start_interval", save, 10);
+        inline ManagedVar start_min_ready(BASE, "start_min_ready", save, 3);
 
+        inline ManagedVar<std::string> teleport_start(BASE, "teleport_start", save,
+                                                      "PARASAUR::START");
+
+        inline std::unordered_map<std::string, ManagedVar<
+                                      llpp::bots::parasaur::ParasaurConfig>> configs;
+    }
 }
