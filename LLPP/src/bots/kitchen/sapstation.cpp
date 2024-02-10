@@ -1,6 +1,5 @@
 #include "sapstation.h"
 #include <asapp/core/state.h>
-#include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/tribemanager.h>
 #include "../../core/discord.h"
@@ -9,26 +8,23 @@
 namespace llpp::bots::kitchen
 {
     SapStation::SapStation(std::string t_name, const std::chrono::minutes t_interval) :
-        BaseStation(std::move(t_name), t_interval), spawn_bed_(name_),
-        storage_box_(name_ + "::STORAGE", 45), tap_(name_ + "::TAP", 1) {}
+        BedStation(std::move(t_name), t_interval), storage_box_(name_ + "::STORAGE", 45),
+        tap_(name_ + "::TAP", 1) {}
 
     core::StationResult SapStation::complete()
     {
-        const auto start = std::chrono::system_clock::now();
-        asa::entities::local_player->fast_travel_to(spawn_bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
-        asa::core::sleep_for(std::chrono::seconds(1));
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         if (!take_sap()) {
             set_completed();
-            return {this, false, util::get_elapsed<std::chrono::seconds>(start), {}};
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
 
         put_away_sap();
         set_completed();
-        core::StationResult res(this, true,
-                                util::get_elapsed<std::chrono::seconds>(start), {});
+        core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(), {});
         send_sap_collected(res, storage_box_slots_);
         return res;
     }

@@ -13,26 +13,21 @@
 
 namespace llpp::bots::paste
 {
-    PasteStation::PasteStation(std::string name, std::chrono::minutes interval) :
-            BaseStation(name, interval), bed_(name_), dedi_(name_ + "::DEDI") {};
+    PasteStation::PasteStation(std::string t_name, std::chrono::minutes t_interval) :
+        BedStation(std::move(t_name), t_interval), dedi_(name_ + "::DEDI") {};
 
     core::StationResult PasteStation::complete()
     {
-        auto start = std::chrono::system_clock::now();
-
-        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
-        asa::core::sleep_for(std::chrono::seconds(1));
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         empty_all();
         int obtained = deposit_paste();
         set_completed();
 
-        auto duration = util::get_elapsed<std::chrono::seconds>(start);
-        core::StationResult res(this, true, duration, {{"Achatina Paste", obtained}});
-
+        core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),
+                                {{"Achatina Paste", obtained}});
         send_paste_collected(res);
         return res;
     }
@@ -93,12 +88,13 @@ namespace llpp::bots::paste
         try {
             if (config::bots::paste::ocr_amount.get()) {
                 asa::entities::local_player->deposit_into_dedi(
-                        *asa::items::resources::achatina_paste, &amount);
-            } else {
+                    *asa::items::resources::achatina_paste, &amount);
+            }
+            else {
                 asa::entities::local_player->deposit_into_dedi(
-                        *asa::items::resources::achatina_paste, nullptr);
+                    *asa::items::resources::achatina_paste, nullptr);
                 return util::get_elapsed<std::chrono::minutes>(last_completed_).count() *
-                       6;
+                    6;
             }
         }
         catch (const asa::structures::StructureError&) {

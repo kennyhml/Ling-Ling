@@ -107,6 +107,9 @@ namespace llpp::config
             if (!curr.contains(k)) { set(default_); }
             value_.name = curr[k].value("name", default_.name);
             value_.interval = curr[k].value("interval", default_.interval);
+            value_.load_for = curr[k].value("load_for", default_.load_for);
+            value_.alert_level = curr[k].value("alert_level", default_.alert_level);
+            value_.check_logs = curr[k].value("check_logs", default_.check_logs);
             value_.is_teleporter = curr[k].value("is_teleporter", default_.is_teleporter);
             value_.disabled = curr[k].value("disabled", default_.disabled);
         }
@@ -145,7 +148,6 @@ namespace llpp::config
         curr[k]["prefix"] = value_.prefix;
         curr[k]["grouped_crates_raw"] = value_.grouped_crates_raw;
         curr[k]["interval"] = value_.interval;
-
         curr[k]["render_group_for"] = value_.render_group_for;
         curr[k]["render_align_for"] = value_.render_align_for;
         curr[k]["render_initial_for"] = value_.render_initial_for;
@@ -166,6 +168,9 @@ namespace llpp::config
 
         curr[k]["name"] = value_.name;
         curr[k]["interval"] = value_.interval;
+        curr[k]["load_for"] = value_.load_for;
+        curr[k]["alert_level"] = value_.alert_level;
+        curr[k]["check_logs"] = value_.check_logs;
         curr[k]["is_teleporter"] = value_.is_teleporter;
         curr[k]["disabled"] = value_.disabled;
         on_change_();

@@ -1,13 +1,13 @@
 #pragma once
-#include "../../core/basestation.h"
+#include "../../core/teleportstation.h"
+#include "../../core/bedstation.h"
 #include "config.h"
 #include <asapp/structures/cavelootcrate.h>
 #include <asapp/structures/simplebed.h>
-#include <asapp/structures/teleporter.h>
 
 namespace llpp::bots::drops
 {
-    class LootCrateStation final : public core::BaseStation
+    class LootCrateStation final : public core::TeleportStation, public core::BedStation
     {
     public:
         explicit LootCrateStation(const std::string& t_name, CrateManagerConfig& t_config,
@@ -16,8 +16,11 @@ namespace llpp::bots::drops
 
         core::StationResult complete() override;
 
-        void set_default_dst(const bool is_default) { is_default_dst_ = is_default; }
-        void set_cooldown() { last_completed_ = std::chrono::system_clock::now(); }
+        void set_cooldown()
+        {
+            BedStation::last_completed_ = std::chrono::system_clock::now();
+        }
+
         void set_rendered(const bool rendered) { is_rendered_ = rendered; }
 
         [[nodiscard]] int get_times_looted() const { return times_looted_; }
@@ -33,7 +36,6 @@ namespace llpp::bots::drops
 
         void loot_crate(cv::Mat& screenshot_out,
                         std::map<std::string, bool>& cherry_picked_out);
-        void go_to();
         bool has_buff_wait_expired() const;
         bool should_reroll() const;
         int times_looted_ = 0;
@@ -43,15 +45,12 @@ namespace llpp::bots::drops
         bool is_first_in_group_;
         bool is_crate_up_ = false;
         bool is_rendered_ = false;
-        bool is_default_dst_ = false;
         bool got_rerolled_ = false;
 
         std::chrono::system_clock::time_point last_discovered_up_;
         std::chrono::minutes max_buff_wait_time_ = std::chrono::minutes(15);
 
         asa::structures::CaveLootCrate crate_;
-        asa::structures::Teleporter teleporter_;
-        asa::structures::SimpleBed bed_;
         asa::structures::Container vault_;
     };
 }

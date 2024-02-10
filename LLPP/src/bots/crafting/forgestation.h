@@ -1,14 +1,12 @@
 #pragma once
-
-#include "../../core/basestation.h"
-#include <asapp/structures/simplebed.h>
+#include "../../core/bedstation.h"
 #include <asapp/structures/container.h>
 #include <asapp/structures/dedicatedstorage.h>
 
 
 namespace llpp::bots::crafting
 {
-    class ForgeStation final : public core::BaseStation
+    class ForgeStation final : public core::BedStation
     {
     public:
         ForgeStation(std::string t_name, std::chrono::minutes t_interval);
@@ -28,8 +26,6 @@ namespace llpp::bots::crafting
         asa::structures::DedicatedStorage dedi_cooked_;
 
         asa::structures::Container forge_;
-        asa::structures::SimpleBed bed_;
-
     };
 
 }

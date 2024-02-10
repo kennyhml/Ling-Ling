@@ -3,8 +3,7 @@
 #include <string>
 #include <chrono>
 #include "asapp/structures/craftingstation.h"
-#include "asapp/structures/simplebed.h"
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 
 namespace llpp::bots::crafting
 {
@@ -19,7 +18,7 @@ namespace llpp::bots::crafting
         std::string info_;
     };
 
-    class BasePowderStation : public core::BaseStation
+    class BasePowderStation : public core::BedStation
     {
     public:
         BasePowderStation(const std::string& t_name, std::chrono::minutes t_interval,
@@ -48,7 +47,6 @@ namespace llpp::bots::crafting
 
         std::chrono::system_clock::time_point crafting_start_;
         asa::structures::CraftingStation chem_bench_;
-        asa::structures::SimpleBed bed_;
 
         std::array<asa::structures::Container, 3> dedis_{
                 asa::structures::Container("DEDI01", 1800),

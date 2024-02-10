@@ -1,8 +1,8 @@
+#include <asapp/game/window.h>
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../core/basestation.h"
 #include "../../core/discord.h"
-#include <asapp/game/window.h>
 #include <format>
 
 #include "../../config/config.h"

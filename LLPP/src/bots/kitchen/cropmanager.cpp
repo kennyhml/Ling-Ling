@@ -44,7 +44,7 @@ namespace llpp::bots::kitchen
 		return true;
     }
 
-    bool CropManager::is_ready_to_run() const
+    bool CropManager::is_ready_to_run()
     {
         if (config::bots::crops::disabled.get()) { return false; }
 

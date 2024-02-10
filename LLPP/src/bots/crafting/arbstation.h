@@ -1,14 +1,12 @@
 #pragma once
-
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 #include <asapp/structures/craftingstation.h>
-#include <asapp/structures/simplebed.h>
 #include <asapp/structures/dedicatedstorage.h>
 
 
 namespace llpp::bots::crafting
 {
-    class ARBStation final : public core::BaseStation
+    class ARBStation final : public core::BedStation
     {
     public:
         ARBStation(std::string t_name, std::chrono::minutes t_interval);
@@ -26,7 +24,6 @@ namespace llpp::bots::crafting
 
         void await_deposited();
 
-        asa::structures::SimpleBed bed_;
         asa::structures::CraftingStation fabricator_;
 
         cv::Mat last_dedi_screenshot_;

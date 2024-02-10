@@ -22,7 +22,7 @@ namespace llpp::bots::kitchen
         return true;
     }
 
-    bool SapManager::is_ready_to_run() const
+    bool SapManager::is_ready_to_run()
     {
         if (config::bots::sap::disabled.get() || stations_.empty()) { return false; }
         return stations_[0]->is_ready();

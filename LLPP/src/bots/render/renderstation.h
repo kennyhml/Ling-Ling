@@ -1,10 +1,9 @@
 #pragma once
-#include "../../core/basestation.h"
-#include <asapp/structures/simplebed.h>
+#include "../../core/bedstation.h"
 
 namespace llpp::bots::render
 {
-	class RenderStation final : public core::BaseStation
+	class RenderStation final : public core::BedStation
 	{
 	public:
 		RenderStation(std::string name, std::chrono::seconds load_for);
@@ -13,7 +12,6 @@ namespace llpp::bots::render
 
 	private:
 		std::chrono::seconds render_duration;
-		asa::structures::SimpleBed src_bed;
 		inline static asa::structures::SimpleBed gateway_bed{
 			"RENDER::GATEWAY"
 		};

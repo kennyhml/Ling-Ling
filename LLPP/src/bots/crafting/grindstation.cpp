@@ -9,16 +9,14 @@
 namespace llpp::bots::crafting
 {
     GrindStation::GrindStation(std::string name, const std::chrono::minutes interval) :
-        BaseStation(std::move(name), interval), bed_(name_),
-        grinder_(name_ + "::GRINDER", 120), paste_dedi_(name_ + "::PASTE") {}
+        BedStation(std::move(name), interval), grinder_(name_ + "::GRINDER", 120),
+        paste_dedi_(name_ + "::PASTE") {}
 
     core::StationResult GrindStation::complete()
     {
-        const auto start = std::chrono::system_clock::now();
-        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
-        asa::core::sleep_for(std::chrono::seconds(1));
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
         bool was_emptied = false;
 
         if (state_ == GRINDING) {
@@ -35,8 +33,7 @@ namespace llpp::bots::crafting
         state_ = GRINDING;
         set_completed();
 
-        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
-        core::StationResult res(this, true, time_taken, {});
+        core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(), {});
         send_paste_grinded(res, was_emptied);
         return res;
     }

@@ -1,36 +1,33 @@
 #pragma once
-#include "../../core/basestation.h"
-
+#include "config.h"
+#include "../../core/teleportstation.h"
+#include "../../core/bedstation.h"
 #include <asapp/entities/dinoent.h>
 #include <asapp/structures/teleporter.h>
 #include <asapp/structures/simplebed.h>
 
 
-namespace llpp::bots::alert
+namespace llpp::bots::parasaur
 {
-
-    class ParasaurStation final : core::BaseStation
+    class ParasaurStation final : public core::BedStation, public core::TeleportStation
     {
     public:
-        ParasaurStation(std::string t_name, std::chrono::minutes t_interval, bool t_is_bed);
+        explicit ParasaurStation(const std::string& t_real_name,
+                                 const ParasaurConfig& t_config);
 
         core::StationResult complete() override;
+
     private:
+        inline static std::chrono::system_clock::time_point last_detected_;
 
-        bool is_bed_station_;
+        std::string real_name_;
 
+        bool use_teleporter_;
+        bool check_logs_;
+        bool previous_detected_enemy_ = false;
+
+        int tag_level_;
+        std::chrono::seconds load_;
         asa::entities::DinoEnt parasaur_;
-
-        asa::structures::Teleporter teleporter_;
-        asa::structures::SimpleBed bed_;
     };
-
-
-
-
-
-
-
-
-
 }

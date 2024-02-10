@@ -11,7 +11,7 @@ namespace llpp::bots::kitchen
         CropManager();
 
         bool run() override;
-        bool is_ready_to_run() const override;
+        bool is_ready_to_run() override;
         std::chrono::minutes get_time_left_until_ready() const override;
 
     private:

@@ -74,7 +74,7 @@ namespace llpp::bots::crafting
             try { if (station->is_ready()) { station->complete(); }}
             catch (const StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
-                station->set_disabled(true);
+                station->set_state(core::BaseStation::State::DISABLED);
             }
         }
     }
@@ -86,7 +86,7 @@ namespace llpp::bots::crafting
             try { if (station->is_ready()) { station->complete(); }}
             catch (const StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
-                station->set_disabled(true);
+                station->set_state(core::BaseStation::State::DISABLED);
             }
         }
     }
@@ -114,7 +114,7 @@ namespace llpp::bots::crafting
             try { if (station->is_ready()) { station->complete(); }}
             catch (const StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
-                station->set_disabled(true);
+                station->set_state(core::BaseStation::State::DISABLED);
             }
         }
     }
@@ -181,7 +181,7 @@ namespace llpp::bots::crafting
                 spark_stations_[0]->get_next_completion());
     }
 
-    bool CraftingManager::is_ready_to_run() const
+    bool CraftingManager::is_ready_to_run()
     {
         return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready() ||
                is_forges_ready() || is_arb_ready();
@@ -237,16 +237,16 @@ namespace llpp::bots::crafting
         }
 
         if (subcommand.name == "enable") {
-            if (!station->get_disabled()) {
+            if (station->get_state() == core::BaseStation::State::ENABLED) {
                 return event.reply(std::format("'{}' is already enabled.", name));
             }
-            station->set_disabled(false);
+            station->set_state(core::BaseStation::State::ENABLED);
             return event.reply(std::format("'{}' has been enabled.", name));
         } else if (subcommand.name == "disable") {
-            if (station->get_disabled()) {
+            if (station->get_state() == core::BaseStation::State::DISABLED) {
                 return event.reply(std::format("'{}' is already enabled.", name));
             }
-            station->set_disabled(true);
+            station->set_state(core::BaseStation::State::DISABLED);
             return event.reply(std::format("'{}' has been disabled.", name));
         }
     }

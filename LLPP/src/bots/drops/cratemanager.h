@@ -25,7 +25,7 @@ namespace llpp::bots::drops
         bool run() override;
         bool is_disabled() const { return config_.disabled; }
 
-        [[nodiscard]] bool is_ready_to_run() const override;
+        [[nodiscard]] bool is_ready_to_run() override;
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
     public:

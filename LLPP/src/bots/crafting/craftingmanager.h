@@ -20,7 +20,7 @@ namespace llpp::bots::crafting
 
         bool run() override;
 
-        [[nodiscard]] bool is_ready_to_run() const override;
+        [[nodiscard]] bool is_ready_to_run() override;
 
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 

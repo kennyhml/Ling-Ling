@@ -111,16 +111,23 @@ namespace llpp::bots::drops
                                        asa::structures::CaveLootCrate t_crate,
                                        const bool t_is_first,
                                        const bool t_is_first_in_group) :
-        BaseStation(t_name, std::chrono::minutes(t_config.interval)), config_(t_config),
-        is_first_(t_is_first), is_first_in_group_(t_is_first_in_group),
-        crate_(std::move(t_crate)), teleporter_(asa::structures::Teleporter(name_)),
-        bed_(asa::structures::SimpleBed(name_)),
-        vault_(asa::structures::Container(name_ + "::VAULT", 350)) {}
+        BedStation(t_name, std::chrono::minutes(t_config.interval)),
+        TeleportStation(t_name, std::chrono::minutes(t_config.interval)),
+        config_(t_config), is_first_(t_is_first), is_first_in_group_(t_is_first_in_group),
+        crate_(std::move(t_crate)), vault_(BedStation::name_ + "::VAULT", 350) {}
 
     core::StationResult LootCrateStation::complete()
     {
-        const auto start = std::chrono::system_clock::now();
-        go_to();
+        if (config_.uses_teleporters ? !TeleportStation::begin() : !BedStation::begin()) {
+            return {
+                static_cast<BedStation*>(this), false,
+                BedStation::get_time_taken<std::chrono::seconds>(), {}
+            };
+        }
+
+        if (!is_default_) {
+            asa::entities::local_player->turn_up(60, std::chrono::milliseconds(500));
+        }
 
         if (is_first_) {
             asa::core::sleep_for(std::chrono::seconds(config_.render_initial_for));
@@ -130,8 +137,8 @@ namespace llpp::bots::drops
             [this]() -> bool { return asa::entities::local_player->can_access(crate_); },
             std::chrono::seconds(is_first_in_group_ ? config_.render_group_for : 1))) {
             is_crate_up_ = false;
-            set_completed();
-            return {this, false, std::chrono::seconds(0), {}};
+            BedStation::set_completed();
+            return {static_cast<BedStation*>(this), false, std::chrono::seconds(0), {}};
         }
 
         if (!is_crate_up_) {
@@ -155,9 +162,9 @@ namespace llpp::bots::drops
             vault_.get_inventory()->close();
             asa::core::sleep_for(std::chrono::seconds(1));
         }
-        set_completed();
-        const auto elapsed = util::get_elapsed<std::chrono::seconds>(start);
-        core::StationResult result(this, true, elapsed, {});
+        BedStation::set_completed();
+        const auto elapsed = BedStation::get_time_taken<std::chrono::seconds>();
+        core::StationResult result(static_cast<BedStation*>(this), true, elapsed, {});
 
         if (!should_reroll()) {
             send_success_embed(result, loot_screenshot, quality, ++times_looted_,
@@ -247,23 +254,6 @@ namespace llpp::bots::drops
             last_seen_items_.push_back(get_repr(items[i]));
         }
         return items_taken;
-    }
-
-    void LootCrateStation::go_to()
-    {
-        if (!config_.uses_teleporters) {
-            asa::entities::local_player->fast_travel_to(bed_);
-            asa::entities::local_player->turn_down(30);
-            return;
-        }
-
-        util::await([]() {
-            return asa::entities::local_player->can_use_default_teleport();
-        }, std::chrono::seconds(10));
-        asa::entities::local_player->teleport_to(teleporter_, is_default_dst_);
-        if (!is_default_dst_) {
-            asa::entities::local_player->turn_up(60, std::chrono::milliseconds(500));
-        }
     }
 
     bool LootCrateStation::has_buff_wait_expired() const

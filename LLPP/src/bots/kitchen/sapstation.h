@@ -1,26 +1,25 @@
 #pragma once
-#include <asapp/structures/simplebed.h>
 #include <asapp/structures/container.h>
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 
 namespace llpp::bots::kitchen
 {
-    class SapStation final : public core::BaseStation
+    class SapStation final : public core::BedStation
     {
     public:
-        explicit SapStation(std::string t_name, std::chrono::minutes t_interval);
+        SapStation(std::string t_name, std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
 
     private:
-        asa::structures::SimpleBed spawn_bed_;
+        bool take_sap() const;
+        void put_away_sap();
+
         asa::structures::Container storage_box_;
         asa::structures::Container tap_;
 
-    private:
         int storage_box_slots_ = 0;
 
-        bool take_sap() const;
-        void put_away_sap();
+
     };
 }

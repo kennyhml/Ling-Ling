@@ -2,7 +2,6 @@
 #include <chrono>
 #include <string>
 #include <asapp/items/items.h>
-#include <asapp/structures/craftingstation.h>
 #include "../../core/basestation.h"
 #include "basepowderstation.h"
 

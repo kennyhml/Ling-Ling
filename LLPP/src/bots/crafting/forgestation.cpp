@@ -9,19 +9,15 @@
 namespace llpp::bots::crafting
 {
     ForgeStation::ForgeStation(std::string t_name, const std::chrono::minutes t_interval)
-            : BaseStation(std::move(t_name), t_interval), dedi_raw_(name_ + "::RAW DEDI"),
-              dedi_cooked_(name_ + "COOKED DEDI"), forge_(name_ + "FORGE", 100),
-              bed_(name_) {}
+        : BedStation(std::move(t_name), t_interval), dedi_raw_(name_ + "::RAW DEDI"),
+          dedi_cooked_(name_ + "COOKED DEDI"), forge_(name_ + "FORGE", 100) {}
 
 
     core::StationResult ForgeStation::complete()
     {
-        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
-        asa::core::sleep_for(std::chrono::seconds(1));
-
-        const auto start = std::chrono::system_clock::now();
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         empty();
         if (!last_known_item_) {
@@ -31,13 +27,12 @@ namespace llpp::bots::crafting
         fill();
         set_completed();
 
-        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
-
         if (!last_known_item_) {
-            return {this, false, time_taken, {}};
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
         auto item = last_known_item_->get_name();
-        core::StationResult res(this, true, time_taken, {{item, last_amount_taken_}});
+        core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),
+                                {{item, last_amount_taken_}});
         send_forge_cycled(res, item, last_amount_added_);
         return res;
     }
@@ -62,7 +57,8 @@ namespace llpp::bots::crafting
 
         if (forge_.get_inventory()->has(*asa::items::resources::charcoal, true)) {
             last_known_item_ = asa::items::resources::charcoal;
-        } else {
+        }
+        else {
             forge_.get_inventory()->search_bar.delete_search();
             if (forge_.get_inventory()->has(*asa::items::resources::metal_ingot, true)) {
                 last_known_item_ = asa::items::resources::metal_ingot;
@@ -90,8 +86,8 @@ namespace llpp::bots::crafting
         asa::entities::local_player->stand_up();
         asa::entities::local_player->set_pitch(0);
 
-        last_amount_taken_ =
-                (slots_before - slots_after) * last_known_item_->get_data().stack_size;
+        last_amount_taken_ = (slots_before - slots_after) * last_known_item_->get_data().
+            stack_size;
     }
 
     void ForgeStation::fill()
@@ -113,8 +109,8 @@ namespace llpp::bots::crafting
         asa::core::sleep_for(std::chrono::seconds(1));
         const int slots_after = forge_.get_current_slots();
 
-        last_amount_added_ =
-                (slots_after - slots_before) * last_known_item_->get_data().stack_size;
+        last_amount_added_ = (slots_after - slots_before) * last_known_item_->get_data().
+            stack_size;
 
         forge_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
@@ -123,6 +119,4 @@ namespace llpp::bots::crafting
         asa::window::press(asa::settings::use);
         asa::core::sleep_for(std::chrono::milliseconds(500));
     }
-
-
 }

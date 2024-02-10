@@ -8,20 +8,20 @@
 namespace llpp::bots::crafting
 {
     ARBStation::ARBStation(std::string t_name, const std::chrono::minutes t_interval)
-            : BaseStation(std::move(t_name), t_interval), bed_(name_),
-              fabricator_(name_ + "::FAB", 70) {}
+        : BedStation(std::move(t_name), t_interval), fabricator_(name_ + "::FAB", 70) {}
 
 
     core::StationResult ARBStation::complete()
     {
-        asa::entities::local_player->fast_travel_to(bed_);
-        const auto start = std::chrono::system_clock::now();
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
+
         requeue();
         empty();
 
         set_completed();
-        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
-        core::StationResult res(this, true, time_taken,
+        core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),
                                 {{"Advanced Rifle Bullet", last_amount_taken_}});
         send_arb_crafted(res, was_still_crafting_);
         return res;
@@ -101,5 +101,4 @@ namespace llpp::bots::crafting
                                            1000);
         asa::core::sleep_for(std::chrono::seconds(1));
     }
-
 }

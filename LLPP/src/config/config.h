@@ -236,7 +236,7 @@ namespace llpp::config
 
         inline ManagedVar<std::vector<const char*>> stations(BASE, "stations", save, {});
 
-        inline ManagedVar start_criteria(BASE, "start_criteria", save, "");
+        inline ManagedVar<std::string> start_criteria(BASE, "start_criteria", save, "");
         inline ManagedVar start_interval(BASE, "start_interval", save, 10);
         inline ManagedVar start_min_ready(BASE, "start_min_ready", save, 3);
 

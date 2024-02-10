@@ -10,19 +10,16 @@ namespace llpp::bots::crafting
 {
     core::StationResult SparkpowderStation::complete()
     {
-        asa::entities::local_player->fast_travel_to(bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
-        asa::core::sleep_for(std::chrono::seconds(1));
-
-        const auto start = std::chrono::system_clock::now();
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         requeue();
         empty();
 
         set_completed();
-        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
-        const core::StationResult res(this, true, time_taken, {});
+        const core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),
+                                      {});
         send_spark_crafted(res, was_still_crafting_);
         return res;
     }

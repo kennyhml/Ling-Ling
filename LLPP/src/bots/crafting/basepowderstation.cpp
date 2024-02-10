@@ -9,8 +9,8 @@ namespace llpp::bots::crafting
                                          const std::chrono::minutes t_interval,
                                          const asa::items::Item& t_to_craft,
                                          const int t_amount_per_queue) :
-            BaseStation(t_name, t_interval), amount_to_queue_(t_amount_per_queue),
-            to_craft_(t_to_craft), chem_bench_(name_ + "::CHEMBENCH", 100), bed_(name_) {}
+        BedStation(t_name, t_interval), amount_to_queue_(t_amount_per_queue),
+        to_craft_(t_to_craft), chem_bench_(name_ + "::CHEMBENCH", 100) {}
 
     void BasePowderStation::await_deposited()
     {
@@ -85,5 +85,4 @@ namespace llpp::bots::crafting
         chem_bench_.get_inventory()->close();
         asa::core::sleep_for(std::chrono::seconds(1));
     }
-
 }

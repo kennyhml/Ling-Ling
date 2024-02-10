@@ -36,7 +36,7 @@ namespace llpp::bots::paste
         return any_ran;
     }
 
-    bool PasteManager::is_ready_to_run() const
+    bool PasteManager::is_ready_to_run()
     {
         return std::any_of(paste_stations_.begin(), paste_stations_.end(),
                            [](const auto& station) {

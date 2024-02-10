@@ -120,6 +120,14 @@ add_executable(LLPP WIN32
         LLPP/src/gui/custom/dialogs.cpp
         LLPP/src/gui/custom/dialogs.h
         LLPP/src/bots/parasaur/config.h
+        LLPP/src/bots/parasaur/parasaurmanager.cpp
+        LLPP/src/bots/parasaur/parasaurmanager.h
+        LLPP/src/bots/parasaur/embeds.cpp
+        LLPP/src/bots/parasaur/embeds.h
+        LLPP/src/core/bedstation.cpp
+        LLPP/src/core/bedstation.h
+        LLPP/src/core/teleportstation.cpp
+        LLPP/src/core/teleportstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

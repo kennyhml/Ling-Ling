@@ -4,7 +4,6 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include "embeds.h"
-#include "../../common/util.h"
 
 namespace llpp::bots::kitchen
 {
@@ -36,7 +35,7 @@ namespace llpp::bots::kitchen
 
     CropStation::CropStation(std::string t_name, const CropType crop,
                              const std::chrono::minutes t_interval) :
-        BaseStation(std::move(t_name), t_interval), spawn_bed_(name_), fridge_(name_, 80),
+        BedStation(std::move(t_name), t_interval), fridge_(name_, 80),
         vault_(name_ + " FERTILIZER", 350),
         crop_plots_({
             {"PLOT01"}, {"PLOT02"}, {"PLOT03"}, {"PLOT04"}, {"PLOT05"}, {"PLOT06"}
@@ -44,8 +43,9 @@ namespace llpp::bots::kitchen
 
     core::StationResult CropStation::complete()
     {
-        const auto start = std::chrono::system_clock::now();
-        asa::entities::local_player->fast_travel_to(spawn_bed_);
+        if (!begin()) {
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         const int slots_needed = get_slots_to_refill();
 
@@ -60,7 +60,7 @@ namespace llpp::bots::kitchen
         put_crops_in_fridge(slots_in_fridge);
         deposit_fertilizer();
 
-        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
+        const auto time_taken = get_time_taken<std::chrono::seconds>();
         const core::StationResult res(this, true, time_taken, {});
         set_completed();
         send_crops_collected(res, crop_, slots_in_fridge);

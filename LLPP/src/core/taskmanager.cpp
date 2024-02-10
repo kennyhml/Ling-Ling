@@ -2,8 +2,6 @@
 
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
-#include <asapp/interfaces/hud.h>
-
 #include "../bots/drops/cratemanager.h"
 #include "../bots/farm/farmbot.h"
 #include "../bots/kitchen/cropmanager.h"
@@ -12,7 +10,7 @@
 #include "../bots/crafting/craftingmanager.h"
 #include "../bots/suicide/suicidestation.h"
 #include "../config/config.h"
-
+#include "../bots/parasaur/parasaurmanager.h"
 
 namespace llpp::core
 {
@@ -55,6 +53,7 @@ namespace llpp::core
         tasks_.emplace_back("STATE CHECK", player_state_check);
         tasks_.emplace_back("FARMING", farm::run_while_requested);
 
+        tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
         for (auto& [key, config] : config::bots::drops::configs) {
             tasks_.emplace_back(

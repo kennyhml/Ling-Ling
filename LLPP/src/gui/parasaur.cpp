@@ -14,14 +14,14 @@ namespace llpp::gui
     {
         int selected_station = 0;
 
-
         bool add_dialog = false;
         bool del_dialog = false;
         bool rename_dialog = false;
 
         bool has_loaded_mode = false;
         int selected_mode = 0;
-        const std::vector<const char*> MODES{"INTERVAL", "MIN READY"};
+        const std::vector MODES{"INTERVAL", "MIN READY"};
+        const std::vector ALERT_MODES{"@ALERT ROLE", "@HERE", "@EVERYONE", "SILENCED"};
 
         const char* STATION_TOOLTIP =
             "Create, remove or rename your parasaur stations here.\n"
@@ -208,18 +208,38 @@ namespace llpp::gui
 
                 ImGui::SetCursorPos({10, 45});
                 ImGui::Text("Interval (min):");
-
                 ImGui::SetCursorPos({130, 42});
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 if (ImGui::InputInt("##para_interval", &active->get_ptr()->interval)) {
                     active->save();
                 }
 
-                if (ImGui::Checkbox("Teleporter:", &active->get_ptr()->is_teleporter)) {
+                ImGui::SetCursorPos({10, 76});
+                ImGui::Text("Load for (s):");
+                ImGui::SetCursorPos({130, 73});
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+                if (ImGui::InputInt("##para_load", &active->get_ptr()->load_for)) {
+                    active->save();
+                }
+
+                ImGui::SetCursorPos({10, 107});
+                ImGui::Text("Alert Level:");
+                ImGui::SetCursorPos({130, 104});
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+                if (ImGui::Combo("##alert_level", &active->get_ptr()->alert_level,
+                                 ALERT_MODES.data(), ALERT_MODES.size())) {
+                    active->save();
+                }
+
+                if (ImGui::Checkbox("Teleporter", &active->get_ptr()->is_teleporter)) {
                     active->save();
                 }
                 ImGui::SameLine();
                 if (ImGui::Checkbox("Disabled", &active->get_ptr()->disabled)) {
+                    active->save();
+                }
+                ImGui::SameLine();
+                if (ImGui::Checkbox("Logcheck", &active->get_ptr()->check_logs)) {
                     active->save();
                 }
             }

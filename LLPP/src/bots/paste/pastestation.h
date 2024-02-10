@@ -1,15 +1,14 @@
 #pragma once
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 #include <asapp/entities/dinoent.h>
 #include <asapp/structures/dedicatedstorage.h>
-#include <asapp/structures/simplebed.h>
 
 namespace llpp::bots::paste
 {
-    class PasteStation final : public core::BaseStation
+    class PasteStation final : public core::BedStation
     {
     public:
-        PasteStation(std::string name, std::chrono::minutes interval);
+        PasteStation(std::string t_name, std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
 
@@ -20,7 +19,6 @@ namespace llpp::bots::paste
             asa::entities::DinoEnt("ACHATINA05"), asa::entities::DinoEnt("ACHATINA06"),
         };
 
-        asa::structures::SimpleBed bed_;
         asa::structures::DedicatedStorage dedi_;
 
         bool empty(asa::entities::DinoEnt& achatina);

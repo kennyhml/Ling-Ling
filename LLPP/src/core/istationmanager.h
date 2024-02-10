@@ -10,7 +10,7 @@ namespace llpp::core
         virtual ~IStationManager() = default;
 
         virtual bool run() = 0;
-        [[nodiscard]] virtual bool is_ready_to_run() const = 0;
+        [[nodiscard]] virtual bool is_ready_to_run() = 0;
         [[nodiscard]] virtual std::chrono::minutes get_time_left_until_ready() const = 0;
 
         IStationManager(const IStationManager&) = delete;

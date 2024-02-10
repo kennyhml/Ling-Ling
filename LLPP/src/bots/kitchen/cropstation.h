@@ -1,11 +1,10 @@
 #pragma once
 #include <asapp/structures/mediumcropplot.h>
-#include <asapp/structures/simplebed.h>
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 
 namespace llpp::bots::kitchen
 {
-    class CropStation final : public core::BaseStation
+    class CropStation final : public core::BedStation
     {
     public:
         enum CropType
@@ -33,7 +32,6 @@ namespace llpp::bots::kitchen
         asa::items::Item* crop_;
         asa::items::Item* seed_;
 
-        asa::structures::SimpleBed spawn_bed_;
         asa::structures::Container fridge_;
         asa::structures::Container vault_;
         std::array<asa::structures::MediumCropPlot, 6> crop_plots_;

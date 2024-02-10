@@ -1,12 +1,12 @@
 #pragma once
-#include "../../core/basestation.h"
+#include "../../core/bedstation.h"
 #include <asapp/structures/craftingstation.h>
 #include <asapp/structures/simplebed.h>
 #include <asapp/structures/dedicatedstorage.h>
 
 namespace llpp::bots::crafting
 {
-    class GrindStation final : public core::BaseStation
+    class GrindStation final : public core::BedStation
     {
     public:
         explicit GrindStation(std::string name, std::chrono::minutes interval);
@@ -23,7 +23,6 @@ namespace llpp::bots::crafting
         std::chrono::system_clock::time_point flint_grind_start_;
         State state_ = GRINDING;
 
-        asa::structures::SimpleBed bed_;
         asa::structures::CraftingStation grinder_;
         asa::structures::DedicatedStorage paste_dedi_;
 

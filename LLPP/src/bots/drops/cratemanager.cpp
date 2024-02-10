@@ -1,8 +1,5 @@
 #include "cratemanager.h"
-
-#include <asapp/core/config.h>
 #include <asapp/core/state.h>
-
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../core/discord.h"
@@ -16,7 +13,7 @@ namespace llpp::bots::drops
         void set_group_cooldown(std::vector<LootCrateStation>& group)
         {
             for (auto& station : group) {
-                station.set_default_dst(false);
+                station.set_tp_is_default(false);
                 station.set_cooldown();
             }
         }
@@ -69,19 +66,20 @@ namespace llpp::bots::drops
         send_summary_embed(config_.prefix, util::get_elapsed<std::chrono::seconds>(start),
                            stats_per_group, vault_fill_levels_,
                            std::chrono::system_clock::now() + crates_[0][0].
-                           get_completion_interval());
+                           BedStation::get_completion_interval());
         return true;
     }
 
-    bool CrateManager::is_ready_to_run() const
+    bool CrateManager::is_ready_to_run()
     {
-        return !is_disabled() && (!crates_.empty() && crates_[0][0].is_ready());
+        return !is_disabled() && (!crates_.empty() && crates_[0][0].
+            BedStation::is_ready());
     }
 
     std::chrono::minutes CrateManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
-            crates_[0][0].get_next_completion());
+            crates_[0][0].BedStation::get_next_completion());
     }
 
     void CrateManager::run_all_stations(bool& any_looted)
@@ -93,15 +91,15 @@ namespace llpp::bots::drops
         for (auto& group : crates_) {
             set_group_rendered(group, false);
             for (auto& station : group) {
-                station.set_default_dst(can_default_tp);
+                station.set_tp_is_default(can_default_tp);
                 const auto result = station.complete();
                 set_group_rendered(group, true);
 
                 if (result.get_success()) {
                     any_looted = true;
                     if (!config_.uses_teleporters) {
-                        vault_fill_levels_[station.get_name()] = static_cast<float>(
-                            station.get_vault_slots()) / 350.f;
+                        vault_fill_levels_[station.BedStation::get_name()] = static_cast<
+                            float>(station.get_vault_slots()) / 350.f;
                     }
                     stats_per_group[i].add_looted();
                     set_group_cooldown(group);
