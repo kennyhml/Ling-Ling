@@ -128,6 +128,15 @@ add_executable(LLPP WIN32
         LLPP/src/core/bedstation.h
         LLPP/src/core/teleportstation.cpp
         LLPP/src/core/teleportstation.h
+        LLPP/src/discord/bot.cpp
+        LLPP/src/discord/bot.h
+        LLPP/src/discord/tribelogs/alerts.cpp
+        LLPP/src/discord/tribelogs/alerts.h
+        LLPP/src/discord/tribelogs/stream.cpp
+        LLPP/src/discord/tribelogs/stream.h
+        LLPP/src/discord/tribelogs/handler.cpp
+        LLPP/src/discord/tribelogs/handler.h
+        LLPP/src/discord/icons.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

@@ -6,7 +6,6 @@
 
 namespace llpp::core::discord
 {
-    using event_callback_t = std::function<void(const dpp::slashcommand_t&)>;
 
     inline std::unique_ptr<dpp::cluster> bot;
 
@@ -20,12 +19,15 @@ namespace llpp::core::discord
 
     bool is_role_command_authorized(dpp::snowflake role);
 
-    void register_slash_command(const dpp::slashcommand& command,
-                                const event_callback_t&);
+
 
     void inform_started();
 
     void inform_fatal_error(const std::exception& error, const std::string& task);
+
+    void send_station_disabled(const std::string& station, const std::string& reason);
+    void send_station_suspended(const std::string& station, const std::string& reason,
+                                std::chrono::minutes duration);
 
     void handle_tribelogs(const asa::interfaces::TribeManager::LogEntries& all_,
                           const asa::interfaces::TribeManager::LogEntries& new_);
