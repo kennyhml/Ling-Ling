@@ -83,8 +83,6 @@ add_executable(LLPP WIN32
         LLPP/src/config/validate.h
         LLPP/src/core/basestation.cpp
         LLPP/src/core/basestation.h
-        LLPP/src/core/discord.cpp
-        LLPP/src/core/discord.h
         LLPP/src/core/istationmanager.h
         LLPP/src/core/recovery.cpp
         LLPP/src/core/recovery.h
@@ -137,6 +135,10 @@ add_executable(LLPP WIN32
         LLPP/src/discord/tribelogs/handler.cpp
         LLPP/src/discord/tribelogs/handler.h
         LLPP/src/discord/icons.h
+        LLPP/src/discord/embeds.cpp
+        LLPP/src/discord/embeds.h
+        LLPP/src/discord/helpers.cpp
+        LLPP/src/discord/helpers.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

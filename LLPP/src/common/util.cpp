@@ -42,14 +42,6 @@ namespace llpp::util
 			std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
 	}
 
-	const std::string mat_to_strbuffer(const cv::Mat& source)
-	{
-		std::vector<uchar> img_buffer;
-		imencode(".png", source, img_buffer);
-		std::string img_content(img_buffer.begin(), img_buffer.end());
-		return img_content;
-	}
-
 	std::string add_num_to_prefix(
 		const std::string& prefix, int number, int fill_zeros)
 	{

@@ -17,9 +17,6 @@ namespace llpp::util
 	bool timedout(const std::chrono::system_clock::time_point& start,
 		std::chrono::minutes timeout);
 
-	const std::string mat_to_strbuffer(const cv::Mat& source);
-
-
 	template <typename cast>
 	cast get_elapsed(std::chrono::system_clock::time_point start)
 	{

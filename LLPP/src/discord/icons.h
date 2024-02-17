@@ -25,4 +25,10 @@ namespace llpp::discord
 
     inline const char* const REPAIR_BROWN_ICON =
         "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/2/24/Crafting_Light.png/revision/latest?cb=20181217123945";
+
+    inline const char* const REPAIR_RED_ICON =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/1/1c/Repair_Icon.png/revision/latest?cb=20150731134649";
+
+    inline const char* const WHIP_ICON =
+        "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/b/b9/Whip_%28Scorched_Earth%29.png/revision/latest/scale-to-width-down/228?cb=20160901213011";
 }
