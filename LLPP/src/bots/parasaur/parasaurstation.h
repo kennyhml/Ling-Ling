@@ -3,9 +3,6 @@
 #include "../../core/teleportstation.h"
 #include "../../core/bedstation.h"
 #include <asapp/entities/dinoent.h>
-#include <asapp/structures/teleporter.h>
-#include <asapp/structures/simplebed.h>
-
 
 namespace llpp::bots::parasaur
 {

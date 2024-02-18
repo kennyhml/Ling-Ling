@@ -50,15 +50,5 @@ namespace llpp::util
 		return prefix + oss.str();
 	}
 
-	std::string get_role_mention(const std::string& role)
-	{
-		return std::format("<@&{}>", role);
-	}
-
-	std::string get_user_mention(const std::string& zser)
-	{
-		return std::format("<@{}>", zser);
-	}
-
 
 }

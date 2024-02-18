@@ -3,7 +3,6 @@
 #include "../../core/bedstation.h"
 #include "config.h"
 #include <asapp/structures/cavelootcrate.h>
-#include <asapp/structures/simplebed.h>
 
 namespace llpp::bots::drops
 {

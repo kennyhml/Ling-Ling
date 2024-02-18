@@ -8,8 +8,6 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
-#include <asapp/interfaces/tribemanager.h>
-#include "../../core/discord.h"
 
 namespace llpp::bots::paste
 {

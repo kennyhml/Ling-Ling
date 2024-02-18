@@ -1,9 +1,5 @@
 #include "gunpowderstation.h"
-#include <asapp/core/state.h>
-#include <asapp/entities/localplayer.h>
-#include <asapp/interfaces/tribemanager.h>
 #include "embeds.h"
-#include "../../core/discord.h"
 
 namespace llpp::bots::crafting
 {

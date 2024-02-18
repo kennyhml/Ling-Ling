@@ -2,7 +2,7 @@
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../core/basestation.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 
 namespace llpp::bots::kitchen
 {
@@ -43,7 +43,7 @@ namespace llpp::bots::kitchen
                         true);
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void send_sap_collected(const core::StationResult& data, const int slots_in_storage)
@@ -74,9 +74,10 @@ namespace llpp::bots::kitchen
 
         if (slots_in_storage > 30) {
             msg.set_content(
-                util::get_role_mention(config::discord::roles::helper_no_access.get()));
+                dpp::utility::role_mention(
+                    config::discord::roles::helper_no_access.get()));
             msg.set_allowed_mentions(false, true, true, false, {}, {});
         }
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 }

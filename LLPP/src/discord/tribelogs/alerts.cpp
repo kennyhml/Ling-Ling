@@ -111,10 +111,10 @@ namespace llpp::discord
             if (tag_everyone) { message.set_content("@everyone"); }
             else {
                 const std::string role = config::discord::roles::alert.get();
-                message.set_content(util::get_role_mention(role));
+                message.set_content(dpp::utility::role_mention(role));
             }
         }
         message.set_allowed_mentions(false, true, true, false, {}, {});
-        bot->message_create(message);
+        get_bot()->message_create(message);
     }
 }

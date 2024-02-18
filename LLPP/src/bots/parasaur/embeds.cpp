@@ -1,7 +1,9 @@
 #include "embeds.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
+#include "../../discord/helpers.h"
+#include <asapp/game/window.h>
 
 namespace llpp::bots::parasaur
 {
@@ -20,7 +22,7 @@ namespace llpp::bots::parasaur
         embed.set_color(dpp::colors::cyan);
         embed.set_thumbnail(SENSOR_ICON);
 
-        const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
+        const auto file_data = discord::strbuf(asa::window::screenshot());
         embed.set_image("attachment://image.png");
 
         embed.set_timestamp(std::chrono::system_clock::to_time_t(
@@ -33,8 +35,8 @@ namespace llpp::bots::parasaur
         switch (tag_level) {
         case 0:
         {
-            const auto role = util::get_role_mention(config::discord::roles::alert.get());
-            msg.set_content(role);
+            msg.set_content(
+                dpp::utility::role_mention(config::discord::roles::alert.get()));
             break;
         }
         case 1:
@@ -49,6 +51,6 @@ namespace llpp::bots::parasaur
             break;
         }
 
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 }

@@ -6,20 +6,18 @@
 
 #include <asapp/interfaces/console.h>
 #include <asapp/interfaces/tribemanager.h>
-#include <asapp/network/queries.h>
-
 #include "bots/farm/commands.h"
-
-
 
 #include "auth/auth.h"
 #include "gui/gui.h"
 #include "config/config.h"
-#include "core/discord.h"
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include <curl/curl.h>
 
+#include "discord/bot.h"
+#include "discord/embeds.h"
+#include "discord/tribelogs/handler.h"
 static bool running = false;
 
 class TerminatedError : public std::exception
@@ -31,6 +29,21 @@ public:
 void check_terminated() { if (!running) { throw TerminatedError(); } }
 
 #include <opencv2/core/utils/logger.hpp>
+
+
+void inform_started()
+{
+    dpp::message msg(llpp::config::discord::channels::info.get(),
+        llpp::discord::get_started_embed());
+    llpp::discord::get_bot()->message_create(msg);
+}
+
+void inform_crashed(const std::string& why, const std::string& task)
+{
+    dpp::message msg(llpp::config::discord::channels::info.get(),
+        llpp::discord::get_started_embed());
+    llpp::discord::get_bot()->message_create(msg);
+}
 
 
 void llpp_main()
@@ -49,7 +62,7 @@ void llpp_main()
     try {
         asa::window::get_handle();
         asa::window::set_foreground();
-        llpp::core::discord::init();
+        llpp::discord::init();
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
     }
@@ -57,31 +70,29 @@ void llpp_main()
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
-    llpp::core::discord::bot->start(dpp::st_return);
-    llpp::core::discord::inform_started();
+    llpp::discord::get_bot()->start(dpp::st_return);
+    inform_started();
 
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_view_angles();
 
         asa::interfaces::tribe_manager->update_tribelogs(
-            llpp::core::discord::handle_tribelogs, std::chrono::seconds(3));
+            llpp::discord::handle_tribelog_events, std::chrono::seconds(3));
     }
     catch (const TerminatedError&) {}
-
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
         } catch (const TerminatedError&) { break; } catch (const std::exception& e) {
-            llpp::core::discord::inform_fatal_error(
-                e, taskmanager.get_previous_task()->get_name());
+            inform_crashed(e.what(), taskmanager.get_previous_task()->get_name());
             running = false;
         }
     }
 
-    llpp::core::discord::bot->shutdown();
+    llpp::discord::get_bot()->shutdown();
     std::cout << "[+] Ling Ling++ has terminated!" << std::endl;
 }
 

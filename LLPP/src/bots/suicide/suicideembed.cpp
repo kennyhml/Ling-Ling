@@ -1,6 +1,6 @@
 #include "suicideembed.h"
 #include "../../core/basestation.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include <format>
 
 #include "../../config/config.h"
@@ -24,6 +24,6 @@ namespace llpp::bots::suicide
                   true).add_field("Respawning at:", respawning_at, true);
 
         auto message = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 }

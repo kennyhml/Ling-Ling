@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include "farmbot.h"
 
 namespace llpp::bots::farm
@@ -29,7 +29,7 @@ namespace llpp::bots::farm
 
         void farm_command_callback(const dpp::slashcommand_t& event)
         {
-            if (core::discord::handle_unauthorized_command(event)) { return; }
+            if (discord::handle_unauthorized_command(event)) { return; }
 
             auto cmd_data = event.command.get_command_interaction();
 
@@ -85,7 +85,7 @@ namespace llpp::bots::farm
         farm.add_option(dpp::command_option(dpp::co_sub_command, "end",
                                             "End an active farming session. Ling Ling++ will go back to regular tasks."));
 
-        core::discord::register_slash_command(farm, farm_command_callback);
+        discord::register_slash_command(farm, farm_command_callback);
         registered = true;
     }
 }

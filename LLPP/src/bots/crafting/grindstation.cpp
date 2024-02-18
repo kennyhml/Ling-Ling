@@ -4,7 +4,6 @@
 #include "embeds.h"
 #include "asapp/entities/localplayer.h"
 #include <asapp/interfaces/tribemanager.h>
-#include "../../core/discord.h"
 
 namespace llpp::bots::crafting
 {

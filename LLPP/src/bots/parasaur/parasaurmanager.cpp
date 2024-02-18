@@ -6,7 +6,8 @@
 #include "../../config/config.h"
 #include "../../common/util.h"
 #include <asapp/interfaces/tribemanager.h>
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
+#include "../../discord/tribelogs/handler.h"
 
 namespace llpp::bots::parasaur
 {
@@ -82,7 +83,7 @@ namespace llpp::bots::parasaur
         asa::entities::local_player->fast_travel_to(bed, AccessFlags_Default,
                                                     TravelFlags_NoTravelAnimation);
 
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events);
         asa::core::sleep_for(std::chrono::seconds(1));
 
         const asa::structures::Teleporter next("PARASAUR::START NEXT");

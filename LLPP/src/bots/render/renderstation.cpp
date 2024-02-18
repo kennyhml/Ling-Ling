@@ -2,7 +2,7 @@
 #include "../../common/util.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/tribemanager.h>
-#include "../../core/discord.h"
+#include "../../discord/tribelogs/handler.h"
 
 namespace llpp::bots::render
 {
@@ -21,7 +21,7 @@ namespace llpp::bots::render
         asa::entities::local_player->fast_travel_to(gateway_bed, AccessFlags_Default,
                                                     TravelFlags_NoTravelAnimation);
 
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs,
+        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events,
                                                          std::chrono::seconds(0));
         set_completed();
         return {this, true, get_time_taken<std::chrono::seconds>(), {}};

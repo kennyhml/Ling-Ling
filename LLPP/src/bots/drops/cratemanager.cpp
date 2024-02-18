@@ -2,9 +2,12 @@
 #include <asapp/core/state.h>
 #include "../../common/util.h"
 #include "../../config/config.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include "embeds.h"
 #include <asapp/entities/localplayer.h>
+#include <asapp/interfaces/tribemanager.h>
+
+#include "../../discord/tribelogs/handler.h"
 
 namespace llpp::bots::drops
 {
@@ -139,7 +142,7 @@ namespace llpp::bots::drops
         asa::entities::local_player->fast_travel_to(align_bed_, AccessFlags_Default,
                                                     TravelFlags_NoTravelAnimation);
 
-        asa::interfaces::tribe_manager->update_tribelogs(core::discord::handle_tribelogs);
+        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events);
         asa::core::sleep_for(std::chrono::seconds(1));
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(20);
@@ -232,13 +235,13 @@ namespace llpp::bots::drops
             crate_commands.add_option(reroll_group);
 
             has_registered_reroll_command_ = true;
-            core::discord::register_slash_command(crate_commands, reroll_mode_callback);
+            discord::register_slash_command(crate_commands, reroll_mode_callback);
         }
     }
 
     void CrateManager::reroll_mode_callback(const dpp::slashcommand_t& event)
     {
-        if (core::discord::handle_unauthorized_command(event)) { return; }
+        if (discord::handle_unauthorized_command(event)) { return; }
 
         auto cmd_data = event.command.get_command_interaction();
 

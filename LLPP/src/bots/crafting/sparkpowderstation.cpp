@@ -1,10 +1,7 @@
 #include "sparkpowderstation.h"
 #include <asapp/core/state.h>
-#include <asapp/entities/localplayer.h>
 #include "embeds.h"
 #include "../../common/util.h"
-
-#include "../../core/discord.h"
 
 namespace llpp::bots::crafting
 {

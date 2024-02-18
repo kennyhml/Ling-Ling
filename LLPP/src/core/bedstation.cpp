@@ -1,15 +1,45 @@
+#include "bedstation.h"
+#include "../discord/embeds.h"
+#include "../discord/tribelogs/handler.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/tribemanager.h>
-#include "bedstation.h"
-
 #include <asapp/entities/exceptions.h>
 #include <asapp/interfaces/spawnmap.h>
-
-#include "discord.h"
+#include "../config/config.h"
+#include "../discord/bot.h"
 
 namespace llpp::core
 {
+    namespace
+    {
+        void send_disabled(const std::string& name, const std::string& why)
+        {
+            dpp::message msg(discord::get_error_channel(),
+                             discord::get_station_disabled_embed(name, why));
+
+            msg.set_content(
+                dpp::utility::role_mention(
+                    config::discord::roles::helper_no_access.get()));
+            msg.set_allowed_mentions(false, true, false, false, {}, {});
+
+            discord::get_bot()->message_create(msg);
+        }
+
+        void send_suspended(const std::string& name, const std::string& why,
+                            const std::chrono::minutes duration)
+        {
+            dpp::message msg(discord::get_error_channel(),
+                             discord::get_station_suspended_embed(name, why, duration));
+
+            msg.set_content(
+                dpp::utility::role_mention(
+                    config::discord::roles::helper_no_access.get()));
+            msg.set_allowed_mentions(false, true, false, false, {}, {});
+            discord::get_bot()->message_create(msg);
+        }
+    }
+
     BedStation::BedStation(std::string t_name, const std::chrono::minutes t_interval)
         : BaseStation(std::move(t_name), t_interval), spawn_bed_(name_) {}
 
@@ -19,24 +49,25 @@ namespace llpp::core
 
         try {
             asa::entities::local_player->fast_travel_to(spawn_bed_, AccessFlags_Default,
-                                            TravelFlags_NoTravelAnimation);
-        } catch (const asa::entities::FastTravelFailedError& e) {
+                                                        TravelFlags_NoTravelAnimation);
+        }
+        catch (const asa::entities::FastTravelFailedError& e) {
             std::cerr << e.what() << std::endl;
             asa::entities::local_player->suicide();
             asa::interfaces::spawn_map->spawn_at(reset_bed_.get_name());
             return begin();
         } catch (const asa::interfaces::DestinationNotFound& e) {
             std::cerr << e.what() << std::endl;
-            // inform via discord that the station was disabled.
+            send_disabled(name_, e.what());
             set_state(State::DISABLED);
             return false;
         } catch (const asa::interfaces::DestinationNotReady& e) {
             std::cerr << e.what() << std::endl;
-            // inform via discord that the station was suspended.
+            send_suspended(name_, e.what(), std::chrono::minutes(5));
             suspend_for(std::chrono::minutes(5));
             return false;
         }
-        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelogs);
+        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events);
         asa::core::sleep_for(std::chrono::seconds(1)); // Give logs time to close.
         return true;
     }

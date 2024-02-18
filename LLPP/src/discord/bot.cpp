@@ -71,8 +71,7 @@ namespace llpp::discord
     bool init()
     {
         validate_configuration();
-        bot = std::make_unique<dpp::cluster>(config::discord::token.get(),
-                                             dpp::i_all_intents);
+        bot = std::make_unique<dpp::cluster>(token.get(), dpp::i_all_intents);
 
         bot->on_slashcommand(slashcommand_callback);
         bot->on_ready(ready_callback);
@@ -106,5 +105,10 @@ namespace llpp::discord
         command_callbacks[cmd.name] = cb;
     }
 
-
+    dpp::snowflake get_error_channel()
+    {
+        return channels::error.get_ref().empty()
+                   ? channels::info.get()
+                   : channels::error.get();
+    }
 }

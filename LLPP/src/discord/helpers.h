@@ -20,4 +20,8 @@ namespace llpp::discord
      * @param embed The embed to set the timestamp on.
      */
     void set_now_timestamp(dpp::embed& embed);
+
+    std::string get_role_mention(const std::string& role);
+    std::string get_user_mention(const std::string& user);
+
 }

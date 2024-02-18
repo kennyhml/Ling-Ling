@@ -3,6 +3,7 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
+#include "../../discord/bot.h"
 
 using namespace llpp::config::bots::crafting;
 
@@ -219,13 +220,13 @@ namespace llpp::bots::crafting
         crafting.add_option(disable.add_option(disable_field));
 
 
-        core::discord::register_slash_command(crafting, slashcommand_callback);
+        discord::register_slash_command(crafting, slashcommand_callback);
         has_registered_commands_ = true;
     }
 
     void CraftingManager::slashcommand_callback(const dpp::slashcommand_t& event)
     {
-        if (core::discord::handle_unauthorized_command(event)) { return; }
+        if (discord::handle_unauthorized_command(event)) { return; }
 
         auto cmd_options = event.command.get_command_interaction();
         auto subcommand = cmd_options.options[0];

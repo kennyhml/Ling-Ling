@@ -2,8 +2,10 @@
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../core/basestation.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include <format>
+
+#include "../../discord/helpers.h"
 
 namespace llpp::bots::drops
 {
@@ -63,14 +65,14 @@ namespace llpp::bots::drops
 
         if (got_rerolled) { embed.set_footer({"The drop was rerolled and left up."}); }
 
-        const auto fdata = util::mat_to_strbuffer(loot);
+        const auto fdata = discord::strbuf(loot);
         const auto channel = loot_channel.get_ptr()->empty()
                                  ? config::discord::channels::info.get()
                                  : loot_channel.get();
         auto message = dpp::message(channel, embed);
         message.add_file("image.png", fdata, "image/png");
 
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void request_reroll(const core::StationResult& data, cv::Mat loot,
@@ -116,20 +118,20 @@ namespace llpp::bots::drops
             embed.add_field("", fmt_string);
         }
 
-        auto fdata = util::mat_to_strbuffer(loot);
+        auto fdata = discord::strbuf(loot);
         const auto channel = loot_channel.get_ptr()->empty()
                                  ? config::discord::channels::info.get()
                                  : loot_channel.get();
         auto message = dpp::message(channel, embed);
 
         if (!reroll_role.get().empty()) {
-            message.content = util::get_role_mention(reroll_role.get());
+            message.content = dpp::utility::role_mention(reroll_role.get());
         }
 
         message.set_allowed_mentions(false, true, false, false, {}, {});
         message.add_file("image.png", fdata, "image/png ");
 
-        core::discord::bot->message_create(message);
+       discord::get_bot()->message_create(message);
     }
 
     void send_summary_embed(const std::string& name,
@@ -175,11 +177,11 @@ namespace llpp::bots::drops
 
         dpp::message msg(config::discord::channels::info.get(), embed);
         if (any_too_full) {
-            msg.set_content(util::get_role_mention(
+            msg.set_content(dpp::utility::role_mention(
                 config::discord::roles::helper_access.get()));
             msg.set_allowed_mentions(false, true, false, false, {}, {});
         }
 
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 }

@@ -2,7 +2,8 @@
 
 #include "../../common/util.h"
 #include "../../config/config.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
+#include "../../discord/helpers.h"
 #include "../../core/basestation.h"
 
 namespace llpp::bots::crafting
@@ -51,7 +52,7 @@ namespace llpp::bots::crafting
         }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void send_gunpowder_crafted(const core::StationResult& data, const bool was_crafting)
@@ -79,7 +80,7 @@ namespace llpp::bots::crafting
         }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void send_arb_crafted(const core::StationResult& data, const bool was_crafting)
@@ -108,7 +109,7 @@ namespace llpp::bots::crafting
         }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void send_station_capped(const std::string& station_name, const cv::Mat& ss)
@@ -128,14 +129,14 @@ namespace llpp::bots::crafting
                                          station_name)
                          });
         auto message = dpp::message(config::discord::channels::info.get(), embed);
-        const auto fdata = util::mat_to_strbuffer(ss);
+        const auto fdata = discord::strbuf(ss);
         message.add_file("image.png", fdata, "image/png ");
 
         message.set_content(
-                util::get_role_mention(config::discord::roles::helper_no_access.get()));
+                dpp::utility::role_mention(config::discord::roles::helper_no_access.get()));
         message.set_allowed_mentions(false, true, false, false, {}, {});
 
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void send_paste_grinded(const core::StationResult& data, const bool grinder_emptied)
@@ -157,7 +158,7 @@ namespace llpp::bots::crafting
                                                 std::format("<t:{}:R>", next), true);
 
         auto msg = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 
     void send_forge_cycled(const core::StationResult& data, const std::string& item,
@@ -186,7 +187,7 @@ namespace llpp::bots::crafting
              .add_field("", "", true);
 
         auto msg = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
 
     }
 

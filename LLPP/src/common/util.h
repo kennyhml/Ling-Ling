@@ -34,7 +34,5 @@ namespace llpp::util
 	std::string add_num_to_prefix(
 		const std::string& prefix, int number, int fillZeros = 2);
 
-	std::string get_role_mention(const std::string& role);
-	std::string get_user_mention(const std::string& user);
 
 }

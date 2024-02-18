@@ -2,7 +2,6 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/tribemanager.h>
-#include "../../core/discord.h"
 #include "embeds.h"
 
 namespace llpp::bots::kitchen

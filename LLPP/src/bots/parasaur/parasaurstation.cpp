@@ -6,7 +6,7 @@
 #include <asapp/interfaces/tribemanager.h>
 
 #include "embeds.h"
-#include "../../core/discord.h"
+#include "../../discord/tribelogs/handler.h"
 
 namespace llpp::bots::parasaur
 {
@@ -37,7 +37,7 @@ namespace llpp::bots::parasaur
         do {
             if (check_logs_) {
                 asa::interfaces::tribe_manager->update_tribelogs(
-                    core::discord::handle_tribelogs);
+                    discord::handle_tribelog_events);
             }
             int sleep = std::min(seconds_left, 10);
             asa::core::sleep_for(std::chrono::seconds(sleep));

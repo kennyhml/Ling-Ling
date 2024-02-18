@@ -2,10 +2,11 @@
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../core/basestation.h"
-#include "../../core/discord.h"
+#include "../../discord/bot.h"
 #include <format>
 
 #include "../../config/config.h"
+#include "../../discord/helpers.h"
 
 using namespace llpp::config::discord;
 
@@ -41,7 +42,7 @@ namespace llpp::bots::paste
             embed.set_footer({"Amount of paste collected could not be deduced."});
         }
         auto msg = dpp::message(config::discord::channels::info.get(), embed);
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 
     void send_paste_not_deposited(const std::string& station)
@@ -57,7 +58,7 @@ namespace llpp::bots::paste
                   "images/f/f6/Radiation.png/revision/latest?cb=20171216191751").
               set_image("attachment://image.png");
 
-        auto fdata = util::mat_to_strbuffer(asa::window::screenshot());
+        auto fdata = discord::strbuf(asa::window::screenshot());
 
         dpp::message msg;
         if (channels::error.get_ptr()->empty()) {
@@ -65,10 +66,10 @@ namespace llpp::bots::paste
         }
         else { msg.set_channel_id(channels::error.get()); }
 
-        msg.set_content(util::get_role_mention(roles::helper_no_access.get())).
+        msg.set_content(dpp::utility::role_mention(roles::helper_no_access.get())).
             set_allowed_mentions(false, true, false, false, {}, {}).add_file(
                 "image.png", fdata, "image/png ").add_embed(embed);
-        core::discord::bot->message_create(msg);
+        discord::get_bot()->message_create(msg);
     }
 
     void send_achatina_not_accessible(const std::string& station_name,
@@ -85,14 +86,13 @@ namespace llpp::bots::paste
               add_field("Station:", station_name, true).add_field(
                   "Achatina: ", achatina_name, true).set_image("attachment://image.png");
 
-        auto fileData = util::mat_to_strbuffer(asa::window::screenshot());
-        dpp::message message = dpp::message(config::discord::channels::info.get(),
+        auto fileData = discord::strbuf(asa::window::screenshot());
+        dpp::message message = dpp::message(discord::get_error_channel(),
                                             std::format(
                                                 "<@&{}>",
-                                                config::discord::roles::helper_no_access.
-                                                get())).set_allowed_mentions(
-            false, true, false, false, {}, {});
+                                                roles::helper_no_access.get())).
+            set_allowed_mentions(false, true, false, false, {}, {});
         message.add_file("image.png", fileData, "image/png ").add_embed(embed);
-        core::discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 }

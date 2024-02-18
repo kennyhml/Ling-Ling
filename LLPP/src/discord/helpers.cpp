@@ -16,4 +16,21 @@ namespace llpp::discord
         embed.set_timestamp(std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now()));
     }
+
+    std::string get_role_mention(const std::string& role)
+    {
+        return std::format("<@&{}>", role);
+    }
+
+    std::string get_user_mention(const std::string& zser)
+    {
+        return std::format("<@{}>", zser);
+    }
+
+
+
+
+
+
+
 }

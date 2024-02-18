@@ -69,7 +69,7 @@ namespace
             }
         }
         return std::format("{}: \u001b[1;{}m{}\u001b[0m\n", event.timestamp.to_string(),
-                           get_text_color(event.type), event.content);
+                           static_cast<int>(get_text_color(event.type)), event.content);
     }
 
     std::vector<std::string> fmt_all(const asa::interfaces::TribeManager::LogEntries& log)
@@ -118,27 +118,34 @@ namespace llpp::discord
                     const std::string& line = fmt_messages[message_iter++];
                     last_msg.content.insert(last_msg.content.length() - 3, line);
                 }
-                if (message_iter) { bot->message_edit(last_msg); }
+                if (message_iter) { discord::get_bot()->message_edit(last_msg); }
             }
             else if (flush_previous_messages) {
                 const auto channel = config::discord::channels::logs.get();
-                if (msg_ids.size() == 1) { bot->message_delete(msg_ids[0], channel); }
-                else if (!msg_ids.empty()) { bot->message_delete_bulk(msg_ids, channel); }
+                if (msg_ids.size() == 1) {
+                    discord::get_bot()->message_delete(msg_ids[0], channel);
+                }
+                else if (!msg_ids.empty()) {
+                    discord::get_bot()->message_delete_bulk(msg_ids, channel);
+                }
             }
 
             dpp::message new_message(config::discord::channels::logs.get(), "```ansi\n");
             while (message_iter < fmt_messages.size()) {
                 if (new_message.content.length() > 1900) {
                     new_message.content += "```";
-                    bot->message_create(new_message);
+                    discord::get_bot()->message_create(new_message);
                     new_message.content = "```ansi\n";
                 }
                 new_message.content += fmt_messages[message_iter++];
             }
             new_message.content += "```";
-            if (new_message.content.length() > 15) { bot->message_create(new_message); }
+            if (new_message.content.length() > 15) {
+                get_bot()->message_create(new_message);
+            }
         };
 
-        bot->messages_get(config::discord::channels::logs.get(), 0, 0, 0, 100, callback);
+        get_bot()->messages_get(config::discord::channels::logs.get(), 0, 0, 0, 100,
+                                callback);
     }
 }

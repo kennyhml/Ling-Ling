@@ -1,6 +1,6 @@
 #include "recovery.h"
 #include "../common/util.h"
-#include "discord.h"
+#include "../discord/bot.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/game/window.h>
 #include <asapp/interfaces/console.h>
@@ -10,6 +10,7 @@
 #include <asapp/interfaces/spawnmap.h>
 
 #include "../config/config.h"
+#include "../discord/helpers.h"
 
 namespace llpp::core
 {
@@ -99,11 +100,6 @@ namespace llpp::core
 
     void inform_crash_detected(asa::core::ShooterGameError& e)
     {
-        if (!discord::bot) {
-            std::cerr << "[!] Skipped posting paste success, no discord bot\n";
-            return;
-        }
-
         auto embed = dpp::embed();
         embed.set_color(0xB82E88).set_title("CRITICAL: The game or server has crashed.").
               set_description(e.what()).set_thumbnail(
@@ -113,7 +109,7 @@ namespace llpp::core
               set_image("attachment://image.png").set_footer(
                   dpp::embed_footer("Recovery should follow automatically."));
 
-        const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
+        const auto file_data = discord::strbuf(asa::window::screenshot());
         dpp::message message = dpp::message(config::discord::channels::info.get(),
                                             std::format(
                                                 "<@&{}>",
@@ -122,15 +118,11 @@ namespace llpp::core
             false, true, false, false, {}, {});
         message.add_file("image.png", file_data, "image/png ").add_embed(embed);
 
-        discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void inform_recovery_initiated(const bool restart, const bool reconnect)
     {
-        if (!discord::bot) {
-            std::cerr << "[!] Skipped posting paste success, no discord bot\n";
-            return;
-        }
         auto embed = dpp::embed();
         embed.set_color(0x7F5D44).set_title("Recovery sequence was initiated!").
               set_description("Recovery attempt imminent. Required steps:").set_thumbnail(
@@ -144,15 +136,11 @@ namespace llpp::core
         }
 
         const auto message = dpp::message(config::discord::channels::info.get(), embed);
-        discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 
     void inform_recovery_successful(const std::chrono::seconds time_taken)
     {
-        if (!discord::bot) {
-            std::cerr << "[!] Skipped posting paste success, no discord bot\n";
-            return;
-        }
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::green).set_title("Recovery sequence was successful!")
              .set_description("Ling Ling++ has successfully recovered itself.").
@@ -163,10 +151,10 @@ namespace llpp::core
                  "attachment://image.png");
 
 
-        const auto file_data = util::mat_to_strbuffer(asa::window::screenshot());
+        const auto file_data = discord::strbuf(asa::window::screenshot());
         auto message = dpp::message(config::discord::channels::info.get(), embed);
         message.add_file("image.png", file_data, "image/png ");
 
-        discord::bot->message_create(message);
+        discord::get_bot()->message_create(message);
     }
 }

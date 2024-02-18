@@ -33,4 +33,9 @@ namespace llpp::discord
      * @param cb The callback function to be called when the slashcommand is invoked.
      */
     void register_slash_command(const dpp::slashcommand& cmd, const event_callback_t& cb);
+
+    /**
+     * @brief Gets the error channel from the config, falls back to info channel.
+     */
+    dpp::snowflake get_error_channel();
 }
