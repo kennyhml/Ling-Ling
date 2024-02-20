@@ -18,7 +18,8 @@ namespace llpp::discord
         embed.set_thumbnail(WHIP_ICON);
 
         embed.add_field("Account: ", config::user::name.get(), true);
-        embed.add_field("Server: ", asa::settings::last_session_3.get(), true);
+        embed.add_field("Version: ", "v1.7.11", true);
+        embed.add_field("Server: ", asa::settings::last_session_0.get());
 
         set_now_timestamp(embed);
         return embed;

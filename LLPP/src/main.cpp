@@ -34,17 +34,17 @@ void check_terminated() { if (!running) { throw TerminatedError(); } }
 void inform_started()
 {
     dpp::message msg(llpp::config::discord::channels::info.get(),
-        llpp::discord::get_started_embed());
+                     llpp::discord::get_started_embed());
     llpp::discord::get_bot()->message_create(msg);
 }
 
-void inform_crashed(const std::string& why, const std::string& task)
+void inform_crashed(const std::exception& why, const std::string& task)
 {
+    std::cout << "crash" << std::endl;
     dpp::message msg(llpp::config::discord::channels::info.get(),
-        llpp::discord::get_started_embed());
+                     llpp::discord::get_fatal_error_embed(why, task));
     llpp::discord::get_bot()->message_create(msg);
 }
-
 
 void llpp_main()
 {
@@ -87,7 +87,7 @@ void llpp_main()
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
         } catch (const TerminatedError&) { break; } catch (const std::exception& e) {
-            inform_crashed(e.what(), taskmanager.get_previous_task()->get_name());
+            inform_crashed(e, taskmanager.get_previous_task()->get_name());
             running = false;
         }
     }
