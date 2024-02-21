@@ -13,8 +13,8 @@ namespace llpp::discord
         // Handle the correct set of events depending on the configuration
         // for the log post type
         if (config::discord::advanced::flush_logs.get()) {
-            handle_stream(all_events, false);
+            handle_stream(all_events, true);
         }
-        else { handle_stream(new_events, true); }
+        else { handle_stream(new_events, false); }
     }
 }

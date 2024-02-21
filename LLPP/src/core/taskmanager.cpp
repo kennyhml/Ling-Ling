@@ -23,11 +23,17 @@ namespace llpp::core
 
         bool player_requires_healing()
         {
+            static asa::structures::SimpleBed generic_bed("generic bed");
+
             const auto& p = asa::entities::local_player;
             if (p->is_out_of_food() || p->is_out_of_water() || p->is_broken_bones()) {
                 return true;
             }
             if (!util::timedout(last_inv_check, inv_check_interval)) { return false; }
+
+            if (generic_bed.get_interface()->is_open()) {
+                generic_bed.get_interface()->close();
+            }
 
             auto& info = p->get_inventory()->info;
             p->get_inventory()->open();
