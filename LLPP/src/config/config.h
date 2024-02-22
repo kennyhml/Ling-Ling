@@ -144,6 +144,7 @@ namespace llpp::config
         inline ManagedVar<bool> disable_completion(BASE, "disabled", save, false);
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
+        inline ManagedVar<std::vector<const char*>> times(BASE, "completion_times", save, {});
 
         inline ManagedVar<std::string> grind_prefix(BASE, "grind_prefix", save,
                                                     "PASTE::GRINDING");

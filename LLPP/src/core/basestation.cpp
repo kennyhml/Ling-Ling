@@ -1,11 +1,17 @@
 #include "basestation.h"
-
 #include <asapp/util/util.h>
 
 namespace llpp::core
 {
     BaseStation::BaseStation(std::string t_name, const std::chrono::minutes t_interval) :
         name_(std::move(t_name)), completion_interval_(t_interval) {}
+
+    BaseStation::BaseStation(std::string t_name,
+                             const std::chrono::system_clock::time_point t_last_completed,
+                             const std::chrono::minutes t_interval)
+        : name_(std::move(t_name)), completion_interval_(t_interval),
+          last_completed_(t_last_completed) {}
+
 
     bool BaseStation::is_ready()
     {

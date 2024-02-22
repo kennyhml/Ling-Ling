@@ -1,8 +1,8 @@
 #include "util.h"
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
-
 namespace llpp::util
 {
 	bool await(const std::function<bool()>& condition,
@@ -50,5 +50,19 @@ namespace llpp::util
 		return prefix + oss.str();
 	}
 
+	std::string time_to_json(const std::chrono::system_clock::time_point& time)
+	{
+		std::stringstream ss;
+		ss << std::chrono::system_clock::to_time_t(time);
+		return ss.str();
+	}
+
+	std::chrono::system_clock::time_point json_to_time(const std::string& json)
+	{
+		std::stringstream ss(json);
+		std::time_t unix;
+		ss >> unix;
+		return std::chrono::system_clock::from_time_t(unix);
+	}
 
 }

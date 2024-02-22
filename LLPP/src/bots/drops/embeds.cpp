@@ -44,20 +44,20 @@ namespace llpp::bots::drops
         using namespace config::bots::drops;
         get_color_fields(quality, color, thumbnail, determined_quality);
         auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.get_station()->
+            std::chrono::system_clock::now() + data.station->
                                                     get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(color).
               set_title(std::format("Crate '{}' has been looted!",
-                                    data.get_station()->get_name())).
+                                    data.station->get_name())).
               set_description(std::format("This crate has been looted {}/{} times!",
                                           times_looted,
-                                          data.get_station()->get_times_completed())).
+                                          data.station->get_times_completed())).
               set_thumbnail(thumbnail).add_field("Time taken:",
                                                  std::format(
                                                      "{} seconds",
-                                                     data.get_time_taken().count()),
+                                                     data.time_taken.count()),
                                                  true).add_field(
                   "Crate Quality:", determined_quality, true).add_field(
                   "Next completion:", std::format("<t:{}:R>", next_completion),
@@ -88,7 +88,7 @@ namespace llpp::bots::drops
         get_color_fields(quality, color, thumbnail, determined_quality);
         using namespace config::bots::drops;
         auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.get_station()->
+            std::chrono::system_clock::now() + data.station->
                                                     get_completion_interval());
 
         auto time_left = std::chrono::system_clock::to_time_t(expires);
@@ -96,7 +96,7 @@ namespace llpp::bots::drops
         auto embed = dpp::embed();
         embed.set_color(color).
               set_title(std::format("Requesting reroll at '{}'!",
-                                    data.get_station()->get_name())).
+                                    data.station->get_name())).
               set_description("If the timer expires, the drop will be looted.").
               set_thumbnail(thumbnail).
               add_field("Expires:", std::format("<t:{}:R>", time_left), true).

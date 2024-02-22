@@ -8,7 +8,9 @@ namespace llpp::bots::paste
     class PasteStation final : public core::BedStation
     {
     public:
-        PasteStation(std::string t_name, std::chrono::minutes t_interval);
+        PasteStation(std::string t_name,
+                     std::chrono::system_clock::time_point t_last_completed,
+                     std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
 

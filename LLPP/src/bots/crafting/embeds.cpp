@@ -30,19 +30,19 @@ namespace llpp::bots::crafting
     void send_spark_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
+                std::chrono::system_clock::now() + data.station->
                         get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::orange)
              .set_title(std::format("Sparkpowder Station '{}' has been looted!",
-                                    data.get_station()->get_name()))
+                                    data.station->get_name()))
              .set_description(
                      std::format("Crafted spark successfully {} times!",
-                                 data.get_station()->get_times_completed()))
+                                 data.station->get_times_completed()))
              .set_thumbnail(SPARK_ICON_URL)
              .add_field("Time taken:",
-                        std::format("{} seconds", data.get_time_taken().count()),
+                        std::format("{} seconds", data.time_taken.count()),
                         true)
              .add_field(
                      "Next completion:", std::format("<t:{}:R>", next_completion), true);
@@ -58,19 +58,19 @@ namespace llpp::bots::crafting
     void send_gunpowder_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
+                std::chrono::system_clock::now() + data.station->
                         get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::black)
              .set_title(std::format("Gunpowder Station '{}' has been looted!",
-                                    data.get_station()->get_name()))
+                                    data.station->get_name()))
              .set_description(
                      std::format("Crafted gunpowder successfully {} times!",
-                                 data.get_station()->get_times_completed()))
+                                 data.station->get_times_completed()))
              .set_thumbnail(GP_ICON_URL)
              .add_field("Time taken:",
-                        std::format("{} seconds", data.get_time_taken().count()),
+                        std::format("{} seconds", data.time_taken.count()),
                         true)
              .add_field(
                      "Next completion:", std::format("<t:{}:R>", next_completion), true);
@@ -86,20 +86,20 @@ namespace llpp::bots::crafting
     void send_arb_crafted(const core::StationResult& data, const bool was_crafting)
     {
         auto next_completion = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
+                std::chrono::system_clock::now() + data.station->
                         get_completion_interval());
 
-        const int produced = data.get_obtained_items().at("Advanced Rifle Bullet");
+        const int produced = data.obtained_items.at("Advanced Rifle Bullet");
 
         auto embed = dpp::embed();
         embed.set_color(0xC59A7B)
              .set_title(std::format("ARB Station '{}' has been completed!",
-                                    data.get_station()->get_name()))
+                                    data.station->get_name()))
              .set_description(std::format("Crafted ARB successfully {} times!",
-                                          data.get_station()->get_times_completed()))
+                                          data.station->get_times_completed()))
              .set_thumbnail(ARB_ICON_URL)
              .add_field("Time taken:",
-                        std::format("{} seconds", data.get_time_taken().count()), true)
+                        std::format("{} seconds", data.time_taken.count()), true)
              .add_field("Produced:", "~" + std::to_string(produced), true)
              .add_field("Next completion:", std::format("<t:{}:R>", next_completion),
                         true);
@@ -142,17 +142,17 @@ namespace llpp::bots::crafting
     void send_paste_grinded(const core::StationResult& data, const bool grinder_emptied)
     {
         auto next = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
+                std::chrono::system_clock::now() + data.station->
                         get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::white).
                 set_title(std::format("Grind Station '{}' has been completed.",
-                                      data.get_station()->get_name())).set_description(
+                                      data.station->get_name())).set_description(
                 std::format("The station was completed successfully {} times!",
-                            data.get_station()->get_times_completed())).
+                            data.station->get_times_completed())).
                      set_thumbnail(GRINDER_ICON_URL).add_field(
-                "Time taken:", std::format("{} seconds", data.get_time_taken().count()),
+                "Time taken:", std::format("{} seconds", data.time_taken.count()),
                 true).add_field("Grinder emptied:", grinder_emptied ? "Yes" : "No",
                                 true).add_field("Next completion:",
                                                 std::format("<t:{}:R>", next), true);
@@ -165,21 +165,21 @@ namespace llpp::bots::crafting
                            const int slots_added)
     {
         auto next = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now() + data.get_station()->
+                std::chrono::system_clock::now() + data.station->
                         get_completion_interval());
 
-        const int took_slots = data.get_obtained_items().at(item);
+        const int took_slots = data.obtained_items.at(item);
 
         auto embed = dpp::embed();
         embed.set_color(0x454545)
              .set_title(std::format("Forge Station '{}' has been completed.",
-                                    data.get_station()->get_name()))
+                                    data.station->get_name()))
              .set_description(
                      std::format("This forge has been cycled {} times!",
-                                 data.get_station()->get_times_completed()))
+                                 data.station->get_times_completed()))
              .set_thumbnail(FORGE_ICON_URL)
              .add_field("Time taken:",
-                        std::format("{} seconds", data.get_time_taken().count()), true)
+                        std::format("{} seconds", data.time_taken.count()), true)
              .add_field("Item cycled:", item, true)
              .add_field("Next completion:", std::format("<t:{}:R>", next), true)
              .add_field("Processed:", std::to_string(took_slots), true)

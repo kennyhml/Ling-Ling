@@ -14,7 +14,6 @@ namespace llpp::bots::paste
         bool run() override;
         [[nodiscard]] bool is_ready_to_run() override;
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
-        [[nodiscard]] const PasteStation* peek_station(int index) const;
 
     private:
         std::vector<std::unique_ptr<PasteStation>> paste_stations_;

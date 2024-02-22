@@ -47,7 +47,7 @@ namespace llpp::core
 
         bool player_state_check()
         {
-            if (player_requires_healing()) { return suicide.complete().get_success(); }
+            if (player_requires_healing()) { return suicide.complete().success; }
             return false;
         }
     }

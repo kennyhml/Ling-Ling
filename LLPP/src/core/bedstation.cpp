@@ -14,6 +14,12 @@ namespace llpp::core
     BedStation::BedStation(std::string t_name, const std::chrono::minutes t_interval)
         : BaseStation(std::move(t_name), t_interval), spawn_bed_(name_) {}
 
+    BedStation::BedStation(std::string t_name,
+                           std::chrono::system_clock::time_point t_last_completed,
+                           const std::chrono::minutes t_interval)
+        : BaseStation(std::move(t_name), t_last_completed, t_interval), spawn_bed_(name_) {}
+
+
     bool BedStation::begin()
     {
         last_started_ = std::chrono::system_clock::now();

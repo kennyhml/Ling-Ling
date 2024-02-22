@@ -83,7 +83,9 @@ namespace llpp::core
 
     protected:
         BaseStation(std::string t_name, std::chrono::minutes t_interval);
-
+        BaseStation(std::string t_name,
+                    std::chrono::system_clock::time_point t_last_completed,
+                    std::chrono::minutes t_interval);
         /**
          * @brief Begins the station by setting the start time point and spawning there.
          *

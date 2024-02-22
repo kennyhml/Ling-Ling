@@ -11,8 +11,10 @@
 
 namespace llpp::bots::paste
 {
-    PasteStation::PasteStation(std::string t_name, std::chrono::minutes t_interval) :
-        BedStation(std::move(t_name), t_interval), dedi_(name_ + "::DEDI") {};
+    PasteStation::PasteStation(std::string t_name,
+                               std::chrono::system_clock::time_point t_last_completed,
+                               const std::chrono::minutes t_interval) : BedStation(
+        std::move(t_name), t_last_completed, t_interval), dedi_(name_ + "::DEDI") {};
 
     core::StationResult PasteStation::complete()
     {

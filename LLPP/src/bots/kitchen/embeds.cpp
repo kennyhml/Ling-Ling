@@ -26,18 +26,18 @@ namespace llpp::bots::kitchen
                               const asa::items::Item* item, const int slots_in_fridge)
     {
         const auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.get_station()->
+            std::chrono::system_clock::now() + data.station->
                                                     get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::orange).
               set_title(std::format("Crop Station '{}' has been completed.",
-                                    data.get_station()->get_name())).
+                                    data.station->get_name())).
               set_description(std::format(
                   "The station was completed successfully {} times!",
-                  data.get_station()->get_times_completed())).
+                  data.station->get_times_completed())).
               set_thumbnail(icon_map[item->get_name()]).add_field(
-                  "Time taken:", std::format("{} seconds", data.get_time_taken().count()),
+                  "Time taken:", std::format("{} seconds", data.time_taken.count()),
                   true).add_field("Fridge:", std::format("{}/80", slots_in_fridge), true).
               add_field("Next completion:", std::format("<t:{}:R>", next_completion),
                         true);
@@ -49,18 +49,18 @@ namespace llpp::bots::kitchen
     void send_sap_collected(const core::StationResult& data, const int slots_in_storage)
     {
         const auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.get_station()->
+            std::chrono::system_clock::now() + data.station->
                                                     get_completion_interval());
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::yellow).
               set_title(std::format("Sap Station '{}' has been completed.",
-                                    data.get_station()->get_name())).
+                                    data.station->get_name())).
               set_description(std::format(
                   "The station was completed successfully {} times!",
-                  data.get_station()->get_times_completed())).set_thumbnail(SAP_URL).
+                  data.station->get_times_completed())).set_thumbnail(SAP_URL).
               add_field("Time taken:",
-                        std::format("{} seconds", data.get_time_taken().count()),
+                        std::format("{} seconds", data.time_taken.count()),
                         true).add_field("Storage:",
                                         std::format("{}/45", slots_in_storage),
                                         true).add_field(

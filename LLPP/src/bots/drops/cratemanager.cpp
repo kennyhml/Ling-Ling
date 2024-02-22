@@ -98,7 +98,7 @@ namespace llpp::bots::drops
                 const auto result = station.complete();
                 set_group_rendered(group, true);
 
-                if (result.get_success()) {
+                if (result.success) {
                     any_looted = true;
                     if (!config_.uses_teleporters) {
                         vault_fill_levels_[station.BedStation::get_name()] = static_cast<

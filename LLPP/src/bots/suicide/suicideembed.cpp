@@ -15,12 +15,12 @@ namespace llpp::bots::suicide
         embed.set_color(dpp::colors::light_blue).
               set_title(std::format("Successfully suicided at '{}'.", at_bed)).
               set_description(std::format("Suicided a total of {} times!",
-                                          data.get_station()->get_times_completed())).
+                                          data.station->get_times_completed())).
               set_thumbnail(
                   "https://static.wikia.nocookie.net/"
                   "arksurvivalevolved_gamepedia/images/5/55/"
                   "Specimen_Implant.png/revision/latest?cb=20180731184153").add_field(
-                  "Time taken:", std::format("{} seconds", data.get_time_taken().count()),
+                  "Time taken:", std::format("{} seconds", data.time_taken.count()),
                   true).add_field("Respawning at:", respawning_at, true);
 
         auto message = dpp::message(config::discord::channels::info.get(), embed);

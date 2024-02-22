@@ -15,6 +15,7 @@
 #include "core/taskmanager.h"
 #include <curl/curl.h>
 
+#include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
 #include "discord/tribelogs/handler.h"

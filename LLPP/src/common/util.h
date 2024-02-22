@@ -35,4 +35,7 @@ namespace llpp::util
 		const std::string& prefix, int number, int fillZeros = 2);
 
 
+	std::string time_to_json(const std::chrono::system_clock::time_point& time);
+
+	std::chrono::system_clock::time_point json_to_time(const std::string& json);
 }

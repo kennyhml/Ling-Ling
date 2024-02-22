@@ -21,20 +21,20 @@ namespace llpp::bots::paste
     void send_paste_collected(const core::StationResult& data)
     {
         auto next = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.get_station()->
+            std::chrono::system_clock::now() + data.station->
                                                     get_completion_interval());
 
-        const int paste_got = data.get_obtained_items().at("Achatina Paste");
+        const int paste_got = data.obtained_items.at("Achatina Paste");
         const std::string obtained = paste_got > 600 ? "N/A" : std::to_string(paste_got);
 
         auto embed = dpp::embed();
         embed.set_color(dpp::colors::gray).
               set_title(std::format("Paste Station '{}' has been completed.",
-                                    data.get_station()->get_name())).set_description(
+                                    data.station->get_name())).set_description(
                   std::format("The station was completed successfully {} times!",
-                              data.get_station()->get_times_completed())).
+                              data.station->get_times_completed())).
               set_thumbnail(PASTE_ICON_URL).add_field(
-                  "Time taken:", std::format("{} seconds", data.get_time_taken().count()),
+                  "Time taken:", std::format("{} seconds", data.time_taken.count()),
                   true).add_field("Paste obtained:", obtained, true).add_field(
                   "Next completion:", std::format("<t:{}:R>", next), true);
 

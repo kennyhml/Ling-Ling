@@ -212,6 +212,7 @@ namespace llpp::config
     template struct ManagedVar<std::vector<char>>;
     template struct ManagedVar<std::array<char, 256>>;
     template struct ManagedVar<std::vector<std::string>>;
+    template struct ManagedVar<std::vector<int>>;
     template struct ManagedVar<std::vector<const char*>>;
     template struct ManagedVar<bots::drops::CrateManagerConfig>;
     template struct ManagedVar<bots::parasaur::ParasaurConfig>;
