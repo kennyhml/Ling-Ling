@@ -104,21 +104,28 @@ namespace llpp::discord
             const dpp::message_map map = std::get<dpp::message_map>(confirmation.value);
 
             int message_iter = 0;
-            for (const auto& id : std::views::keys(map)) { msg_ids.push_back(id); }
 
-            std::cout << msg_ids.size() << " previous messages found" << std::endl;
+            dpp::message most_recent_;
+            double latest_found = 0;
+
+            for (const auto& [id, message] : map) {
+                msg_ids.push_back(id);
+                if (message.get_creation_time() > latest_found) {
+                    most_recent_ = message;
+                    latest_found = message.get_creation_time();
+                }
+            }
+
             if (!flush_previous_messages && !msg_ids.empty()) {
-                auto last_msg = map.at(msg_ids.front());
+                std::string original_content = most_recent_.content;
 
-                std::string original_content = last_msg.content;
-
-                while (last_msg.content.length() < 1900) {
+                while (most_recent_.content.length() < 1900) {
                     if (message_iter >= fmt_messages.size()) { break; }
 
                     const std::string& line = fmt_messages[message_iter++];
-                    last_msg.content.insert(last_msg.content.length() - 3, line);
+                    most_recent_.content.insert(most_recent_.content.length() - 3, line);
                 }
-                if (message_iter) { discord::get_bot()->message_edit(last_msg); }
+                if (message_iter) { discord::get_bot()->message_edit(most_recent_); }
             }
             else if (flush_previous_messages) {
                 const auto channel = config::discord::channels::logs.get();
