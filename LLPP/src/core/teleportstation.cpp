@@ -12,7 +12,13 @@ namespace llpp::core
                                      const std::chrono::minutes t_interval)
         : BaseStation(std::move(t_name), t_interval), start_tp_(name_) {}
 
-    bool TeleportStation::begin()
+
+    StationResult TeleportStation::complete()
+    {
+        return {this, begin(false), get_time_taken<std::chrono::seconds>(), {}};
+    }
+
+    bool TeleportStation::begin(bool check_logs)
     {
         last_started_ = std::chrono::system_clock::now();
 

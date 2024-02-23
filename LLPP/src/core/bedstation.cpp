@@ -17,16 +17,27 @@ namespace llpp::core
     BedStation::BedStation(std::string t_name,
                            std::chrono::system_clock::time_point t_last_completed,
                            const std::chrono::minutes t_interval)
-        : BaseStation(std::move(t_name), t_last_completed, t_interval), spawn_bed_(name_) {}
+        : BaseStation(std::move(t_name), t_last_completed, t_interval),
+          spawn_bed_(name_) {}
 
+    StationResult BedStation::complete()
+    {
+        return {this, begin(), get_time_taken<std::chrono::seconds>(), {}};
+    }
 
-    bool BedStation::begin()
+    bool BedStation::begin(const bool check_logs)
     {
         last_started_ = std::chrono::system_clock::now();
 
+        const auto flags = check_logs ? TravelFlags_NoTravelAnimation : TravelFlags_None;
         try {
-            asa::entities::local_player->fast_travel_to(spawn_bed_, AccessFlags_Default,
-                                                        TravelFlags_NoTravelAnimation);
+            if (asa::interfaces::spawn_map->is_open()) {
+                asa::interfaces::spawn_map->spawn_at(spawn_bed_.get_name());
+            }
+            else {
+                asa::entities::local_player->fast_travel_to(
+                    spawn_bed_, AccessFlags_Default, flags);
+            }
         }
         catch (const asa::entities::FastTravelFailedError& e) {
             std::cerr << e.what() << std::endl;
@@ -47,8 +58,11 @@ namespace llpp::core
             suspend_for(std::chrono::minutes(5));
             return false;
         }
-        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events);
-        asa::core::sleep_for(std::chrono::seconds(1)); // Give logs time to close.
+        if (check_logs) {
+            asa::interfaces::tribe_manager->update_tribelogs(
+                discord::handle_tribelog_events);
+            asa::core::sleep_for(std::chrono::seconds(1)); // Give logs time to close.
+        }
         return true;
     }
 }

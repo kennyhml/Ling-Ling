@@ -12,6 +12,8 @@ namespace llpp::core
     public:
         TeleportStation(std::string t_name, std::chrono::minutes t_interval);
 
+        StationResult complete() override;
+
         /**
          * @brief Sets this station as the default destination of the current teleporter.
          *
@@ -23,7 +25,7 @@ namespace llpp::core
         /**
          * @brief Starts the station by tping there, does not check logs.
          */
-        [[nodiscard]] bool begin() override;
+        [[nodiscard]] bool begin(bool check_logs = false) override;
 
         bool is_default_ = false;
         asa::structures::Teleporter start_tp_;
