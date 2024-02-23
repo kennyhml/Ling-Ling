@@ -1,6 +1,6 @@
 #pragma once
-#include "../../core/istationmanager.h"
 #include "parasaurstation.h"
+#include "../../core/istationmanager.h"
 
 namespace llpp::bots::parasaur
 {
@@ -17,11 +17,16 @@ namespace llpp::bots::parasaur
         /**
          * @brief Travels to the start tp to start the tp stations.
          */
-        void go_to_start_tp() const;
+        bool go_to_start();
 
         std::chrono::system_clock::time_point last_completed_;
 
         std::vector<std::unique_ptr<ParasaurStation>> bed_stations_;
         std::vector<std::unique_ptr<ParasaurStation>> tp_stations_;
+        core::BedStation spawn_bed_;
+        core::TeleportStation spawn_tp_;
+        core::TeleportStation next_tp_;
+
+
     };
 }

@@ -21,11 +21,17 @@ namespace llpp::bots::parasaur
 
     core::StationResult ParasaurStation::complete()
     {
+        if (use_teleporter_) { find_teleporter(); }
         if (use_teleporter_ ? !TeleportStation::begin() : !BedStation::begin()) {
             return {
                 static_cast<BedStation*>(this), false,
                 BedStation::get_time_taken<std::chrono::seconds>(), {}
             };
+        }
+
+        if (use_teleporter_) {
+            asa::entities::local_player->stand_up();
+            asa::entities::local_player->crouch();
         }
 
         int seconds_left = static_cast<int>(load_.count());
@@ -54,5 +60,18 @@ namespace llpp::bots::parasaur
             static_cast<BedStation*>(this), true,
             BedStation::get_time_taken<std::chrono::seconds>(), {}
         };
+    }
+
+    void ParasaurStation::find_teleporter()
+    {
+        auto start = std::chrono::system_clock::now();
+        constexpr int per_turn = 30;
+        asa::entities::local_player->set_pitch(90);
+        asa::core::sleep_for(std::chrono::milliseconds(500));
+
+        for (int i = 0; i < 360 / per_turn; i++) {
+            if (asa::interfaces::HUD::can_teleport()) { break; }
+            asa::entities::local_player->turn_right(30);
+        }
     }
 }

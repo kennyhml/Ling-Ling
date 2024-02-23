@@ -146,7 +146,7 @@ namespace llpp::gui
         end_child();
         ImGui::SameLine();
         const ImVec2 advanced_dimensions(270, ImGui::GetWindowHeight() * 0.53f);
-        begin_child("Advanced", advanced_dimensions);
+        begin_child("General Configuration", advanced_dimensions);
         {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Start bed:");
@@ -188,6 +188,8 @@ namespace llpp::gui
             ImGui::SetCursorPos({100, 73});
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
             if (ImGui::InputInt("##interval|min", dst->get_ptr(), 1, 5)) { dst->save(); }
+
+            if (ImGui::Checkbox("Disabled", disabled.get_ptr())) { disabled.save(); }
         }
         end_child();
 

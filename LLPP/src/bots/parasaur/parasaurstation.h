@@ -15,6 +15,8 @@ namespace llpp::bots::parasaur
         core::StationResult complete() override;
 
     private:
+        void find_teleporter();
+
         inline static std::chrono::system_clock::time_point last_detected_;
 
         std::string real_name_;
