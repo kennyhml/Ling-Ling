@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/istationmanager.h"
-#include "../render/renderstation.h"
+#include "../common/renderstation.h"
 #include "pastestation.h"
 #include <memory>
 
@@ -18,7 +18,7 @@ namespace llpp::bots::paste
     private:
         std::vector<std::unique_ptr<PasteStation>> paste_stations_;
 
-        render::RenderStation render_station_{
+        RenderStation render_station_{
             "PASTE::RENDER::SRC", std::chrono::seconds(10)
         };
 

@@ -19,7 +19,6 @@ namespace llpp::bots::paste
         for (int i = 0; i < num_stations.get(); i++) {
             std::string name = util::add_num_to_prefix(prefix.get(), i + 1);
             auto completed = util::json_to_time(times.get_ref()[i]);
-            std::cout << completed << std::endl;
             paste_stations_.push_back(
                 std::make_unique<PasteStation>(name, completed, p_interval));
         }
@@ -27,17 +26,17 @@ namespace llpp::bots::paste
 
     bool PasteManager::run()
     {
-        if (!is_paste_rendered()) {
-            if (render_station_.get_state() != core::BaseStation::State::ENABLED) {
-                return false;
-            }
-            if (!render_station_.complete().success) { return false; }
-        }
-
         bool any_ran = false;
         for (int i = 0; i < paste_stations_.size(); i++) {
             // Completion may get disabled during runtime so check every time.
             if (!paste_stations_[i]->is_ready() || disable_completion.get()) { continue; }
+
+            if (!any_ran && !is_paste_rendered()) {
+                if (render_station_.get_state() != core::BaseStation::State::ENABLED) {
+                    return false;
+                }
+                if (!render_station_.complete().success) { return false; }
+            }
 
             if (paste_stations_[i]->complete().success) {
                 any_ran = true;
