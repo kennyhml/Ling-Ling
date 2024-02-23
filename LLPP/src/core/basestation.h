@@ -91,7 +91,7 @@ namespace llpp::core
          *
          * @returns True if the station was started successfully, false otherwise.
          */
-        [[nodiscard]] virtual bool begin() = 0;
+        [[nodiscard]] virtual bool begin(bool check_logs) = 0;
 
         template <typename T>
         T get_time_taken() const { return util::get_elapsed<T>(last_started_); }

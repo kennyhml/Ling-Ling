@@ -64,12 +64,12 @@ add_executable(LLPP WIN32
         LLPP/src/bots/paste/pastemanager.h
         LLPP/src/bots/paste/pastestation.cpp
         LLPP/src/bots/paste/pastestation.h
-        LLPP/src/bots/render/renderstation.cpp
-        LLPP/src/bots/render/renderstation.h
+        LLPP/src/bots/common/renderstation.cpp
+        LLPP/src/bots/common/renderstation.h
         LLPP/src/bots/suicide/suicideembed.cpp
         LLPP/src/bots/suicide/suicideembed.h
-        LLPP/src/bots/suicide/suicidestation.cpp
-        LLPP/src/bots/suicide/suicidestation.h
+        LLPP/src/bots/common/suicidestation.cpp
+        LLPP/src/bots/common/suicidestation.h
         LLPP/src/common/hsvfilter.h
         LLPP/src/common/hsvtester.cpp
         LLPP/src/common/hsvtester.h

@@ -8,7 +8,7 @@
 #include "../bots/kitchen/sapmanager.h"
 #include "../bots/paste/pastemanager.h"
 #include "../bots/crafting/craftingmanager.h"
-#include "../bots/suicide/suicidestation.h"
+#include "../bots/common/suicidestation.h"
 #include "../config/config.h"
 #include "../bots/parasaur/parasaurmanager.h"
 
@@ -19,7 +19,7 @@ namespace llpp::core
         std::chrono::system_clock::time_point last_inv_check;
         std::chrono::seconds inv_check_interval(60);
 
-        bots::suicide::SuicideStation suicide("SUICIDE DEATH", "SUICIDE RESPAWN");
+        bots::SuicideStation suicide("SUICIDE DEATH", "SUICIDE RESPAWN");
 
         bool player_requires_healing()
         {

@@ -124,6 +124,14 @@ namespace llpp::bots::drops
                 BedStation::get_time_taken<std::chrono::seconds>(), {}
             };
         }
+        BedStation::last_started_ = std::chrono::system_clock::now();
+
+        if (!config_.uses_teleporters) {
+            asa::entities::local_player->set_pitch(30);
+        } else {
+            asa::entities::local_player->stand_up();
+            asa::entities::local_player->crouch();
+        }
 
         if (!is_default_) {
             asa::entities::local_player->turn_up(60, std::chrono::milliseconds(500));
