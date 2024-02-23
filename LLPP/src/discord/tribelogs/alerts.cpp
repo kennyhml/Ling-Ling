@@ -11,10 +11,11 @@ namespace
     bool suicided_or_starved(const TribeLogMessage& msg)
     {
         // only care for tribe mates and tribe tames dying
-        if (msg.type != TribeLogMessage::TRIBE_PLAYER_KILLED && msg.type !=
-            TribeLogMessage::TRIBE_DINO_KILLED) { return false; }
+        std::cout << msg.type << std::endl;
+        if ((msg.type != TribeLogMessage::TRIBE_PLAYER_KILLED) && (msg.type !=
+            TribeLogMessage::TRIBE_DINO_KILLED)) { return false; }
 
-        return msg.content.find("by") != std::string::npos;
+        return msg.content.find("by") == std::string::npos;
     }
 
     const char* get_event_title(const TribeLogMessage::EventType event)

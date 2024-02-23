@@ -105,27 +105,28 @@ namespace llpp::discord
 
             int message_iter = 0;
 
-            dpp::message most_recent_;
+            dpp::message most_recent;
             double latest_found = 0;
 
             for (const auto& [id, message] : map) {
                 msg_ids.push_back(id);
                 if (message.get_creation_time() > latest_found) {
-                    most_recent_ = message;
+                    most_recent = message;
                     latest_found = message.get_creation_time();
                 }
             }
 
-            if (!flush_previous_messages && !msg_ids.empty()) {
-                std::string original_content = most_recent_.content;
+            if (!(flush_previous_messages || msg_ids.empty()) && most_recent.author.id ==
+                get_bot()->me.id) {
+                std::string original_content = most_recent.content;
 
-                while (most_recent_.content.length() < 1900) {
+                while (most_recent.content.length() < 1900) {
                     if (message_iter >= fmt_messages.size()) { break; }
 
                     const std::string& line = fmt_messages[message_iter++];
-                    most_recent_.content.insert(most_recent_.content.length() - 3, line);
+                    most_recent.content.insert(most_recent.content.length() - 3, line);
                 }
-                if (message_iter) { discord::get_bot()->message_edit(most_recent_); }
+                if (message_iter) { discord::get_bot()->message_edit(most_recent); }
             }
             else if (flush_previous_messages) {
                 const auto channel = config::discord::channels::logs.get();
