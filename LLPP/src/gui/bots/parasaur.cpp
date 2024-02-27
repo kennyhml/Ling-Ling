@@ -1,10 +1,9 @@
 #include "parasaur.h"
-#include "common.h"
-#include "state.h"
-#include "../config/config.h"
-#include "custom/combo_dynamic.h"
-#include "../../external/imgui/imgui_stdlib.h"
-
+#include "../common.h"
+#include "../state.h"
+#include "../../config/config.h"
+#include "../custom/combo_dynamic.h"
+#include "../../../external/imgui/imgui_stdlib.h"
 
 namespace llpp::gui
 {
@@ -116,8 +115,7 @@ namespace llpp::gui
         }
     }
 
-
-    void draw_bots_parasaur_tab()
+    void draw_parasaur_tab()
     {
         const ImVec2 stations_dimensions(425 - state::maintabs_data.width,
                                          ImGui::GetWindowHeight() * 0.33f);

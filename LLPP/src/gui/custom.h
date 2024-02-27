@@ -43,7 +43,6 @@ namespace llpp::gui
     void draw_discord_info_tabs();
     void draw_discord_alert_tabs();
 
-    void draw_bots_paste_tabs();
     void draw_bots_drops_tab();
     void draw_bots_crops_tabs();
     void draw_bots_sap_tabs();

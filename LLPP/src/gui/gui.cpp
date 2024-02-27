@@ -6,7 +6,8 @@
 #include "../fonts/IconsFontAwesome6.h"
 #include "../fonts/fa.h"
 #include "custom.h"
-#include "parasaur.h"
+#include "bots/parasaur.h"
+#include "bots/paste.h"
 #include "state.h"
 
 #include "../../external/imgui/imgui.h"
@@ -353,7 +354,7 @@ namespace llpp::gui
 
             switch (state::selected_bot_tab) {
             case PASTE:
-                draw_bots_paste_tabs();
+                draw_paste_tab();
                 break;
 
             case DROPS:
@@ -370,7 +371,7 @@ namespace llpp::gui
                 draw_bots_crafting_tabs();
                 break;
             case PARASAUR:
-                draw_bots_parasaur_tab();
+                draw_parasaur_tab();
                 break;
             }
             ImGui::EndChild();

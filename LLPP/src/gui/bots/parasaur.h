@@ -2,5 +2,5 @@
 
 namespace llpp::gui
 {
-    void draw_bots_parasaur_tab();
+    void draw_parasaur_tab();
 }
