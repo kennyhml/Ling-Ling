@@ -94,6 +94,10 @@ namespace llpp::bots::drops
         for (auto& group : crates_) {
             set_group_rendered(group, false);
             for (auto& station : group) {
+                if (!station.BedStation::is_ready()) {
+                    can_default_tp = false;
+                    continue;
+                }
                 station.set_tp_is_default(can_default_tp);
                 const auto result = station.complete();
                 set_group_rendered(group, true);
