@@ -17,11 +17,14 @@ namespace llpp::bots::parasaur
           next_tp_("PARASAUR::NEXT", std::chrono::minutes(0))
     {
         for (auto& [name, data] : configs) {
-            auto station = std::make_unique<ParasaurStation>(name, data.get());
             if (data.get_ptr()->is_teleporter) {
-                tp_stations_.push_back(std::move(station));
+                tp_stations_.emplace_back(
+                    std::make_unique<TeleportParasaurStation>(name, data.get()));
             }
-            else { bed_stations_.push_back(std::move(station)); }
+            else {
+                bed_stations_.emplace_back(
+                    std::make_unique<BedParasaurStation>(name, data.get()));
+            }
         }
     }
 
@@ -31,7 +34,7 @@ namespace llpp::bots::parasaur
         bool started_teleporters = false;
 
         for (const auto& station : tp_stations_) {
-            if (!station->BedStation::is_ready()) { continue; }
+            if (!station->is_ready()) { continue; }
 
             if (!started_teleporters) {
                 if (!go_to_start()) { return false; }
@@ -61,9 +64,7 @@ namespace llpp::bots::parasaur
 
         if (start_criteria.get() == "MIN READY") {
             int ready = 0;
-            for (const auto& station : tp_stations_) {
-                ready += station->BedStation::is_ready();
-            }
+            for (const auto& station : tp_stations_) { ready += station->is_ready(); }
             for (const auto& station : bed_stations_) {
                 ready += station->BedStation::is_ready();
             }
@@ -77,7 +78,7 @@ namespace llpp::bots::parasaur
     std::chrono::minutes ParasaurManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
-            tp_stations_[0]->BedStation::get_next_completion());
+            tp_stations_[0]->get_next_completion());
     }
 
     bool ParasaurManager::go_to_start()

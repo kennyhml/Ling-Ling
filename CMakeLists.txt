@@ -103,8 +103,6 @@ add_executable(LLPP WIN32
         LLPP/src/bots/crafting/arbstation.cpp
         LLPP/src/bots/crafting/arbstation.h
         LLPP/src/bots/crafting/arbstation.cpp
-        LLPP/src/bots/parasaur/parasaurstation.cpp
-        LLPP/src/bots/parasaur/parasaurstation.h
         LLPP/src/gui/bots/parasaur.cpp
         LLPP/src/gui/bots/parasaur.h
         LLPP/src/gui/common.cpp
@@ -143,6 +141,11 @@ add_executable(LLPP WIN32
         LLPP/src/gui/bots/paste.h
         LLPP/src/gui/custom/clampedint.cpp
         LLPP/src/gui/custom/clampedint.h
+        LLPP/src/bots/parasaur/bed_parasaur_station.cpp
+        LLPP/src/bots/parasaur/bed_parasaur_station.h
+        LLPP/src/bots/parasaur/teleport_parasaur_station.cpp
+        LLPP/src/bots/parasaur/teleport_parasaur_station.h
+        LLPP/src/bots/parasaur/teleport_parasaur_station.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

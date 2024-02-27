@@ -1,5 +1,6 @@
 #pragma once
-#include "parasaurstation.h"
+#include "teleport_parasaur_station.h"
+#include "bed_parasaur_station.h"
 #include "../../core/istationmanager.h"
 
 namespace llpp::bots::parasaur
@@ -21,12 +22,10 @@ namespace llpp::bots::parasaur
 
         std::chrono::system_clock::time_point last_completed_;
 
-        std::vector<std::unique_ptr<ParasaurStation>> bed_stations_;
-        std::vector<std::unique_ptr<ParasaurStation>> tp_stations_;
+        std::vector<std::unique_ptr<BedParasaurStation>> bed_stations_;
+        std::vector<std::unique_ptr<TeleportParasaurStation>> tp_stations_;
         core::BedStation spawn_bed_;
         core::TeleportStation spawn_tp_;
         core::TeleportStation next_tp_;
-
-
     };
 }
