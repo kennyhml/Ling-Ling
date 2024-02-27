@@ -141,16 +141,12 @@ namespace llpp::config
         inline ManagedVar<int> interval(BASE, "interval", save, 5);
         inline ManagedVar<int> load_for(BASE, "load_for", save, 15);
 
-        inline ManagedVar<bool> disable_completion(BASE, "disabled", save, false);
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
         inline ManagedVar<bool> ocr_amount(BASE, "ocr_amount", save, false);
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
-        inline ManagedVar<std::vector<const char*>> times(BASE, "completion_times", save, {});
+        inline ManagedVar<bool> mute_pings(BASE, "mute_pings", save, false);
 
-        inline ManagedVar<std::string> grind_prefix(BASE, "grind_prefix", save,
-                                                    "PASTE::GRINDING");
-        inline ManagedVar<int> num_grind_stations(BASE, "num_grind_stations", save, 2);
-        inline ManagedVar<int> grind_interval(BASE, "grind_interval", save, 5);
-        inline ManagedVar<bool> grind_disabled(BASE, "grind_disabled", save, false);
+        inline ManagedVar<std::vector<const char*>> times(BASE, "completion_times", save, {});
     }
 
     namespace bots::sap

@@ -12,7 +12,7 @@ namespace llpp::bots::paste
         times.get_ptr()->resize(num_stations.get());
         if (times.get_ptr()->size() > original_size) {
             std::fill(times.get_ptr()->begin() + original_size, times.get_ptr()->end(),
-                      "");
+                      "0");
         }
         times.save();
         std::chrono::minutes p_interval(interval.get());
@@ -29,7 +29,7 @@ namespace llpp::bots::paste
         bool any_ran = false;
         for (int i = 0; i < paste_stations_.size(); i++) {
             // Completion may get disabled during runtime so check every time.
-            if (!paste_stations_[i]->is_ready() || disable_completion.get()) { continue; }
+            if (!paste_stations_[i]->is_ready() || disabled.get()) { continue; }
 
             if (!any_ran && !is_paste_rendered()) {
                 if (render_station_.get_state() != core::BaseStation::State::ENABLED) {

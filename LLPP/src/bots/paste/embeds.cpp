@@ -69,6 +69,10 @@ namespace llpp::bots::paste
         msg.set_content(dpp::utility::role_mention(roles::helper_no_access.get())).
             set_allowed_mentions(false, true, false, false, {}, {}).add_file(
                 "image.png", fdata, "image/png ").add_embed(embed);
+
+        if (config::bots::paste::mute_pings.get()) {
+            msg.set_content("");
+        }
         discord::get_bot()->message_create(msg);
     }
 
@@ -93,6 +97,9 @@ namespace llpp::bots::paste
                                                 roles::helper_no_access.get())).
             set_allowed_mentions(false, true, false, false, {}, {});
         message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+        if (config::bots::paste::mute_pings.get()) {
+            message.set_content("");
+        }
         discord::get_bot()->message_create(message);
     }
 }
