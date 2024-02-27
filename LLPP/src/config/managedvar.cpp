@@ -108,6 +108,7 @@ namespace llpp::config
             value_.name = curr[k].value("name", default_.name);
             value_.interval = curr[k].value("interval", default_.interval);
             value_.load_for = curr[k].value("load_for", default_.load_for);
+            value_.load_for = curr[k].value("last_completed", default_.last_completed);
             value_.alert_level = curr[k].value("alert_level", default_.alert_level);
             value_.check_logs = curr[k].value("check_logs", default_.check_logs);
             value_.is_teleporter = curr[k].value("is_teleporter", default_.is_teleporter);
@@ -169,6 +170,7 @@ namespace llpp::config
         curr[k]["name"] = value_.name;
         curr[k]["interval"] = value_.interval;
         curr[k]["load_for"] = value_.load_for;
+        curr[k]["last_completed"] = value_.last_completed;
         curr[k]["alert_level"] = value_.alert_level;
         curr[k]["check_logs"] = value_.check_logs;
         curr[k]["is_teleporter"] = value_.is_teleporter;

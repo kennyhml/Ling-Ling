@@ -19,7 +19,7 @@ namespace llpp::bots::parasaur
         for (auto& [name, data] : configs) {
             if (data.get_ptr()->is_teleporter) {
                 tp_stations_.emplace_back(
-                    std::make_unique<TeleportParasaurStation>(name, data.get()));
+                    std::make_unique<TeleportParasaurStation>(name, data.get_ptr()));
             }
             else {
                 bed_stations_.emplace_back(

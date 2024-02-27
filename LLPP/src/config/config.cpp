@@ -66,9 +66,12 @@ namespace llpp::config
 
             for (auto& station : bots::parasaur::stations.get()) {
                 if (!bots::parasaur::configs.contains(station)) {
-                    bots::parasaur::configs[station] = ManagedVar(
+                    auto& obj = bots::parasaur::configs[station] = ManagedVar(
                         {"bots", "parasaur", station}, save,
                         llpp::bots::parasaur::ParasaurConfig());
+                    bots::parasaur::configs[station].get_ptr()->on_changed = [&obj]() {
+                        return obj.save();
+                    };
                 }
             }
         }

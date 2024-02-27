@@ -11,6 +11,10 @@ namespace llpp::core
     {
     public:
         TeleportStation(std::string t_name, std::chrono::minutes t_interval);
+        TeleportStation(std::string t_name,
+                   std::chrono::system_clock::time_point t_last_completed,
+                   std::chrono::minutes t_interval);
+
 
         StationResult complete() override;
 
