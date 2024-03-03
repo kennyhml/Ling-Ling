@@ -155,7 +155,8 @@ namespace llpp::bots::drops
         }
 
         got_rerolled_ = false;
-        const auto quality = crate_.get_crate_quality();
+        // const auto quality = crate_.get_crate_quality();
+        const auto quality = asa::structures::CaveLootCrate::RED;
 
         cv::Mat loot_screenshot;
         std::map<std::string, bool> cherry_picked_items;

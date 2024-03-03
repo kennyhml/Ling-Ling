@@ -23,7 +23,7 @@ namespace llpp::bots::parasaur
             }
             else {
                 bed_stations_.emplace_back(
-                    std::make_unique<BedParasaurStation>(name, data.get()));
+                    std::make_unique<BedParasaurStation>(name, data.get_ptr()));
             }
         }
     }

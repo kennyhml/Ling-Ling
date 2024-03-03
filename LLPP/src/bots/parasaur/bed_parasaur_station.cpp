@@ -32,12 +32,11 @@ namespace llpp::bots::parasaur
     }
 
     BedParasaurStation::BedParasaurStation(std::string t_real_name,
-                                           const ParasaurConfig& t_config)
-        : BedStation(t_config.name, std::chrono::minutes(t_config.interval)),
-          real_name_(std::move(t_real_name)), check_logs_(t_config.check_logs),
-          tag_level_(t_config.alert_level),
-          load_(std::chrono::seconds(t_config.load_for)),
-          parasaur_(name_ + "::PARASAUR") {}
+                                           ParasaurConfig* t_config)
+        : BedStation(t_config->name,
+                     std::chrono::system_clock::from_time_t(t_config->last_completed),
+                     std::chrono::minutes(t_config->interval)), config_(t_config),
+          real_name_(std::move(t_real_name)), parasaur_(name_ + "::PARASAUR") {}
 
     core::StationResult BedParasaurStation::complete()
     {
@@ -47,13 +46,13 @@ namespace llpp::bots::parasaur
 
         // let the station load for at least 15s if we detected something at the previous
         // station in order to get rid of the lingering alert.
-        int load_for = static_cast<int>(load_.count());
+        int load_for = config_->load_for;
         if (has_lingering_ping()) { load_for = std::max(load_for, 15); }
 
-        let_load(load_for, check_logs_);
+        let_load(load_for, config_->check_logs);
 
         if (asa::interfaces::hud->detected_enemy()) {
-            send_enemy_detected(real_name_, tag_level_);
+            send_enemy_detected(real_name_, config_->alert_level);
             last_detected_ = std::chrono::system_clock::now();
         }
 
