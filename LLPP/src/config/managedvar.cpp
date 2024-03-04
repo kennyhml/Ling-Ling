@@ -204,9 +204,11 @@ namespace llpp::config
     void ManagedVar<T>::handle_not_found(const nlohmann::ordered_json::out_of_range& e)
     {
         if (has_inserted_default_) { throw e; }
+        /* Commented to hide spam on console
         std::cout << std::format(
             "[!] ManagedVar '{}' was not found, inserting default value.\n",
             path_.back());
+        */
         set(default_);
     }
 
