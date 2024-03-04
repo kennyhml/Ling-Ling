@@ -13,7 +13,7 @@ namespace llpp::bots::kitchen
 
     private:
         [[nodiscard]] bool take_sap() const;
-        bool put_away_sap();
+        void put_away_sap();
 
         asa::structures::Container storage_box_;
         asa::structures::Container tap_;

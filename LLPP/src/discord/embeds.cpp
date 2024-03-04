@@ -48,8 +48,28 @@ namespace llpp::discord
         return msg;
     }
 
+    dpp::message create_error_message(const std::exception& error, const bool ping)
+    {
+        dpp::embed embed;
+        embed.set_title("Ling Ling++ ran into a problem!");
+        embed.set_color(dpp::colors::red);
+        embed.set_thumbnail(REPAIR_BROWN_ICON);
+        embed.set_description("The error was handled accordingly.");
+        embed.add_field("Error: ", error.what(), true);
+        embed.set_image("attachment://image.png");
+        set_now_timestamp(embed);
+
+        dpp::message msg(get_error_channel(), embed);
+        if (ping) {
+            msg.set_content(dpp::utility::role_mention(roles::helper_no_access.get()));
+            msg.set_allowed_mentions(false, true, false, false, {}, {});
+        }
+        msg.add_file("image.png", strbuf(asa::window::screenshot()), "image/png");
+        return msg;
+    }
+
     dpp::message create_station_disabled_message(const std::string& station,
-                                          const std::string& reason)
+                                                 const std::string& reason)
     {
         dpp::embed embed;
         embed.set_title(std::format("'{}' has been disabled automatically!", station));
@@ -69,8 +89,8 @@ namespace llpp::discord
     }
 
     dpp::message create_station_suspended_message(const std::string& station,
-                                           const std::string& reason,
-                                           const std::chrono::minutes duration)
+                                                  const std::string& reason,
+                                                  const std::chrono::minutes duration)
     {
         dpp::embed embed;
         embed.set_title(std::format("'{}' has been suspended!", station));
