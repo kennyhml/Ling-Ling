@@ -3,6 +3,7 @@
 #include "../../config/config.h"
 #include "../../core/basestation.h"
 #include "../../discord/bot.h"
+#include "../../discord/helpers.h"
 
 namespace llpp::bots::kitchen
 {
@@ -79,5 +80,53 @@ namespace llpp::bots::kitchen
             msg.set_allowed_mentions(false, true, true, false, {}, {});
         }
         discord::get_bot()->message_create(msg);
+    }
+
+    void send_saptap_not_accessible(const std::string& station_name)
+    {
+        auto embed = dpp::embed();
+        embed.set_color(0xf6c330).
+              set_title(std::format("Problem with Sap Tap at '{}'!", station_name)).
+              set_description(std::format(
+                  "A sap tap may be inaccessible, manual check required.")).set_thumbnail(
+                  "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
+                  "7/73/Sap.png/revision/latest?cb=20160706145127").
+              add_field("Station:", station_name, true).set_image("attachment://image.png");
+
+        auto fileData = discord::strbuf(asa::window::screenshot());
+        dpp::message message = dpp::message(discord::get_error_channel(),
+                                            std::format(
+                                                "<@&{}>",
+                                                config::discord::roles::helper_no_access.get())).
+            set_allowed_mentions(false, true, false, false, {}, {});
+        message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+        if (config::bots::paste::mute_pings.get()) {
+            message.set_content("");
+        }
+        discord::get_bot()->message_create(message);
+    }
+
+    void send_sapstorage_not_accessible(const std::string& station_name)
+    {
+        auto embed = dpp::embed();
+        embed.set_color(0xf6c330).
+              set_title(std::format("Problem with Sap Storage at '{}'!", station_name)).
+              set_description(std::format(
+                  "The sap storage may be inaccessible, manual check required.")).set_thumbnail(
+                  "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
+                  "7/73/Sap.png/revision/latest?cb=20160706145127").
+              add_field("Station:", station_name, true).set_image("attachment://image.png");
+
+        auto fileData = discord::strbuf(asa::window::screenshot());
+        dpp::message message = dpp::message(discord::get_error_channel(),
+                                            std::format(
+                                                "<@&{}>",
+                                                config::discord::roles::helper_no_access.get())).
+            set_allowed_mentions(false, true, false, false, {}, {});
+        message.add_file("image.png", fileData, "image/png ").add_embed(embed);
+        if (config::bots::paste::mute_pings.get()) {
+            message.set_content("");
+        }
+        discord::get_bot()->message_create(message);
     }
 }
