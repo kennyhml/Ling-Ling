@@ -1219,7 +1219,7 @@ namespace llpp::gui
             if (ImGui::InputInt("##sap_count", config::bots::sap::num_stations.get_ptr(),
                                 1, 5)) { config::bots::sap::num_stations.save(); }
             int* num_stations = config::bots::sap::num_stations.get_ptr();
-            *num_stations = std::clamp(*num_stations, 1, 100);
+            *num_stations = std::clamp(*num_stations, 1, 999);
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The number of sap stations you have.");
@@ -1232,7 +1232,7 @@ namespace llpp::gui
             if (ImGui::InputInt("##sap_interval", config::bots::sap::interval.get_ptr(),
                                 1, 5)) { config::bots::sap::interval.save(); }
             int* interval = config::bots::sap::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 1000);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -1312,7 +1312,7 @@ namespace llpp::gui
                                 config::bots::crafting::spark::interval.get_ptr(), 1,
                                 5)) { config::bots::crafting::spark::interval.save(); }
             int* interval = config::bots::crafting::spark::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 180);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -1378,7 +1378,7 @@ namespace llpp::gui
                 config::bots::crafting::gunpowder::interval.save();
             }
             int* interval = config::bots::crafting::gunpowder::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 180);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -1430,7 +1430,7 @@ namespace llpp::gui
                                 config::bots::crafting::grinding::interval.get_ptr(), 1,
                                 5)) { config::bots::crafting::grinding::interval.save(); }
             int* interval = config::bots::crafting::grinding::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 180);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -1482,7 +1482,7 @@ namespace llpp::gui
                 config::bots::crafting::arb::interval.save();
             }
             int* interval = config::bots::crafting::arb::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 180);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
@@ -1534,7 +1534,7 @@ namespace llpp::gui
                                 config::bots::crafting::forges::interval.get_ptr(), 1,
                                 5)) { config::bots::crafting::forges::interval.save(); }
             int* interval = config::bots::crafting::forges::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 150);
+            *interval = std::clamp(*interval, 5, 180);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "The interval to complete the station at (in minutes).");
