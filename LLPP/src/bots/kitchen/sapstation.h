@@ -12,8 +12,8 @@ namespace llpp::bots::kitchen
         core::StationResult complete() override;
 
     private:
-        bool take_sap() const;
-        void put_away_sap();
+        [[nodiscard]] bool take_sap() const;
+        bool put_away_sap();
 
         asa::structures::Container storage_box_;
         asa::structures::Container tap_;
