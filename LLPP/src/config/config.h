@@ -240,6 +240,7 @@ namespace llpp::config
 
         inline ManagedVar start_interval(BASE, "start_interval", save, 10);
         inline ManagedVar start_min_ready(BASE, "start_min_ready", save, 3);
+        inline ManagedVar start_load(BASE, "start_load", save, 10);
 
         inline ManagedVar<std::string> teleport_start(BASE, "teleport_start", save,
                                                       "PARASAUR::START");

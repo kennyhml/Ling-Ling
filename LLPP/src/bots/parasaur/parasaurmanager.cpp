@@ -1,5 +1,7 @@
 #include "parasaurmanager.h"
 
+#include <asapp/core/init.h>
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
 #include "../../config/config.h"
@@ -54,8 +56,9 @@ namespace llpp::bots::parasaur
 
     bool ParasaurManager::is_ready_to_run()
     {
-        if (disabled.get()) { return false; }
-        if (!spawn_bed_.is_ready() || !next_tp_.is_ready()) { return false; }
+        if (disabled.get() || !(spawn_bed_.is_ready() && next_tp_.is_ready())) {
+            return false;
+        }
 
         if (start_criteria.get() == "INTERVAL") {
             return util::timedout(last_completed_,
@@ -84,6 +87,7 @@ namespace llpp::bots::parasaur
     bool ParasaurManager::go_to_start()
     {
         if (!spawn_bed_.complete().success) { return false; }
+        asa::core::sleep_for(std::chrono::seconds(start_load.get()));
 
         asa::entities::local_player->crouch();
         spawn_tp_.set_tp_is_default(true);

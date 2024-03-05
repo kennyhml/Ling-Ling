@@ -4,6 +4,7 @@
 #include "../../config/config.h"
 #include "../custom/combo_dynamic.h"
 #include "../../../external/imgui/imgui_stdlib.h"
+#include "../custom/clampedint.h"
 
 namespace llpp::gui
 {
@@ -143,7 +144,7 @@ namespace llpp::gui
         }
         end_child();
         ImGui::SameLine();
-        const ImVec2 advanced_dimensions(270, ImGui::GetWindowHeight() * 0.53f);
+        const ImVec2 advanced_dimensions(270, ImGui::GetWindowHeight() * 0.6f);
         begin_child("General Configuration", advanced_dimensions);
         {
             ImGui::SetCursorPos({10, 14});
@@ -171,7 +172,7 @@ namespace llpp::gui
 
             ImGui::SetCursorPos({10, 76});
             const char* text;
-            config::ManagedVar<int>* dst = nullptr;
+            config::ManagedVar<int>* dst;
 
             if (strcmp(MODES[selected_mode], "INTERVAL") == 0) {
                 text = "Interval:";
@@ -181,13 +182,21 @@ namespace llpp::gui
                 text = "Min. Ready:";
                 dst = &start_min_ready;
             }
-
             ImGui::Text(text);
             ImGui::SetCursorPos({100, 73});
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
             if (ImGui::InputInt("##interval|min", dst->get_ptr(), 1, 5)) { dst->save(); }
 
-            if (ImGui::Checkbox("Disabled", disabled.get_ptr())) { disabled.save(); }
+            ImGui::SetCursorPos({10, 107});
+            ImGui::Text("Start Load:");
+            ImGui::SetCursorPos({100, 104});
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
+
+            if (custom::ClampedInputInt("##para_load", start_load.get_ptr(), 1, 30)) {
+                start_load.save();
+            }
+
+            if (ImGui::Checkbox("All Disabled", disabled.get_ptr())) { disabled.save(); }
         }
         end_child();
 
@@ -230,7 +239,6 @@ namespace llpp::gui
                                  ALERT_MODES.data(), ALERT_MODES.size())) {
                     active->save();
                 }
-
                 if (ImGui::Checkbox("Teleporter", &active->get_ptr()->is_teleporter)) {
                     active->save();
                 }
