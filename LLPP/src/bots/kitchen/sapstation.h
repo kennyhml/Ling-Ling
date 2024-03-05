@@ -7,7 +7,9 @@ namespace llpp::bots::kitchen
     class SapStation final : public core::BedStation
     {
     public:
-        SapStation(std::string t_name, std::chrono::minutes t_interval);
+        SapStation(std::string t_name,
+                   std::chrono::system_clock::time_point t_last_completed,
+                   std::chrono::minutes t_interval);
 
         core::StationResult complete() override;
 
@@ -19,7 +21,5 @@ namespace llpp::bots::kitchen
         asa::structures::Container tap_;
 
         int storage_box_slots_ = 0;
-
-
     };
 }

@@ -153,6 +153,8 @@ namespace llpp::config
     {
         inline const std::vector<std::string> BASE{"bots", "sap"};
 
+        inline ManagedVar<std::vector<int64_t>> times(BASE, "completion_times", save, {});
+
         inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SAP");
         inline ManagedVar<int> num_stations(BASE, "num_stations", save, 12);
         inline ManagedVar<int> interval(BASE, "interval", save, 5);

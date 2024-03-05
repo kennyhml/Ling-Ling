@@ -8,9 +8,11 @@
 
 namespace llpp::bots::kitchen
 {
-    SapStation::SapStation(std::string t_name, const std::chrono::minutes t_interval) :
-        BedStation(std::move(t_name), t_interval), storage_box_(name_ + "::STORAGE", 45),
-        tap_(name_ + "::TAP", 1) {}
+    SapStation::SapStation(std::string t_name,
+                           const std::chrono::system_clock::time_point t_last_completed,
+                           const std::chrono::minutes t_interval) :
+        BedStation(std::move(t_name), t_last_completed, t_interval),
+        storage_box_(name_ + "::STORAGE", 45), tap_(name_ + "::TAP", 1) {}
 
     core::StationResult SapStation::complete()
     {
@@ -24,7 +26,8 @@ namespace llpp::bots::kitchen
                 put_away_sap();
                 success = true;
             }
-        } catch (asa::structures::StructureNotOpenedError& e) {
+        }
+        catch (asa::structures::StructureNotOpenedError& e) {
             discord::get_bot()->message_create(discord::create_error_message(e));
         }
         set_completed();
