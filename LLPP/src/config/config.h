@@ -146,7 +146,7 @@ namespace llpp::config
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
         inline ManagedVar<bool> mute_pings(BASE, "mute_pings", save, false);
 
-        inline ManagedVar<std::vector<const char*>> times(BASE, "completion_times", save, {});
+        inline ManagedVar<std::vector<int64_t>> times(BASE, "completion_times", save, {});
     }
 
     namespace bots::sap

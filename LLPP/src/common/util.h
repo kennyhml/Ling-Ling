@@ -38,4 +38,7 @@ namespace llpp::util
 	std::string time_to_json(const std::chrono::system_clock::time_point& time);
 
 	std::chrono::system_clock::time_point json_to_time(const std::string& json);
+
+	int64_t time_t_now();
 }
+

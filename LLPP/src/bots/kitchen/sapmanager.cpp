@@ -42,9 +42,7 @@ namespace llpp::bots::kitchen
             if (!stations_[i]->is_ready() || disabled.get()) { continue; }
 
             if (stations_[i]->complete().success) {
-                const int64_t now = std::chrono::system_clock::to_time_t(
-                    std::chrono::system_clock::now());
-                times.get_ptr()->at(i) = now;
+                times.get_ptr()->at(i) = util::time_t_now();
                 times.save();
                 return true;
             }

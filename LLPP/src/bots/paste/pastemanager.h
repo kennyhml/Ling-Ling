@@ -16,7 +16,7 @@ namespace llpp::bots::paste
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
     private:
-        std::vector<std::unique_ptr<PasteStation>> paste_stations_;
+        std::vector<std::unique_ptr<PasteStation>> stations_;
 
         RenderStation render_station_{
             "PASTE::RENDER::SRC", std::chrono::seconds(10)
