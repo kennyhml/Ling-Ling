@@ -67,8 +67,8 @@ namespace llpp::bots::drops
 
     dpp::message get_looted_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,
-                                    asa::structures::CaveLootCrate::Quality drop_quality,
-                                    int total_times_looted)
+                                    const asa::structures::CaveLootCrate::Quality
+                                    drop_quality, int total_times_looted)
     {
         // default values for drops we couldnt figure out
         auto color = dpp::colors::white;
@@ -106,8 +106,9 @@ namespace llpp::bots::drops
 
     dpp::message get_reroll_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,
-                                    asa::structures::CaveLootCrate::Quality drop_quality,
-                                    std::chrono::system_clock::time_point expires,
+                                    const asa::structures::CaveLootCrate::Quality
+                                    drop_quality,
+                                    const std::chrono::system_clock::time_point expires,
                                     const std::map<std::string, bool>& items_taken)
     {
         const auto time_left = std::chrono::system_clock::to_time_t(expires);
@@ -147,12 +148,12 @@ namespace llpp::bots::drops
 
 
     dpp::message get_summary_message(const std::string& manager_name,
-                                     std::chrono::seconds time_taken,
+                                     const std::chrono::seconds time_taken,
                                      const std::vector<CrateManager::CrateGroupStatistics>
                                      & stats,
                                      const std::map<std::string, float>&
                                      vault_fill_levels,
-                                     std::chrono::system_clock::time_point
+                                     const std::chrono::system_clock::time_point
                                      next_completion)
     {
         const std::string secs_taken = std::format("{} seconds", time_taken.count());
@@ -194,13 +195,9 @@ namespace llpp::bots::drops
                 config::discord::roles::helper_access.get()));
             message.set_allowed_mentions(false, true, false, false, {}, {});
             embed.set_footer({"The vault slot threshold was exceeded, please empty."});
-        } else {
-            discord::set_now_timestamp(embed);
         }
+        else { discord::set_now_timestamp(embed); }
 
         return message;
-
-
     }
-
 }
