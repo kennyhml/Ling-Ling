@@ -11,103 +11,121 @@ namespace llpp::bots::drops
 {
     namespace
     {
-        void get_color_fields(int quality, uint32_t& color_out,
+        auto const WHITE_CRATE_THUMBNAIL =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/8/8c/White_Crate.png/revision/latest?cb=20190116151008";
+
+        auto const BLUE_CRATE_THUMBNAIL =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/9/9c/Blue_Crate.png/revision/latest/scale-to-width-down/109?cb=20190116151056";
+
+        auto const YELLOW_CRATE_THUMBNAIL =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/6/63/Yellow_Crate.png/revision/latest?cb=20190116151124";
+
+        auto const RED_CRATE_THUMBNAIL =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/c/c5/Red_Crate.png/revision/latest?cb=20190116151200";
+
+
+        void get_color_fields(const int quality, uint32_t& color_out,
                               std::string& thumbnail_out, std::string& quality_out)
         {
             using Quality = asa::structures::CaveLootCrate::Quality;
 
             switch (quality) {
-            case Quality::RED: color_out = dpp::colors::red_blood;
+            case Quality::RED:
+            {
+                color_out = dpp::colors::red_blood;
                 thumbnail_out = RED_CRATE_THUMBNAIL;
                 quality_out = "RED";
                 break;
-            case Quality::YELLOW: color_out = dpp::colors::yellow;
+            }
+            case Quality::YELLOW:
+            {
+                color_out = dpp::colors::yellow;
                 thumbnail_out = YELLOW_CRATE_THUMBNAIL;
                 quality_out = "YELLOW";
                 break;
-            case Quality::BLUE: color_out = dpp::colors::blue;
+            }
+            case Quality::BLUE:
+            {
+                color_out = dpp::colors::blue;
                 thumbnail_out = BLUE_CRATE_THUMBNAIL;
                 quality_out = "BLUE";
                 break;
+            }
             default: break;
             }
         }
+
+        dpp::snowflake get_loot_channel()
+        {
+            if (config::bots::drops::loot_channel.get_ref().empty()) {
+                return config::discord::channels::info.get();
+            }
+            return config::bots::drops::loot_channel.get();
+        }
     }
 
-    void send_success_embed(const core::StationResult& data, cv::Mat loot,
-                            asa::structures::CaveLootCrate::Quality quality,
-                            int times_looted, const bool got_rerolled)
+
+    dpp::message get_looted_message(const core::StationResult& data,
+                                    const cv::Mat& loot_image,
+                                    asa::structures::CaveLootCrate::Quality drop_quality,
+                                    int total_times_looted)
     {
+        // default values for drops we couldnt figure out
         auto color = dpp::colors::white;
         std::string thumbnail = WHITE_CRATE_THUMBNAIL;
         std::string determined_quality = "Undetermined";
-        using namespace config::bots::drops;
-        get_color_fields(quality, color, thumbnail, determined_quality);
-        auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.station->
-                                                    get_completion_interval());
+        get_color_fields(drop_quality, color, thumbnail, determined_quality);
 
-        auto embed = dpp::embed();
-        embed.set_color(color).
-              set_title(std::format("Crate '{}' has been looted!",
-                                    data.station->get_name())).
-              set_description(std::format("This crate has been looted {}/{} times!",
-                                          times_looted,
-                                          data.station->get_times_completed())).
-              set_thumbnail(thumbnail).add_field("Time taken:",
-                                                 std::format(
-                                                     "{} seconds",
-                                                     data.time_taken.count()),
-                                                 true).add_field(
-                  "Crate Quality:", determined_quality, true).add_field(
-                  "Next completion:", std::format("<t:{}:R>", next_completion),
-                  true).set_image("attachment://image.png");
 
-        if (got_rerolled) { embed.set_footer({"The drop was rerolled and left up."}); }
+        const auto loot_ratio = std::format("The crate was looted {}/{} times!",
+                                            total_times_looted,
+                                            data.station->get_times_completed());
+        const auto secs_taken = std::format("{} seconds", data.time_taken.count());
+        auto next = std::chrono::system_clock::to_time_t(
+            data.station->get_next_completion());
 
-        const auto fdata = discord::strbuf(loot);
-        const auto channel = loot_channel.get_ptr()->empty()
-                                 ? config::discord::channels::info.get()
-                                 : loot_channel.get();
-        auto message = dpp::message(channel, embed);
-        message.add_file("image.png", fdata, "image/png");
+        dpp::embed embed;
+        embed.set_title(std::format("Looted '{}'!"));
+        embed.set_color(color);
+        embed.set_thumbnail(thumbnail);
+        embed.set_description(loot_ratio);
+        embed.add_field("Time taken:", secs_taken, true);
+        embed.add_field("Crate Quality:", determined_quality, true);
+        embed.add_field("Next completion:", std::format("<t:{}:R>", next), true);
 
-        discord::get_bot()->message_create(message);
+        embed.set_image("attachment://image.png");
+        discord::set_now_timestamp(embed);
+
+        auto message = dpp::message(get_loot_channel(), embed);
+
+        const auto filedata = discord::strbuf(loot_image);
+        message.add_file("image.png", filedata, "image/png");
+
+        return message;
     }
 
-    void request_reroll(const core::StationResult& data, cv::Mat loot,
-                        asa::structures::CaveLootCrate::Quality quality,
-                        std::chrono::system_clock::time_point expires,
-                        std::map<std::string, bool> cherry_picked)
+    dpp::message get_reroll_message(const core::StationResult& data,
+                                    const cv::Mat& loot_image,
+                                    asa::structures::CaveLootCrate::Quality drop_quality,
+                                    std::chrono::system_clock::time_point expires,
+                                    const std::map<std::string, bool>& items_taken)
     {
-        using Quality = asa::structures::CaveLootCrate::Quality;
+        const auto time_left = std::chrono::system_clock::to_time_t(expires);
+        // The reroll request message is essentially the same as the looted message
+        // with some minor modifications, so to avoid boilerplate just modify a
+        // looted message instead.
+        dpp::message message = get_looted_message(data, loot_image, drop_quality, 0);
+        dpp::embed& embed = message.embeds[0];
 
-        auto color = dpp::colors::white;
-        std::string thumbnail = WHITE_CRATE_THUMBNAIL;
-        std::string determined_quality = "Undetermined";
-        get_color_fields(quality, color, thumbnail, determined_quality);
-        using namespace config::bots::drops;
-        auto next_completion = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now() + data.station->
-                                                    get_completion_interval());
+        embed.set_title(std::format("Crate '{}' is up!", data.station->get_name()));
+        embed.set_description("If the timer expires, the drop will be looted.");
 
-        auto time_left = std::chrono::system_clock::to_time_t(expires);
+        embed.fields[0] = {"Expires:", std::format("<t:{}:R>", time_left), true};
 
-        auto embed = dpp::embed();
-        embed.set_color(color).
-              set_title(std::format("Requesting reroll at '{}'!",
-                                    data.station->get_name())).
-              set_description("If the timer expires, the drop will be looted.").
-              set_thumbnail(thumbnail).
-              add_field("Expires:", std::format("<t:{}:R>", time_left), true).
-              add_field("Crate Quality:", determined_quality, true).add_field(
-                  "Next completion:", std::format("<t:{}:R>", next_completion),
-                  true).set_image("attachment://image.png");
-
-        if (!cherry_picked.empty()) {
+        if (!items_taken.empty()) {
             std::string fmt_string = ">>> **__Automatically looted:__**\n";
 
-            for (auto& [key, looted] : cherry_picked) {
+            for (auto& [key, looted] : items_taken) {
                 std::string item = key;
                 std::string emote = looted ? ":shopping_cart:" : ":x:";
 
@@ -118,47 +136,42 @@ namespace llpp::bots::drops
             embed.add_field("", fmt_string);
         }
 
-        auto fdata = discord::strbuf(loot);
-        const auto channel = loot_channel.get_ptr()->empty()
-                                 ? config::discord::channels::info.get()
-                                 : loot_channel.get();
-        auto message = dpp::message(channel, embed);
-
-        if (!reroll_role.get().empty()) {
-            message.content = dpp::utility::role_mention(reroll_role.get());
+        if (!config::bots::drops::reroll_role.get().empty()) {
+            message.content = dpp::utility::role_mention(
+                config::bots::drops::reroll_role.get());
         }
 
         message.set_allowed_mentions(false, true, false, false, {}, {});
-        message.add_file("image.png", fdata, "image/png ");
-
-       discord::get_bot()->message_create(message);
+        return message;
     }
 
-    void send_summary_embed(const std::string& name,
-                            const std::chrono::seconds time_taken,
-                            const std::vector<CrateManager::CrateGroupStatistics>& stats,
-                            const std::map<std::string, float>& vault_fill_levels,
-                            const std::chrono::system_clock::time_point next_completion)
+
+    dpp::message get_summary_message(const std::string& manager_name,
+                                     std::chrono::seconds time_taken,
+                                     const std::vector<CrateManager::CrateGroupStatistics>
+                                     & stats,
+                                     const std::map<std::string, float>&
+                                     vault_fill_levels,
+                                     std::chrono::system_clock::time_point
+                                     next_completion)
     {
-        const auto fmt_taken = std::format("{} seconds", time_taken.count());
-        const auto fmt_stamp = std::format("<t:{}:R>",
-                                           std::chrono::system_clock::to_time_t(
-                                               next_completion));
+        const std::string secs_taken = std::format("{} seconds", time_taken.count());
+        const auto next = std::chrono::system_clock::to_time_t(next_completion);
 
-        auto embed = dpp::embed().set_color(dpp::colors::yellow).
-                                  set_title(std::format(
-                                      "Crate Manager '{}' has been completed!", name))
-                                  .set_description(
-                                      "Here is a summary of this crate managers data:").
-                                  set_thumbnail(YELLOW_CRATE_THUMBNAIL).add_field(
-                                      "Time taken:", fmt_taken, true).add_field(
-                                      "Next completion:", fmt_stamp, true);
+        dpp::embed embed;
+        embed.set_title(std::format("Crates '{}' completed!", manager_name));
+        embed.set_color(dpp::colors::yellow);
+        embed.set_description("Summary of the associated crates:");
+        embed.set_thumbnail(YELLOW_CRATE_THUMBNAIL);
 
-        // add the vault fill levels
+        embed.add_field("Time taken:", secs_taken, true);
+        embed.add_field("Next completion:", std::format("<t:{}:R>", next), true);
+
         std::string vault_data;
         bool any_too_full = false;
         const int threshold = config::bots::drops::vault_alert_threshold.get();
-        for (auto [vault_name, level] : vault_fill_levels) {
+
+        for (const auto& [vault_name, level] : vault_fill_levels) {
             vault_data += std::format("{}: {}%\n", vault_name,
                                       static_cast<int>(level * 100));
             any_too_full |= (static_cast<int>(level * 100) > threshold);
@@ -175,13 +188,19 @@ namespace llpp::bots::drops
                                 stats[i].get_times_looted()), true);
         }
 
-        dpp::message msg(config::discord::channels::info.get(), embed);
+        dpp::message message(config::discord::channels::info.get(), embed);
         if (any_too_full) {
-            msg.set_content(dpp::utility::role_mention(
+            message.set_content(dpp::utility::role_mention(
                 config::discord::roles::helper_access.get()));
-            msg.set_allowed_mentions(false, true, false, false, {}, {});
+            message.set_allowed_mentions(false, true, false, false, {}, {});
+            embed.set_footer({"The vault slot threshold was exceeded, please empty."});
+        } else {
+            discord::set_now_timestamp(embed);
         }
 
-        discord::get_bot()->message_create(msg);
+        return message;
+
+
     }
+
 }

@@ -6,34 +6,22 @@
 
 namespace llpp::bots::drops
 {
-	const std::string WHITE_CRATE_THUMBNAIL =
-		"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
-		"8/8c/White_Crate.png/revision/latest?cb=20190116151008";
+    dpp::message get_looted_message(const core::StationResult& data,
+                                    const cv::Mat& loot_image,
+                                    asa::structures::CaveLootCrate::Quality drop_quality,
+                                    int total_times_looted);
 
-	const std::string BLUE_CRATE_THUMBNAIL =
-		"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
-		"9/9c/Blue_Crate.png/revision/latest/scale-to-width-down/"
-		"109?cb=20190116151056";
+    dpp::message get_reroll_message(const core::StationResult& data,
+                                    const cv::Mat& loot_image,
+                                    asa::structures::CaveLootCrate::Quality drop_quality,
+                                    std::chrono::system_clock::time_point expires,
+                                    const std::map<std::string, bool>& items_taken);
 
-	const std::string YELLOW_CRATE_THUMBNAIL =
-		"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
-		"6/63/Yellow_Crate.png/revision/latest?cb=20190116151124";
-
-	const std::string RED_CRATE_THUMBNAIL =
-		"https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
-		"c/c5/Red_Crate.png/revision/latest?cb=20190116151200";
-
-	void send_success_embed(const core::StationResult&, cv::Mat loot,
-		asa::structures::CaveLootCrate::Quality, int times_looted, bool got_rerolled);
-
-	void request_reroll(const core::StationResult&, cv::Mat loot,
-		asa::structures::CaveLootCrate::Quality,
-		std::chrono::system_clock::time_point expires,
-		std::map<std::string, bool> cherry_picked);
-
-	void send_summary_embed(const std::string& name,
-		std::chrono::seconds time_taken,
-		const std::vector<CrateManager::CrateGroupStatistics>& stats,
-		const std::map<std::string, float>& vault_fill_levels,
-		std::chrono::system_clock::time_point next_completion);
+    dpp::message get_summary_message(const std::string& manager_name,
+                                     std::chrono::seconds time_taken,
+                                     const std::vector<CrateManager::CrateGroupStatistics>
+                                     & stats, const std::map<std::string, float>&
+                                     vault_fill_levels,
+                                     std::chrono::system_clock::time_point
+                                     next_completion);
 }
