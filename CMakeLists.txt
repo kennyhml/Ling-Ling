@@ -40,8 +40,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/drops/cratemanager.h
         LLPP/src/bots/drops/embeds.cpp
         LLPP/src/bots/drops/embeds.h
-        LLPP/src/bots/drops/lootcratestation.cpp
-        LLPP/src/bots/drops/lootcratestation.h
+        LLPP/src/bots/drops/cratestation.cpp
+        LLPP/src/bots/drops/cratestation.h
         LLPP/src/bots/farm/commands.cpp
         LLPP/src/bots/farm/commands.h
         LLPP/src/bots/farm/farmbot.cpp
@@ -146,6 +146,11 @@ add_executable(LLPP WIN32
         LLPP/src/bots/parasaur/teleport_parasaur_station.cpp
         LLPP/src/bots/parasaur/teleport_parasaur_station.h
         LLPP/src/bots/parasaur/teleport_parasaur_station.h
+        LLPP/src/bots/drops/bed_crate_station.cpp
+        LLPP/src/bots/drops/bed_crate_station.h
+        LLPP/src/bots/drops/teleport_crate_station.cpp
+        LLPP/src/bots/drops/teleport_crate_station.h
+        LLPP/src/bots/drops/item_priorities.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

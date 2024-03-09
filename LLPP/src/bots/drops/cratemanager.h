@@ -1,7 +1,7 @@
 #pragma once
 #include "../../core/istationmanager.h"
 #include "config.h"
-#include "lootcratestation.h"
+#include "cratestation.h"
 #include <asapp/structures/simplebed.h>
 #include <dpp/dpp.h>
 
