@@ -20,7 +20,9 @@ namespace llpp::core
 
     StationResult TeleportStation::complete()
     {
-        return {this, begin(false), get_time_taken<std::chrono::seconds>(), {}};
+        const StationResult res(this, begin(), get_time_taken<std::chrono::seconds>());
+        set_completed();
+        return res;
     }
 
     bool TeleportStation::begin(bool check_logs)

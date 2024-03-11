@@ -5,6 +5,14 @@
 
 namespace llpp::bots::drops
 {
+    TeleportCrateStation::TeleportCrateStation(const std::string& t_name,
+                                               CrateManagerConfig* t_config,
+                                               asa::structures::CaveLootCrate t_crate,
+                                               const bool t_is_first,
+                                               const bool t_is_first_in_group)
+        : TeleportStation(t_name, std::chrono::minutes(t_config->interval)),
+          CrateStation(t_config, std::move(t_crate), t_is_first, t_is_first_in_group) {}
+
     core::StationResult TeleportCrateStation::complete()
     {
         if (!begin()) {
@@ -25,7 +33,10 @@ namespace llpp::bots::drops
         }
 
         is_up_ = await_crate_loaded();
-        if (!is_up_) { return {this, false, get_time_taken<std::chrono::seconds>(), {}}; }
+        if (!is_up_) {
+            set_completed();
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         cv::Mat loot_image;
         std::map<std::string, bool> items_taken;

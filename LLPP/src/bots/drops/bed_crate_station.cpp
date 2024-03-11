@@ -24,7 +24,10 @@ namespace llpp::bots::drops
 
         asa::entities::local_player->set_pitch(30);
         is_up_ = await_crate_loaded();
-        if (!is_up_) { return {this, false, get_time_taken<std::chrono::seconds>(), {}}; }
+        if (!is_up_) {
+            set_completed();
+            return {this, false, get_time_taken<std::chrono::seconds>(), {}};
+        }
 
         cv::Mat loot_image;
         std::map<std::string, bool> items_taken;
@@ -39,7 +42,7 @@ namespace llpp::bots::drops
                                       {});
 
         dpp::message msg;
-        if (should_reroll()) {
+        if (!should_reroll()) {
             msg = get_looted_message(res, loot_image, quality, ++times_looted_);
         }
         else {

@@ -13,6 +13,7 @@ namespace llpp::bots::drops
         int render_align_for{5};
         int render_initial_for{3};
 
+        bool uses_teleporters{false};
         bool no_reroll{false};
         bool allow_partial_completion{false};
         bool disabled{false};

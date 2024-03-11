@@ -85,7 +85,7 @@ namespace llpp::bots::drops
             data.station->get_next_completion());
 
         dpp::embed embed;
-        embed.set_title(std::format("Looted '{}'!"));
+        embed.set_title(std::format("Looted '{}'!", data.station->get_name()));
         embed.set_color(color);
         embed.set_thumbnail(thumbnail);
         embed.set_description(loot_ratio);

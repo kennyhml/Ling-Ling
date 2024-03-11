@@ -80,8 +80,8 @@ namespace llpp::config
 
             value_.uses_teleporters = curr[k].value("uses_teleporters",
                                                     default_.uses_teleporters);
-            value_.overrule_reroll_mode = curr[k].value(
-                "overrule_reroll_mode", default_.overrule_reroll_mode);
+            value_.no_reroll = curr[k].value(
+                "overrule_reroll_mode", default_.no_reroll);
             value_.allow_partial_completion = curr[k].value(
                 "allow_partial_completion", default_.allow_partial_completion);
 
@@ -154,7 +154,7 @@ namespace llpp::config
         curr[k]["render_initial_for"] = value_.render_initial_for;
 
         curr[k]["uses_teleporters"] = value_.uses_teleporters;
-        curr[k]["overrule_reroll_mode"] = value_.overrule_reroll_mode;
+        curr[k]["overrule_reroll_mode"] = value_.no_reroll;
         curr[k]["allow_partial_completion"] = value_.allow_partial_completion;
         curr[k]["disabled"] = value_.disabled;
         on_change_();

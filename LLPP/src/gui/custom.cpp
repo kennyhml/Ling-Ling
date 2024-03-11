@@ -1090,7 +1090,7 @@ namespace llpp::gui
             if (active) {
                 ImGui::SetCursorPos({10, 104});
                 if (ImGui::Checkbox("Overrule reroll mode",
-                                    &active->get_ptr()->overrule_reroll_mode)) {
+                                    &active->get_ptr()->no_reroll)) {
                     active->save();
                 }
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {

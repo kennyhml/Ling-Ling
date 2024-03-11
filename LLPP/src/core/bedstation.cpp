@@ -6,7 +6,6 @@
 #include <asapp/interfaces/tribemanager.h>
 #include <asapp/entities/exceptions.h>
 #include <asapp/interfaces/spawnmap.h>
-#include "../config/config.h"
 #include "../discord/bot.h"
 
 namespace llpp::core
@@ -22,7 +21,9 @@ namespace llpp::core
 
     StationResult BedStation::complete()
     {
-        return {this, begin(), get_time_taken<std::chrono::seconds>(), {}};
+        const StationResult res(this, begin(), get_time_taken<std::chrono::seconds>());
+        set_completed();
+        return res;
     }
 
     bool BedStation::begin(const bool check_logs)

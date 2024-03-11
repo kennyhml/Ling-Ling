@@ -61,9 +61,11 @@ namespace llpp::core
 
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
+
         for (auto& [key, config] : config::bots::drops::configs) {
             tasks_.emplace_back(
-                key, std::make_unique<drops::CrateManager>(*config.get_ptr()));
+                key, std::make_unique<drops::CrateManager>(config.get_ptr()));
+
         }
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());

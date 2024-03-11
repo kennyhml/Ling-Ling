@@ -1,29 +1,21 @@
 #pragma once
-#include "../../core/istationmanager.h"
 #include "config.h"
 #include "cratestation.h"
-#include <asapp/structures/simplebed.h>
+#include "bed_crate_station.h"
+#include "teleport_crate_station.h"
+#include "../../core/istationmanager.h"
 #include <dpp/dpp.h>
-
-#define UNDEFINED_TIME std::chrono::system_clock::time_point()
 
 namespace llpp::bots::drops
 {
     using QualityFlags = int;
 
-    /**
-     * @brief Handles the completion of multiple related crate stations.
-     *
-     *
-     *
-     */
     class CrateManager final : public core::IStationManager
     {
     public:
-        explicit CrateManager(CrateManagerConfig& t_config);
+        explicit CrateManager(CrateManagerConfig* t_config);
 
         bool run() override;
-        bool is_disabled() const { return config_.disabled; }
 
         [[nodiscard]] bool is_ready_to_run() override;
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
@@ -32,7 +24,7 @@ namespace llpp::bots::drops
         struct CrateGroupStatistics
         {
         public:
-            std::chrono::system_clock::time_point last_looted = UNDEFINED_TIME;
+            std::chrono::system_clock::time_point last_looted;
 
             void add_looted();
 
@@ -45,28 +37,31 @@ namespace llpp::bots::drops
         };
 
         std::vector<CrateGroupStatistics> stats_per_group;
-        void parse_groups(std::string groups);
 
     private:
-        CrateManagerConfig& config_;
-        std::vector<std::vector<LootCrateStation>> crates_;
+        CrateManagerConfig* config_;
 
-        asa::structures::SimpleBed align_bed_;
-        asa::structures::SimpleBed out_bed_;
+        std::vector<std::vector<BedCrateStation>> bed_stations_;
+        std::vector<std::vector<TeleportCrateStation>> teleport_stations_;
 
-        asa::structures::Teleporter dropoff_tp_;
+        core::BedStation teleport_align_station_;
+        core::BedStation beds_out_station_;
+        core::TeleportStation teleport_dropoff_station_;
+
         asa::structures::Container dropoff_vault_;
-
-        std::map<std::string, float> vault_fill_levels_;
+        std::map<std::string, float> vaults_filled_;
 
         inline static bool has_registered_reroll_command_ = false;
 
     private:
         static void reroll_mode_callback(const dpp::slashcommand_t&);
 
+        void run_teleport_stations();
+
+        void run_bed_stations();
+
         void dropoff_items();
         void teleport_to_dropoff();
-        void run_all_stations(bool& any_looted);
         void spawn_on_align_bed();
         void register_slash_commands();
     };

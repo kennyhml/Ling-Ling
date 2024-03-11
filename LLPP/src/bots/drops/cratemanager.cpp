@@ -1,48 +1,115 @@
 #include "cratemanager.h"
-#include <asapp/core/state.h>
+#include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../discord/bot.h"
-#include "embeds.h"
+#include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
-#include <asapp/interfaces/tribemanager.h>
-
-#include "../../discord/tribelogs/handler.h"
 
 namespace llpp::bots::drops
 {
     namespace
     {
-        void set_group_cooldown(std::vector<LootCrateStation>& group)
+        void set_group_cooldown(std::vector<BedCrateStation>& group)
+        {
+            for (auto& station : group) { station.suspend_for(std::chrono::minutes(1)); }
+        }
+
+        void set_group_cooldown(std::vector<TeleportCrateStation>& group)
         {
             for (auto& station : group) {
                 station.set_tp_is_default(false);
-                station.set_cooldown();
+                station.suspend_for(std::chrono::minutes(1));
             }
         }
 
-        void set_group_rendered(std::vector<LootCrateStation>& group, const bool rendered)
+        template <typename T>
+        void set_group_rendered(std::vector<T>& group, const bool rendered)
         {
             for (auto& station : group) { station.set_rendered(rendered); }
         }
+
+        template <typename T>
+        std::vector<std::vector<T>> parse_stations(CrateManagerConfig* config)
+        {
+            std::vector<std::vector<T>> ret;
+            std::vector<int> lefts;
+            std::vector<int> rights;
+
+            std::string str = config->grouped_crates_raw;
+
+            std::erase_if(str, isspace);
+
+            // keep track of the positions of the left and right curly brackets
+            for (int i = 0; i < str.size(); i++) {
+                if (str.at(i) == '{') { lefts.push_back(i); }
+                else if (str.at(i) == '}') { rights.push_back(i); }
+            }
+
+            if (lefts.size() != rights.size()) {
+                throw std::exception("Left brackets do not match right brackets");
+            }
+            ret.resize(lefts.size());
+
+            int group = 0;
+            int num_station = 1;
+            for (int left : lefts) {
+                std::string roi = str.substr(left + 1, rights[group] - left - 1);
+                std::vector<int> commas;
+                for (int j = 0; j < roi.size(); j++) {
+                    if (roi.at(j) == ',') { commas.push_back(j); }
+                }
+
+                for (int crate = 0; crate < commas.size() + 1; crate++) {
+                    int prev = crate > 0 ? commas[crate - 1] + 1 : 0;
+                    int end = commas.empty() || crate >= commas.size()
+                                  ? roi.size()
+                                  : commas[crate] - prev;
+
+                    QualityFlags flag = 0;
+                    std::string color = roi.substr(prev, end);
+                    std::vector<std::string> tokens;
+                    std::istringstream stream(color);
+                    std::string token;
+
+                    while (std::getline(stream, token, '|')) {
+                        flag |= asa::structures::CaveLootCrate::string_to_quality(token);
+                    }
+                    const bool first = num_station == 1;
+                    const bool first_in_grp = crate == 0;
+                    ret[group].emplace_back(
+                        util::add_num_to_prefix(config->prefix + "::DROP", num_station++),
+                        config, asa::structures::CaveLootCrate(flag), first,
+                        first_in_grp);
+                }
+                group++;
+            }
+            return ret;
+        }
     }
 
-    CrateManager::CrateManager(CrateManagerConfig& t_config) : config_(t_config),
-        align_bed_(config_.prefix + "::ALIGN"), out_bed_(config_.prefix + "::DROPS::OUT"),
-        dropoff_tp_(config_.prefix + "::DROPOFF"),
-        dropoff_vault_(config_.prefix + "::DROPOFF", 350)
+    CrateManager::CrateManager(CrateManagerConfig* t_config) : config_(t_config),
+        teleport_align_station_(config_->prefix + "::ALIGN", std::chrono::minutes(5)),
+        beds_out_station_(config_->prefix + "::DROPS::OUT", std::chrono::minutes(5)),
+        teleport_dropoff_station_(config_->prefix + "::DROPOFF", std::chrono::minutes(0)),
+        dropoff_vault_(config_->prefix + "::DROPOFF", 350)
     {
-        parse_groups(config_.grouped_crates_raw);
+        if (config_->uses_teleporters) {
+            teleport_stations_ = parse_stations<TeleportCrateStation>(config_);
+            stats_per_group.resize(teleport_stations_.size());
+        }
+        else {
+            bed_stations_ = parse_stations<BedCrateStation>(config_);
+            stats_per_group.resize(bed_stations_.size());
+        }
         register_slash_commands();
     }
 
     void CrateManager::CrateGroupStatistics::add_looted()
     {
         const auto now = std::chrono::system_clock::now();
-        const std::chrono::seconds elapsed = (last_looted != UNDEFINED_TIME)
-                                                 ? util::get_elapsed<
-                                                     std::chrono::seconds>(last_looted)
-                                                 : std::chrono::minutes(30);
+        auto elapsed = util::get_elapsed<std::chrono::seconds>(last_looted);
+        if (elapsed > std::chrono::hours(2)) { elapsed = std::chrono::minutes(30); }
 
         avg_respawn_ = ((avg_respawn_ * times_looted_) + elapsed) / (times_looted_ + 1);
         times_looted_++;
@@ -54,69 +121,97 @@ namespace llpp::bots::drops
         if (!is_ready_to_run()) { return false; }
 
         const auto start = std::chrono::system_clock::now();
-        if (config_.uses_teleporters) { spawn_on_align_bed(); }
 
-        bool any_looted = false;
-        run_all_stations(any_looted);
+        if (config_->uses_teleporters) { run_teleport_stations(); }
+        else { run_bed_stations(); }
 
-        if (config_.uses_teleporters) {
-            teleport_to_dropoff();
-            if (any_looted) { dropoff_items(); }
-            else { asa::core::sleep_for(std::chrono::seconds(config_.render_align_for)); }
-        }
-        else { asa::entities::local_player->fast_travel_to(out_bed_); }
+        const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
+        const auto next = std::chrono::system_clock::now() + get_time_left_until_ready();
+        const auto msg = get_summary_message(config_->prefix, time_taken, stats_per_group,
+                                             vaults_filled_, next);
 
-        send_summary_embed(config_.prefix, util::get_elapsed<std::chrono::seconds>(start),
-                           stats_per_group, vault_fill_levels_,
-                           std::chrono::system_clock::now() + crates_[0][0].
-                           BedStation::get_completion_interval());
+        discord::get_bot()->message_create(msg);
         return true;
     }
 
-    bool CrateManager::is_ready_to_run()
+    void CrateManager::run_bed_stations()
     {
-        return !is_disabled() && (!crates_.empty() && crates_[0][0].
-            BedStation::is_ready());
+        for (int i = 0; i < bed_stations_.size(); i++) {
+            set_group_rendered(bed_stations_[i], false);
+            for (auto& station : bed_stations_[i]) {
+                if (!station.is_ready()) { continue; }
+
+                const auto result = station.complete();
+                set_group_rendered(bed_stations_[i], true);
+
+                if (!result.success) { continue; }
+
+                const int slots = station.get_vault().get_last_known_slots();
+                vaults_filled_[station.get_name()] = static_cast<float>(slots) / 350.f;
+                stats_per_group[i].add_looted();
+                set_group_cooldown(bed_stations_[i]);
+                break;
+            }
+        }
+
+        beds_out_station_.complete();
     }
 
-    std::chrono::minutes CrateManager::get_time_left_until_ready() const
-    {
-        return util::get_time_left_until<std::chrono::minutes>(
-            crates_[0][0].BedStation::get_next_completion());
-    }
 
-    void CrateManager::run_all_stations(bool& any_looted)
+    void CrateManager::run_teleport_stations()
     {
-        any_looted = false;
+        bool any_looted = false;
         bool can_default_tp = true;
 
-        int i = 0;
-        for (auto& group : crates_) {
-            set_group_rendered(group, false);
-            for (auto& station : group) {
-                if (!station.BedStation::is_ready()) {
+        spawn_on_align_bed();
+
+        for (int i = 0; i < teleport_stations_.size(); i++) {
+            set_group_rendered(teleport_stations_[i], false);
+            for (auto& station : teleport_stations_[i]) {
+                if (!station.is_ready()) {
                     can_default_tp = false;
                     continue;
                 }
                 station.set_tp_is_default(can_default_tp);
                 const auto result = station.complete();
-                set_group_rendered(group, true);
+                set_group_rendered(teleport_stations_[i], true);
 
                 if (result.success) {
                     any_looted = true;
-                    if (!config_.uses_teleporters) {
-                        vault_fill_levels_[station.BedStation::get_name()] = static_cast<
-                            float>(station.get_vault_slots()) / 350.f;
-                    }
                     stats_per_group[i].add_looted();
-                    set_group_cooldown(group);
-                    can_default_tp = (&station == &group.back());
+                    set_group_cooldown(teleport_stations_[i]);
+                    can_default_tp = (&station == &teleport_stations_[i].back());
                     break;
                 }
                 can_default_tp = true;
             }
-            i++;
         }
+
+        teleport_to_dropoff();
+        // if we have nothing to drop off make sure we load the align
+        // so that we dont get any render issues on the bed / tp
+        if (any_looted) { dropoff_items(); }
+        else { asa::core::sleep_for(std::chrono::seconds(config_->render_align_for)); }
+    }
+
+    bool CrateManager::is_ready_to_run()
+    {
+        if (config_->disabled) { return false; }
+
+        if (config_->uses_teleporters) {
+            return teleport_align_station_.is_ready() && (!teleport_stations_.empty() &&
+                teleport_stations_[0][0].is_ready());
+        }
+        return beds_out_station_.is_ready() && (!bed_stations_.empty() && bed_stations_[0]
+            [0].is_ready());
+    }
+
+    std::chrono::minutes CrateManager::get_time_left_until_ready() const
+    {
+        const auto next = config_->uses_teleporters
+                              ? teleport_stations_[0][0].get_next_completion()
+                              : bed_stations_[0][0].get_next_completion();
+        return util::get_time_left_until<std::chrono::minutes>(next);
     }
 
     void CrateManager::dropoff_items()
@@ -127,95 +222,28 @@ namespace llpp::bots::drops
         asa::entities::local_player->access(dropoff_vault_);
         asa::entities::local_player->get_inventory()->transfer_all();
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        vault_fill_levels_[dropoff_vault_.get_name()] = static_cast<float>(dropoff_vault_.
-            get_current_slots()) / 350.f;
+
+        const auto slots = static_cast<float>(dropoff_vault_.get_last_known_slots());
+        vaults_filled_[dropoff_vault_.get_name()] = slots / 350.f;
 
         dropoff_vault_.get_inventory()->close();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     void CrateManager::teleport_to_dropoff()
     {
-        asa::entities::local_player->teleport_to(dropoff_tp_);
+        auto result = teleport_dropoff_station_.complete();
         std::this_thread::sleep_for(std::chrono::seconds(2));
         asa::entities::local_player->stand_up();
     }
 
     void CrateManager::spawn_on_align_bed()
     {
-        asa::entities::local_player->fast_travel_to(align_bed_, AccessFlags_Default,
-                                                    TravelFlags_NoTravelAnimation);
-
-        asa::interfaces::tribe_manager->update_tribelogs(discord::handle_tribelog_events);
-        asa::core::sleep_for(std::chrono::seconds(1));
+        auto result = teleport_align_station_.complete();
         asa::entities::local_player->crouch();
         asa::entities::local_player->turn_down(20);
 
-        asa::core::sleep_for(std::chrono::seconds(config_.render_align_for));
-    }
-
-    void CrateManager::parse_groups(std::string groups)
-    {
-        std::erase_if(groups, isspace);
-
-        std::vector<int> lefts;
-        std::vector<int> rights;
-
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.at(i) == '{') { lefts.push_back(i); }
-            else if (groups.at(i) == '}') { rights.push_back(i); }
-        }
-
-        if (lefts.size() != rights.size()) {
-            throw std::exception("Num left brackets does not match num right brackets");
-        }
-        crates_.resize(lefts.size());
-        stats_per_group.resize(lefts.size());
-
-        int group = 0;
-        int num_station = 1;
-        for (int left : lefts) {
-            std::string roi = groups.substr(left + 1, rights[group] - left - 1);
-            std::vector<int> commas;
-            for (int j = 0; j < roi.size(); j++) {
-                if (roi.at(j) == ',') { commas.push_back(j); }
-            }
-
-            for (int crate = 0; crate < commas.size() + 1; crate++) {
-                int prev = crate > 0 ? commas[crate - 1] + 1 : 0;
-                int end = commas.empty() || crate >= commas.size()
-                              ? roi.size()
-                              : commas[crate] - prev;
-
-                QualityFlags curr_flag = 0;
-                std::string color = roi.substr(prev, end);
-                std::vector<std::string> tokens;
-                std::istringstream stream(color);
-                std::string token;
-
-                while (std::getline(stream, token, '|')) {
-                    if (token == "RED") {
-                        curr_flag |= asa::structures::CaveLootCrate::Quality::RED;
-                    }
-                    else if (token == "YELLOW") {
-                        curr_flag |= asa::structures::CaveLootCrate::Quality::YELLOW;
-                    }
-                    if (token == "BLUE") {
-                        curr_flag |= asa::structures::CaveLootCrate::Quality::BLUE;
-                    }
-                    if (token == "ANY") {
-                        curr_flag |= asa::structures::CaveLootCrate::Quality::ANY;
-                    }
-                }
-                const bool first = num_station == 1;
-                const bool first_in_grp = crate == 0;
-                crates_[group].emplace_back(
-                    util::add_num_to_prefix(config_.prefix + "::DROP", num_station++),
-                    config_, asa::structures::CaveLootCrate(curr_flag), first,
-                    first_in_grp);
-            }
-            group++;
-        }
+        asa::core::sleep_for(std::chrono::seconds(config_->render_align_for));
     }
 
     void CrateManager::register_slash_commands()
