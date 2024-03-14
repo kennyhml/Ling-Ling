@@ -1,4 +1,5 @@
 #pragma once
+#include "lootresult.h"
 #include "../../core/stationresult.h"
 #include "cratemanager.h"
 #include <asapp/structures/cavelootcrate.h>
@@ -15,7 +16,7 @@ namespace llpp::bots::drops
                                     const cv::Mat& loot_image,
                                     asa::structures::CaveLootCrate::Quality drop_quality,
                                     std::chrono::system_clock::time_point expires,
-                                    const std::map<std::string, bool>& items_taken);
+                                    const std::vector<LootResult>& looted);
 
     dpp::message get_summary_message(const std::string& manager_name,
                                      std::chrono::seconds time_taken,

@@ -15,6 +15,7 @@
 #include "core/taskmanager.h"
 #include <curl/curl.h>
 
+#include "bots/drops/bed_crate_station.h"
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
@@ -116,7 +117,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         // Handle error, if any
         return false;
     }
-    llpp::auth::login();
+    // llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

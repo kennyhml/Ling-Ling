@@ -1,4 +1,5 @@
 #pragma once
+#include "lootresult.h"
 #include "../../core/teleportstation.h"
 #include "../../core/bedstation.h"
 #include "config.h"
@@ -6,7 +7,7 @@
 
 namespace llpp::bots::drops
 {
-    bool any_looted(const std::map<std::string, bool>& items);
+    bool any_looted(const std::vector<LootResult>& items);
 
     class CrateStation
     {
@@ -49,20 +50,20 @@ namespace llpp::bots::drops
         /**
          * @brief Takes the high-priority items out of the crate without despawning it.
          *
-         * @return A map where each key represents the item name and the corresponding
-         * value indicates whether the item was selected or not.
+         * @return A vector where each index i represents slot i in the crate and contains
+         * information about the item at that slot.
          *
          * @note REROLL RELATED FEATURE
          */
-        [[nodiscard]] std::map<std::string, bool> take_high_priority_items() const;
+        [[nodiscard]] std::vector<LootResult> take_high_priority_items() const;
 
         /**
          * @brief Loots the items from the crate.
          *
          * @param loot_img_out The Mat to store the image of the crate loot in.
-         * @param taken_out The map to store the taken items in, if needed.
+         * @param taken_out A list containing each item and information if it was taken.
          */
-        void loot(cv::Mat& loot_img_out, std::map<std::string, bool>& taken_out);
+        void loot(cv::Mat& loot_img_out, std::vector<LootResult>& taken_out);
 
         asa::structures::CaveLootCrate crate_;
 

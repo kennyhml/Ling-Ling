@@ -4,16 +4,11 @@
 #include "../../config/config.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
+#include <opencv2/highgui.hpp>
 
 namespace llpp::bots::drops
 {
     using namespace config::bots::drops;
-
-    bool any_looted(const std::map<std::string, bool>& items)
-    {
-        return std::ranges::any_of(items, [](const auto& p) { return p.second; });
-    }
-
 
     namespace
     {
@@ -21,6 +16,17 @@ namespace llpp::bots::drops
         {
             return item ? item->info() : "???";
         }
+
+        bool inspect_tooltip(const asa::items::ItemData& data)
+        {
+            return data.is_blueprint && data.has_armor_value;
+        }
+    }
+
+    bool any_looted(const std::vector<LootResult>& items)
+    {
+        return std::ranges::any_of(
+            items, [](const LootResult& res) { return res.looted; });
     }
 
     CrateStation::CrateStation(CrateManagerConfig* t_config,
@@ -48,8 +54,7 @@ namespace llpp::bots::drops
         }, std::chrono::seconds(is_first_in_group_ ? config_->render_group_for : 1));
     }
 
-
-    void CrateStation::loot(cv::Mat& loot_img_out, std::map<std::string, bool>& taken_out)
+    void CrateStation::loot(cv::Mat& loot_img_out, std::vector<LootResult>& taken_out)
     {
         asa::entities::local_player->access(crate_);
         // Make sure that we did not default to the crafting tab.
@@ -60,12 +65,20 @@ namespace llpp::bots::drops
         // finding the drop, keeping track of this helps avoiding a scenario where
         // a drop respawns after being rerolled before the bot gets back to it.
         const bool has_folder = crate_.get_inventory()->slots[0].is_folder();
-        if (!has_folder) { last_found_up_ = std::chrono::system_clock::now(); }
+        if (!has_folder || !times_looted_) {
+            last_found_up_ = std::chrono::system_clock::now();
+        }
 
         if (should_reroll()) {
             // Take out the good items but leave the drop up so it can be rerolled.
             taken_out = take_high_priority_items();
             if (!has_folder) { crate_.get_inventory()->make_new_folder("checked"); }
+            for (auto& item : taken_out) {
+                if (item.tooltip) {
+                    cv::imshow("tt", item.tooltip->get_image());
+                    cv::waitKey(0);
+                }
+            }
             crate_.get_inventory()->close();
         }
         else {
@@ -79,29 +92,34 @@ namespace llpp::bots::drops
         asa::core::sleep_for(std::chrono::seconds(1));
     }
 
-    std::map<std::string, bool> CrateStation::take_high_priority_items() const
+    std::vector<LootResult> CrateStation::take_high_priority_items() const
     {
-        std::map<std::string, bool> items_taken{};
         int taken_offset = 0;
         auto items = crate_.get_inventory()->get_current_page_items();
+        std::vector<LootResult> res(items.size());
 
         // set all looted states to 0 initially.
         for (size_t i = 0; i < items.size(); i++) {
-            std::string repr = get_repr(items[i]);
-            items_taken[std::format("{}: {}", i, repr)] = false;
+            res[i] = {get_repr(items[i]), false, nullptr};
         }
 
         // Take the items based on their priority in the priority order.
-        for (int slot = 0; slot < items.size() && items.size() > 1; slot++) {
+        for (int s = 0; s < items.size() && items.size() > 1; s++) {
             bool item_found = false;
             for (const auto& priority : get_priority_order()) {
                 if (item_found) { break; } // restart the priority iteration
                 for (size_t i = 0; i < items.size(); i++) {
                     if (!items[i] || *items[i] != priority) { continue; }
 
+                    if (inspect_tooltip(items[i]->get_data())) {
+                        const auto& slot = crate_.get_inventory()->slots[i];
+                        asa::core::sleep_for(std::chrono::milliseconds(500));
+                        crate_.get_inventory()->select_slot(slot);
+                        res[i + taken_offset].tooltip = slot.get_tooltip();
+                    }
+
                     crate_.get_inventory()->take_slot(static_cast<int>(i));
-                    items_taken[std::format("{}: {}", i + taken_offset,
-                                            get_repr(items[i]))] = true;
+                    res[i + taken_offset].looted = true;
                     // erase this item from the items array to shift all the other items.
                     items.erase(items.begin() + static_cast<int>(i));
                     taken_offset++;
@@ -110,6 +128,6 @@ namespace llpp::bots::drops
                 }
             }
         }
-        return items_taken;
+        return res;
     }
 }

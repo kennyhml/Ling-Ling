@@ -4,6 +4,7 @@
 #include "../../core/basestation.h"
 #include "../../discord/bot.h"
 #include <format>
+#include <opencv2/highgui.hpp>
 
 #include "../../discord/helpers.h"
 
@@ -109,7 +110,7 @@ namespace llpp::bots::drops
                                     const asa::structures::CaveLootCrate::Quality
                                     drop_quality,
                                     const std::chrono::system_clock::time_point expires,
-                                    const std::map<std::string, bool>& items_taken)
+                                    const std::vector<LootResult>& looted)
     {
         const auto time_left = std::chrono::system_clock::to_time_t(expires);
         // The reroll request message is essentially the same as the looted message
@@ -123,16 +124,16 @@ namespace llpp::bots::drops
 
         embed.fields[0] = {"Expires:", std::format("<t:{}:R>", time_left), true};
 
-        if (!items_taken.empty()) {
+        if (!looted.empty()) {
             std::string fmt_string = ">>> **__Automatically looted:__**\n";
 
-            for (auto& [key, looted] : items_taken) {
-                std::string item = key;
-                std::string emote = looted ? ":shopping_cart:" : ":x:";
-
-                const auto pos = item.find("Blueprint");
-                if (pos != std::string::npos) { item.replace(pos, 9, "Bp"); }
-                fmt_string += std::format("{}: {}\n", item, emote);
+            for (int i = 0; i < looted.size(); i++) {
+                const std::string emote = looted[i].looted ? ":shopping_cart:" : ":x:";
+                std::string name = looted[i].name;
+                if (const auto pos = name.find("Blueprint"); pos != std::string::npos) {
+                    name.replace(pos, 9, "Bp");
+                }
+                fmt_string += std::format("{}: {}\n", name, emote);
             }
             embed.add_field("", fmt_string);
         }

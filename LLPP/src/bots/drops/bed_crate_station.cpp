@@ -30,7 +30,7 @@ namespace llpp::bots::drops
         }
 
         cv::Mat loot_image;
-        std::map<std::string, bool> items_taken;
+        std::vector<LootResult> items_taken;
         const auto quality = crate_.get_crate_quality();
 
         loot(loot_image, items_taken);
