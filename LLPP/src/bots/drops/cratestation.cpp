@@ -104,7 +104,9 @@ namespace llpp::bots::drops
         }
 
         // Take the items based on their priority in the priority order.
-        for (int s = 0; s < items.size() && items.size() > 1; s++) {
+        const size_t original_size = items.size();
+        for (int slot_ = 0; slot_ < original_size - 1; slot_++) {
+
             bool item_found = false;
             for (const auto& priority : get_priority_order()) {
                 if (item_found) { break; } // restart the priority iteration
@@ -114,7 +116,7 @@ namespace llpp::bots::drops
                     if (inspect_tooltip(items[i]->get_data())) {
                         const auto& slot = crate_.get_inventory()->slots[i];
                         asa::core::sleep_for(std::chrono::milliseconds(500));
-                        crate_.get_inventory()->select_slot(slot);
+                        crate_.get_inventory()->select_slot(slot, true, true);
                         res[i + taken_offset].tooltip = slot.get_tooltip();
                     }
 
