@@ -16,7 +16,7 @@ namespace llpp::core
 {
     namespace
     {
-        std::chrono::system_clock::time_point last_inv_check;
+        auto last_inv_check = std::chrono::system_clock::now();
         std::chrono::seconds inv_check_interval(60);
 
         bots::SuicideStation suicide("SUICIDE DEATH", "SUICIDE RESPAWN");
@@ -65,7 +65,6 @@ namespace llpp::core
         for (auto& [key, config] : config::bots::drops::configs) {
             tasks_.emplace_back(
                 key, std::make_unique<drops::CrateManager>(config.get_ptr()));
-
         }
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());

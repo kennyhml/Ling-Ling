@@ -40,5 +40,8 @@ namespace llpp::util
 	std::chrono::system_clock::time_point json_to_time(const std::string& json);
 
 	int64_t time_t_now();
+
+	cv::Mat bytes_to_mat(const uchar* data, int width, int height, int channels);
+
 }
 

@@ -29,6 +29,18 @@ namespace llpp::bots::drops
             for (auto& station : group) { station.set_rendered(rendered); }
         }
 
+
+        template <typename T>
+        bool all_ready(std::vector<std::vector<T>>& stations)
+        {
+            if (stations.empty()) { return false; }
+            return std::ranges::all_of(stations, [](std::vector<T>& group) -> bool {
+                return std::ranges::all_of(group, [](T& station) -> bool {
+                    return station.is_ready();
+                });
+            });
+        }
+
         template <typename T>
         std::vector<std::vector<T>> parse_stations(CrateManagerConfig* config)
         {
@@ -169,6 +181,12 @@ namespace llpp::bots::drops
             set_group_rendered(teleport_stations_[i], false);
             for (auto& station : teleport_stations_[i]) {
                 if (!station.is_ready()) {
+                    if (i == 0 && &station == &teleport_stations_[i].front()) {
+                        // Here we are in trouble, the first station currently
+                        // shouldnt be used for whatever reason that may be,
+                        // but its the default target, so this run wont work out.
+                        return;
+                    }
                     can_default_tp = false;
                     continue;
                 }
@@ -199,11 +217,9 @@ namespace llpp::bots::drops
         if (config_->disabled) { return false; }
 
         if (config_->uses_teleporters) {
-            return teleport_align_station_.is_ready() && (!teleport_stations_.empty() &&
-                teleport_stations_[0][0].is_ready());
+            return teleport_align_station_.is_ready() && all_ready(teleport_stations_);
         }
-        return beds_out_station_.is_ready() && (!bed_stations_.empty() && bed_stations_[0]
-            [0].is_ready());
+        return beds_out_station_.is_ready() && all_ready(bed_stations_);
     }
 
     std::chrono::minutes CrateManager::get_time_left_until_ready() const

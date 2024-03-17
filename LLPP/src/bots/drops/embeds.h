@@ -10,7 +10,8 @@ namespace llpp::bots::drops
     dpp::message get_looted_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,
                                     asa::structures::CaveLootCrate::Quality drop_quality,
-                                    int total_times_looted);
+                                    int total_times_looted,
+                                    const std::vector<LootResult>& contents);
 
     dpp::message get_reroll_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,

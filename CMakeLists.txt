@@ -152,6 +152,7 @@ add_executable(LLPP WIN32
         LLPP/src/bots/drops/teleport_crate_station.h
         LLPP/src/bots/drops/item_priorities.h
         LLPP/src/bots/drops/lootresult.h
+        LLPP/src/bots/drops/checkmark_green.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

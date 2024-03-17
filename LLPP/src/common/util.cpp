@@ -66,4 +66,11 @@ namespace llpp::util
     {
         return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     }
+
+
+    cv::Mat bytes_to_mat(const uchar* data, const int width, const int height,
+                         const int channels)
+    {
+        return cv::Mat(height, width, CV_8UC(channels), (uchar*)data).clone();
+    }
 }

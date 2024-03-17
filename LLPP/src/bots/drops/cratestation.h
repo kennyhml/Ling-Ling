@@ -58,12 +58,22 @@ namespace llpp::bots::drops
         [[nodiscard]] std::vector<LootResult> take_high_priority_items() const;
 
         /**
+         * @brief Checks for valuable items in the drop and gets their tooltips.
+         *
+         * @return A vector where each index i represents slot i in the crate and contains
+         * information about the item at that slot.
+         *
+         * @note NON-REROLL RELATED FEATURE
+         */
+        [[nodiscard]] std::vector<LootResult> get_valuable_tooltips() const;
+
+        /**
          * @brief Loots the items from the crate.
          *
          * @param loot_img_out The Mat to store the image of the crate loot in.
-         * @param taken_out A list containing each item and information if it was taken.
+         * @param contents A list containing each item and information if it was taken.
          */
-        void loot(cv::Mat& loot_img_out, std::vector<LootResult>& taken_out);
+        void loot(cv::Mat& loot_img_out, std::vector<LootResult>& contents);
 
         asa::structures::CaveLootCrate crate_;
 

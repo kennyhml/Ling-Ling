@@ -30,12 +30,12 @@ namespace llpp::bots::drops
         }
 
         cv::Mat loot_image;
-        std::vector<LootResult> items_taken;
+        std::vector<LootResult> contents;
         const auto quality = crate_.get_crate_quality();
 
-        loot(loot_image, items_taken);
+        loot(loot_image, contents);
         // only deposit items if we actually got any.
-        if (!should_reroll() || any_looted(items_taken)) { deposit_items(); }
+        if (!should_reroll() || any_looted(contents)) { deposit_items(); }
 
         set_completed();
         const core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),
@@ -43,11 +43,11 @@ namespace llpp::bots::drops
 
         dpp::message msg;
         if (!should_reroll()) {
-            msg = get_looted_message(res, loot_image, quality, ++times_looted_);
+            msg = get_looted_message(res, loot_image, quality, ++times_looted_, contents);
         }
         else {
             msg = get_reroll_message(res, loot_image, quality,
-                                     last_found_up_ + buff_max_wait_, items_taken);
+                                     last_found_up_ + buff_max_wait_, contents);
         }
         discord::get_bot()->message_create(msg);
         return res;

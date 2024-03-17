@@ -4,9 +4,11 @@
 #include "../../core/basestation.h"
 #include "../../discord/bot.h"
 #include <format>
+#include <asapp/core/config.h>
 #include <opencv2/highgui.hpp>
-
+#include "checkmark_green.h"
 #include "../../discord/helpers.h"
+#include <asapp/util/util.h>
 
 namespace llpp::bots::drops
 {
@@ -63,13 +65,64 @@ namespace llpp::bots::drops
             }
             return config::bots::drops::loot_channel.get();
         }
-    }
 
+        void paste_dura(cv::Mat& dst, const int slot, const cv::Mat& dura)
+        {
+            constexpr int x_offset = 14;
+            constexpr int y_offset = 80;
+            constexpr int per = 94;
+
+            cv::Mat dura_mask = asa::window::get_mask(dura, {158, 224, 238}, 50);
+
+            const int vertical_middle = dura_mask.rows / 2;
+            int zero_count = 0;
+            int width = 0;
+            for (int col = 0; col < dura_mask.cols; col++) {
+                if (zero_count > 15) { break; }
+                if (dura_mask.at<uchar>(vertical_middle, col) == 0) { zero_count++; }
+                else {
+                    width = col;
+                    zero_count = 0;
+                }
+            }
+            width -= 5;
+            cv::Mat red(cv::Size(width / 2, dura.rows), CV_8UC4);
+
+            for (int y = 0; y < red.rows; ++y) {
+                for (int x = 0; x < red.cols; ++x) {
+                    if (x > width) { break; }
+                    if (dura_mask.at<uchar>(y, x) == 0) {
+                        red.at<cv::Vec4b>(y, x) = {0, 0, 0, 255};
+                    }
+                    else { red.at<cv::Vec4b>(y, x) = {0, 0, 255, 255}; }
+                }
+            }
+            const cv::Rect where(x_offset + (per * slot), y_offset + (per * (slot / 5)),
+                                 red.cols, red.rows);
+            red.copyTo(dst(where), dura_mask({0, 0, red.cols, red.rows}));
+        }
+
+        void paste_checkmark(cv::Mat& dst, const int slot)
+        {
+            constexpr int x_offset = 77;
+            constexpr int y_offset = 80;
+            constexpr int per = 94;
+
+            static cv::Mat checkmark = util::bytes_to_mat(checkmark_data, 20, 20, 4);
+
+            const auto mask = ::util::mask_alpha_channel(checkmark);
+
+            const cv::Rect where(x_offset + (per * slot), y_offset + (per * (slot / 5)),
+                                 checkmark.cols, checkmark.rows);
+            checkmark.copyTo(dst(where), mask);
+        }
+    }
 
     dpp::message get_looted_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,
                                     const asa::structures::CaveLootCrate::Quality
-                                    drop_quality, int total_times_looted)
+                                    drop_quality, int total_times_looted,
+                                    const std::vector<LootResult>& contents)
     {
         // default values for drops we couldnt figure out
         auto color = dpp::colors::white;
@@ -77,6 +130,18 @@ namespace llpp::bots::drops
         std::string determined_quality = "Undetermined";
         get_color_fields(drop_quality, color, thumbnail, determined_quality);
 
+        cv::Mat edited_image;
+        cv::cvtColor(loot_image, edited_image, cv::COLOR_RGB2RGBA);
+        for (int i = 0; i < contents.size(); i++) {
+            if (contents[i].tooltip) {
+                auto dura = cv::Mat(contents[i].tooltip->get_image(),
+                                    contents[i].tooltip->get_durability_area()->to_cv());
+                paste_dura(edited_image, i, dura);
+            }
+            if (contents[i].looted) {
+                paste_checkmark(edited_image, i);
+            }
+        }
 
         const auto loot_ratio = std::format("The crate was looted {}/{} times!",
                                             total_times_looted,
@@ -99,7 +164,7 @@ namespace llpp::bots::drops
 
         auto message = dpp::message(get_loot_channel(), embed);
 
-        const auto filedata = discord::strbuf(loot_image);
+        const auto filedata = discord::strbuf(edited_image);
         message.add_file("image.png", filedata, "image/png");
 
         return message;
@@ -116,27 +181,13 @@ namespace llpp::bots::drops
         // The reroll request message is essentially the same as the looted message
         // with some minor modifications, so to avoid boilerplate just modify a
         // looted message instead.
-        dpp::message message = get_looted_message(data, loot_image, drop_quality, 0);
+        auto message = get_looted_message(data, loot_image, drop_quality, 0, looted);
         dpp::embed& embed = message.embeds[0];
 
         embed.set_title(std::format("Crate '{}' is up!", data.station->get_name()));
         embed.set_description("If the timer expires, the drop will be looted.");
 
         embed.fields[0] = {"Expires:", std::format("<t:{}:R>", time_left), true};
-
-        if (!looted.empty()) {
-            std::string fmt_string = ">>> **__Automatically looted:__**\n";
-
-            for (int i = 0; i < looted.size(); i++) {
-                const std::string emote = looted[i].looted ? ":shopping_cart:" : ":x:";
-                std::string name = looted[i].name;
-                if (const auto pos = name.find("Blueprint"); pos != std::string::npos) {
-                    name.replace(pos, 9, "Bp");
-                }
-                fmt_string += std::format("{}: {}\n", name, emote);
-            }
-            embed.add_field("", fmt_string);
-        }
 
         if (!config::bots::drops::reroll_role.get().empty()) {
             message.content = dpp::utility::role_mention(
