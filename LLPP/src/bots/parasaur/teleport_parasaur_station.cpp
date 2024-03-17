@@ -51,7 +51,7 @@ namespace llpp::bots::parasaur
                           std::chrono::minutes(t_config->interval)), config_(t_config),
           real_name_(std::move(t_real_name)), parasaur_(name_ + "::PARASAUR") {}
 
-    core::StationResult TeleportParasaurStation::complete()
+    core::StationResult TeleportParasaurStation::complete(std::string& station_name, bool& enemy_detected)
     {
         find_teleporter();
         if (!begin()) {
@@ -68,9 +68,12 @@ namespace llpp::bots::parasaur
 
         let_load(load_for, config_->check_logs);
 
+        station_name = real_name_;
+        enemy_detected = false;
         if (asa::interfaces::hud->detected_enemy()) {
             send_enemy_detected(real_name_, config_->alert_level);
             last_detected_ = std::chrono::system_clock::now();
+            enemy_detected = true;
         }
 
         set_completed();

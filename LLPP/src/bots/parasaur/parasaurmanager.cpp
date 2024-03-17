@@ -7,6 +7,10 @@
 #include "../../config/config.h"
 #include "../../common/util.h"
 #include <asapp/interfaces/tribemanager.h>
+
+#include <utility>
+
+#include "embeds.h"
 #include "../../discord/bot.h"
 
 namespace llpp::bots::parasaur
@@ -30,11 +34,34 @@ namespace llpp::bots::parasaur
         }
     }
 
+    void ParasaurManager::ParasaurGroupStatistics::station_checked(const std::string& stationname, bool alerting)
+    {
+        const auto now = std::chrono::system_clock::now();
+        const std::chrono::seconds elapsed = (last_checked != UNDEFINED_TIME)
+                                                 ? util::get_elapsed<
+                                                     std::chrono::seconds>(last_checked)
+                                                 : std::chrono::minutes(30);
+
+        times_checked_++;
+        last_checked = now;
+        parasaur_station_name = stationname;
+        parasaur_alerting = alerting;
+    }
+
     bool ParasaurManager::run()
     {
+        bool parasaursChecked = false;
+
         if (!is_ready_to_run()) { return false; }
         bool started_teleporters = false;
 
+        const auto start = std::chrono::system_clock::now();
+
+        int i = 0;
+        std::string station_name;
+        bool enemy_detected;
+        station_stats.clear();
+        station_stats.resize(tp_stations_.size() + bed_stations_.size());
         for (const auto& station : tp_stations_) {
             if (!station->is_ready()) { continue; }
 
@@ -42,15 +69,32 @@ namespace llpp::bots::parasaur
                 if (!go_to_start()) { return false; }
                 started_teleporters = true;
             }
-            station->complete();
+            station->complete(station_name, enemy_detected);
+            station_stats[i].station_checked(station_name, enemy_detected);
+            parasaursChecked = true;
+            i++;
         }
 
         if (started_teleporters) { spawn_tp_.complete(); }
 
+        int j = 0;
         for (const auto& station : bed_stations_) {
-            if (station->BedStation::is_ready()) { station->complete(); }
+            if (station->BedStation::is_ready()) {
+                station->complete(station_name, enemy_detected);
+
+                station_stats[i+j].station_checked(station_name, enemy_detected);
+                parasaursChecked = true;
+                j++;
+            }
         }
-        last_completed_ = std::chrono::system_clock::now();
+
+        if(parasaursChecked) {
+            // Only send the embed if a parasaur station was completed
+            send_summary_embed(util::get_elapsed<std::chrono::seconds>(start), station_stats);
+
+            last_completed_ = std::chrono::system_clock::now();
+        }
+
         return true;
     }
 

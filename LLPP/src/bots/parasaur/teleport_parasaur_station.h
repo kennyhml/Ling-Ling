@@ -11,7 +11,7 @@ namespace llpp::bots::parasaur
     public:
         TeleportParasaurStation(std::string t_real_name, ParasaurConfig* t_config);
 
-        core::StationResult complete() override;
+        core::StationResult complete(std::string& station_name, bool& enemy_detected);
 
     private:
         static bool has_lingering_ping();

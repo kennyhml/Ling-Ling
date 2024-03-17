@@ -53,4 +53,42 @@ namespace llpp::bots::parasaur
 
         discord::get_bot()->message_create(msg);
     }
+
+    void send_summary_embed(const std::chrono::seconds time_taken, const std::vector<ParasaurManager::ParasaurGroupStatistics>& stats)
+    {
+        const auto fmt_taken = std::format("{} seconds", time_taken.count());
+
+        // write list of stations checked
+        std::string stations_checked;
+        std::string station_icon;
+        for(int i = 0; i < static_cast<int>(stats.size()); i++) {
+            // check for station name before adding to embed
+            if(stats[i].parasaur_station_name != "") {
+                if(stats[i].parasaur_alerting) {
+                    station_icon = ":alarm_clock:";
+                } else {
+                    station_icon = ":green_circle:";
+                }
+
+                stations_checked += std::format(
+                                    "{} {}\n",
+                                    station_icon, stats[i].parasaur_station_name
+                                    );
+            }
+        }
+
+        auto embed = dpp::embed().set_color(dpp::colors::cyan).
+                                  set_title(std::format(
+                                      "Parasaur Stations have been completed!"))
+                                  .set_description(
+                                      "Here is a summary of the stations checked:")
+                                  .set_thumbnail(PARASAUR_THUMBNAIL)
+                                  .add_field("", std::format("{}", stations_checked), true)
+                                  .add_field("Time taken for all stations:", fmt_taken, true);
+
+        dpp::message msg(config::discord::channels::info.get(), embed);
+
+        discord::get_bot()->message_create(msg);
+    }
+
 }
