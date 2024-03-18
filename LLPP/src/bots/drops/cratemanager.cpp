@@ -34,11 +34,13 @@ namespace llpp::bots::drops
         bool all_ready(std::vector<std::vector<T>>& stations)
         {
             if (stations.empty()) { return false; }
-            return std::ranges::all_of(stations, [](std::vector<T>& group) -> bool {
-                return std::ranges::all_of(group, [](T& station) -> bool {
-                    return station.is_ready();
-                });
-            });
+
+            for (auto& group : stations) {
+                for (auto& station : group) {
+                    if (!station.is_ready()) { return false; }
+                }
+            }
+            return true;
         }
 
         template <typename T>

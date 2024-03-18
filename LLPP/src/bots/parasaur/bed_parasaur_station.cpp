@@ -38,7 +38,7 @@ namespace llpp::bots::parasaur
                      std::chrono::minutes(t_config->interval)), config_(t_config),
           real_name_(std::move(t_real_name)), parasaur_(name_ + "::PARASAUR") {}
 
-    core::StationResult BedParasaurStation::complete(std::string& station_name, bool& enemy_detected)
+    core::StationResult BedParasaurStation::complete()
     {
         if (!begin(false)) {
             return {this, false, get_time_taken<std::chrono::seconds>(), {}};
@@ -51,15 +51,16 @@ namespace llpp::bots::parasaur
 
         let_load(load_for, config_->check_logs);
 
-        station_name = real_name_;
-        enemy_detected = false;
         if (asa::interfaces::hud->detected_enemy()) {
             send_enemy_detected(real_name_, config_->alert_level);
             last_detected_ = std::chrono::system_clock::now();
-            enemy_detected = true;
+            last_detection_ = std::chrono::system_clock::now();
         }
 
         set_completed();
+        config_->last_completed = std::chrono::system_clock::to_time_t(
+            std::chrono::system_clock::now());
+        if (config_->on_changed) { config_->on_changed(); }
 
         return {this, true, get_time_taken<std::chrono::seconds>(), {}};
     }

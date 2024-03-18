@@ -74,7 +74,6 @@ namespace llpp::bots::drops
         if (should_reroll()) {
             // Take out the good items but leave the drop up so it can be rerolled.
             contents = take_high_priority_items();
-            std::cout << "[+] " << contents.size() << " items taken out!" << std::endl;
             if (!has_folder) { crate_.get_inventory()->make_new_folder("checked"); }
             crate_.get_inventory()->close();
         }
@@ -83,7 +82,7 @@ namespace llpp::bots::drops
             contents = get_valuable_tooltips();
             do { crate_.get_inventory()->transfer_all(); }
             while (!util::await([this]() -> bool {
-                return crate_.get_inventory()->is_open();
+                return !crate_.get_inventory()->is_open();
             }, std::chrono::seconds(10)));
         }
         // Closing the drop or despawning it often causes a frame-drop

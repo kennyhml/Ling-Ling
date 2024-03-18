@@ -1,6 +1,5 @@
 #include "embeds.h"
 #include "../../discord/bot.h"
-#include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../discord/helpers.h"
 #include <asapp/game/window.h>
@@ -54,41 +53,52 @@ namespace llpp::bots::parasaur
         discord::get_bot()->message_create(msg);
     }
 
-    void send_summary_embed(const std::chrono::seconds time_taken, const std::vector<ParasaurManager::ParasaurGroupStatistics>& stats)
+    dpp::message get_summary_message(const std::chrono::seconds total_time_taken,
+                                     const std::vector<ParasaurStationResult>& stats)
     {
-        const auto fmt_taken = std::format("{} seconds", time_taken.count());
+        const int total_ran = std::ranges::count_if(
+            stats, [](const auto& result) -> bool { return result.ran; });
 
-        // write list of stations checked
-        std::string stations_checked;
-        std::string station_icon;
-        for(int i = 0; i < static_cast<int>(stats.size()); i++) {
-            // check for station name before adding to embed
-            if(stats[i].parasaur_station_name != "") {
-                if(stats[i].parasaur_alerting) {
-                    station_icon = ":alarm_clock:";
-                } else {
-                    station_icon = ":green_circle:";
-                }
+        const auto fmt_taken = std::format("{} seconds", total_time_taken.count());
+        const auto fmt_checked = std::format("{}/{}", total_ran, stats.size());
 
-                stations_checked += std::format(
-                                    "{} {}\n",
-                                    station_icon, stats[i].parasaur_station_name
-                                    );
+        dpp::embed embed;
+        embed.set_color(dpp::colors::cyan);
+        embed.set_title("Parasaur Stations have been completed!");
+        embed.set_description("Here is an overview of the stations:");
+        embed.set_thumbnail(PARASAUR_THUMBNAIL);
+
+        embed.add_field("Time taken:", fmt_taken, true);
+        embed.add_field("Total checked:", fmt_checked, true);
+        embed.add_field("Mode:", config::bots::parasaur::start_criteria.get(), true);
+
+        std::string formatted_data;
+
+        for (const auto& data : stats) {
+            const bool detecting = util::get_elapsed<std::chrono::minutes>(
+                data.last_detection).count() < 5;
+
+            std::string data_str;
+
+            if (!data.ran) { data_str += ":hourglass: "; }
+            else if (detecting) { data_str += ":alarm_clock: "; }
+            else { data_str += ":green_circle: "; }
+
+            data_str += ("**" + data.station->get_name() + "**");
+            if (data.ran) {
+                data_str += std::format(" (<t:{}:R>)",
+                                        std::chrono::system_clock::to_time_t(
+                                            data.station->get_last_completion()));
             }
+            else {
+                data_str += std::format(" (<t:{}:R>)",
+                                        std::chrono::system_clock::to_time_t(
+                                            data.station->get_next_completion()));
+            }
+            formatted_data += (data_str + "\n");
         }
 
-        auto embed = dpp::embed().set_color(dpp::colors::cyan).
-                                  set_title(std::format(
-                                      "Parasaur Stations have been completed!"))
-                                  .set_description(
-                                      "Here is a summary of the stations checked:")
-                                  .set_thumbnail(PARASAUR_THUMBNAIL)
-                                  .add_field("", std::format("{}", stations_checked), true)
-                                  .add_field("Time taken for all stations:", fmt_taken, true);
-
-        dpp::message msg(config::discord::channels::info.get(), embed);
-
-        discord::get_bot()->message_create(msg);
+        embed.add_field("", formatted_data, true);
+        return {config::discord::channels::info.get(), embed};
     }
-
 }

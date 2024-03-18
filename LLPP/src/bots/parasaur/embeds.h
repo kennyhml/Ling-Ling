@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include <asapp/structures/cavelootcrate.h>
 #include <format>
-#include "parasaurmanager.h"
+#include <dpp/dpp.h>
+#include "parasaur_station_result.h"
 
 namespace llpp::bots::parasaur
 {
@@ -10,8 +10,8 @@ namespace llpp::bots::parasaur
         "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/"
         "6/65/Parasaur.png";
 
-    void send_enemy_detected(const std::string& where,  int tag_level);
+    void send_enemy_detected(const std::string& where, int tag_level);
 
-    void send_summary_embed(std::chrono::seconds time_taken,
-        const std::vector<ParasaurManager::ParasaurGroupStatistics>& stats);
+    dpp::message get_summary_message(std::chrono::seconds total_time_taken,
+                                     const std::vector<ParasaurStationResult>& stats);
 }

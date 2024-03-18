@@ -1,16 +1,11 @@
 #include "parasaurmanager.h"
-
-#include <asapp/core/init.h>
+#include "parasaur_station_result.h"
+#include "embeds.h"
+#include "../../config/config.h"
+#include "../../common/util.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
-#include "../../config/config.h"
-#include "../../common/util.h"
-#include <asapp/interfaces/tribemanager.h>
-
-#include <utility>
-
-#include "embeds.h"
 #include "../../discord/bot.h"
 
 namespace llpp::bots::parasaur
@@ -34,68 +29,48 @@ namespace llpp::bots::parasaur
         }
     }
 
-    void ParasaurManager::ParasaurGroupStatistics::station_checked(const std::string& stationname, bool alerting)
-    {
-        const auto now = std::chrono::system_clock::now();
-        const std::chrono::seconds elapsed = (last_checked != UNDEFINED_TIME)
-                                                 ? util::get_elapsed<
-                                                     std::chrono::seconds>(last_checked)
-                                                 : std::chrono::minutes(30);
-
-        times_checked_++;
-        last_checked = now;
-        parasaur_station_name = stationname;
-        parasaur_alerting = alerting;
-    }
-
     bool ParasaurManager::run()
     {
-        bool parasaursChecked = false;
-
         if (!is_ready_to_run()) { return false; }
-        bool started_teleporters = false;
 
+        std::vector<ParasaurStationResult> results;
+        bool any_ran = false;
+
+        bool started_teleporters = false;
         const auto start = std::chrono::system_clock::now();
 
-        int i = 0;
-        std::string station_name;
-        bool enemy_detected;
-        station_stats.clear();
-        station_stats.resize(tp_stations_.size() + bed_stations_.size());
         for (const auto& station : tp_stations_) {
-            if (!station->is_ready()) { continue; }
-
+            if (!station->is_ready()) {
+                results.emplace_back(false, station.get(), station->get_last_alert());
+                continue;
+            }
             if (!started_teleporters) {
                 if (!go_to_start()) { return false; }
                 started_teleporters = true;
             }
-            station->complete(station_name, enemy_detected);
-            station_stats[i].station_checked(station_name, enemy_detected);
-            parasaursChecked = true;
-            i++;
+            any_ran = true;
+            station->complete();
+            results.emplace_back(true, station.get(), station->get_last_alert());
         }
 
         if (started_teleporters) { spawn_tp_.complete(); }
 
-        int j = 0;
         for (const auto& station : bed_stations_) {
-            if (station->BedStation::is_ready()) {
-                station->complete(station_name, enemy_detected);
-
-                station_stats[i+j].station_checked(station_name, enemy_detected);
-                parasaursChecked = true;
-                j++;
+            if (station->is_ready()) {
+                any_ran = true;
+                station->complete();
+                results.emplace_back(true, station.get(), station->get_last_alert());
+            }
+            else {
+                results.emplace_back(false, station.get(), station->get_last_alert());
             }
         }
-
-        if(parasaursChecked) {
-            // Only send the embed if a parasaur station was completed
-            send_summary_embed(util::get_elapsed<std::chrono::seconds>(start), station_stats);
-
-            last_completed_ = std::chrono::system_clock::now();
+        if (any_ran) {
+            const dpp::message summary = get_summary_message(
+                util::get_elapsed<std::chrono::seconds>(start), results);
+            discord::get_bot()->message_create(summary);
         }
-
-        return true;
+        return any_ran;
     }
 
     bool ParasaurManager::is_ready_to_run()
@@ -134,7 +109,7 @@ namespace llpp::bots::parasaur
         asa::core::sleep_for(std::chrono::seconds(start_load.get()));
 
         asa::entities::local_player->crouch();
-        spawn_tp_.set_tp_is_default(true);
-        return spawn_tp_.complete().success;
+        next_tp_.set_tp_is_default(true);
+        return next_tp_.complete().success;
     }
 }
