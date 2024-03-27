@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/bedstation.h"
-#include <asapp/entities/dinoent.h>
+#include <asapp/entities/dinoentity.h>
 #include <asapp/structures/dedicatedstorage.h>
 
 namespace llpp::bots::paste
@@ -15,15 +15,18 @@ namespace llpp::bots::paste
         core::StationResult complete() override;
 
     private:
-        std::array<asa::entities::DinoEnt, 6> achatinas{
-            asa::entities::DinoEnt("ACHATINA01"), asa::entities::DinoEnt("ACHATINA02"),
-            asa::entities::DinoEnt("ACHATINA03"), asa::entities::DinoEnt("ACHATINA04"),
-            asa::entities::DinoEnt("ACHATINA05"), asa::entities::DinoEnt("ACHATINA06"),
+        std::array<asa::entities::DinoEntity, 6> achatinas{
+            asa::entities::DinoEntity("ACHATINA01"),
+            asa::entities::DinoEntity("ACHATINA02"),
+            asa::entities::DinoEntity("ACHATINA03"),
+            asa::entities::DinoEntity("ACHATINA04"),
+            asa::entities::DinoEntity("ACHATINA05"),
+            asa::entities::DinoEntity("ACHATINA06"),
         };
 
         asa::structures::DedicatedStorage dedi_;
 
-        bool empty(asa::entities::DinoEnt& achatina);
+        bool empty(asa::entities::DinoEntity& achatina);
         void empty_all();
         int deposit_paste();
 

@@ -3,11 +3,9 @@
 #include <asapp/core/init.h>
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
-
 #include <asapp/interfaces/console.h>
 #include <asapp/interfaces/tribemanager.h>
 #include "bots/farm/commands.h"
-
 #include "auth/auth.h"
 #include "gui/gui.h"
 #include "config/config.h"
@@ -15,11 +13,11 @@
 #include "core/taskmanager.h"
 #include <curl/curl.h>
 
-#include "bots/drops/bed_crate_station.h"
+#include "bots/metal/metalstation.h"
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
-#include "discord/tribelogs/handler.h"
+
 static bool running = false;
 
 class TerminatedError : public std::exception
@@ -72,13 +70,24 @@ void llpp_main()
     inform_started();
 
     try {
-        asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
-        asa::entities::local_player->reset_view_angles();
-
-        asa::interfaces::tribe_manager->update_tribelogs(
-            llpp::discord::handle_tribelog_events, std::chrono::seconds(3));
+        // asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
+        asa::entities::local_player->reset_state();
     }
     catch (const TerminatedError&) {}
+
+    auto anky = asa::entities::DinoEntity("ANKY");
+    asa::entities::local_player->mount(anky);
+    asa::entities::local_player->set_pitch(90);
+
+    for (int i = 0; i < 25; i++) {
+        auto station = llpp::bots::metal::MetalStation(llpp::util::add_num_to_prefix
+        ("METAL", i), std::chrono::minutes(120));
+
+        station.complete();
+    }
+
+    return;
+
     while (running) {
         try { taskmanager.execute_next(); }
         catch (asa::core::ShooterGameError& e) {
@@ -117,7 +126,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         // Handle error, if any
         return false;
     }
-    // llpp::auth::login();
+
+    llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

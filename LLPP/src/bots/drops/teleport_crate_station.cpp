@@ -18,7 +18,7 @@ namespace llpp::bots::drops
 
     core::StationResult TeleportCrateStation::complete()
     {
-        if (!begin()) {
+        if (!begin(false)) {
             return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
 

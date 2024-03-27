@@ -1,7 +1,7 @@
 #pragma once
 #include "config.h"
 #include "../../core/bedstation.h"
-#include <asapp/entities/dinoent.h>
+#include <asapp/entities/dinoentity.h>
 
 namespace llpp::bots::parasaur
 {
@@ -34,6 +34,6 @@ namespace llpp::bots::parasaur
 
         std::chrono::system_clock::time_point last_detection_;
         std::string real_name_;
-        asa::entities::DinoEnt parasaur_;
+        asa::entities::DinoEntity parasaur_;
     };
 }

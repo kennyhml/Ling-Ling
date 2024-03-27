@@ -1,5 +1,5 @@
 #pragma once
-#include <asapp/entities/dinoent.h>
+#include <asapp/entities/dinoentity.h>
 #include <asapp/structures/cavelootcrate.h>
 #include <asapp/structures/simplebed.h>
 #include "../../discord/bot.h"
@@ -76,6 +76,6 @@ namespace llpp::bots::farm
 
         asa::structures::SimpleBed spawn_at_;
 
-        asa::entities::DinoEnt mount_;
+        asa::entities::DinoEntity mount_;
     };
 }

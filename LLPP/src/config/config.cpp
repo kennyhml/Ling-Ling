@@ -11,7 +11,6 @@ namespace llpp::config
         bool has_passed_initial_check = false;
         bool has_loaded_dynamic_maps = false;
 
-
         std::filesystem::path get_appdata_path()
         {
             PWSTR path;
@@ -61,6 +60,13 @@ namespace llpp::config
                     bots::drops::configs[manager] = ManagedVar(
                         {"bots", "drops", manager}, save,
                         llpp::bots::drops::CrateManagerConfig());
+                }
+            }
+            for (auto& manager : bots::metal::managers.get()) {
+                if (!bots::metal::configs.contains(manager)) {
+                    bots::metal::configs[manager] = ManagedVar(
+                        {"bots", "metal", manager}, save,
+                        llpp::bots::metal::MetalManagerConfig());
                 }
             }
 

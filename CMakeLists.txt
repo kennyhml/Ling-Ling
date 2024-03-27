@@ -154,6 +154,13 @@ add_executable(LLPP WIN32
         LLPP/src/bots/drops/lootresult.h
         LLPP/src/bots/drops/checkmark_green.h
         LLPP/src/bots/parasaur/parasaur_station_result.h
+        LLPP/src/gui/bots/metal.cpp
+        LLPP/src/gui/bots/metal.h
+        LLPP/src/bots/metal/config.h
+        LLPP/src/bots/metal/metalstation.cpp
+        LLPP/src/bots/metal/metalstation.h
+        LLPP/src/bots/metal/data.cpp
+        LLPP/src/bots/metal/data.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

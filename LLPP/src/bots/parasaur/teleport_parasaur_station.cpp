@@ -54,7 +54,7 @@ namespace llpp::bots::parasaur
     core::StationResult TeleportParasaurStation::complete()
     {
         find_teleporter();
-        if (!begin()) {
+        if (!begin(false)) {
             return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
 

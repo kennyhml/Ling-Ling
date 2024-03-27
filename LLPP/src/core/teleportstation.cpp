@@ -1,9 +1,10 @@
 #include "teleportstation.h"
 #include "../discord/embeds.h"
 #include "../discord/bot.h"
-#include <asapp/entities/localplayer.h>
+#include "../discord/tribelogs/handler.h"
+#include <asapp/core/state.h>
 #include <asapp/interfaces/spawnmap.h>
-#include "../config/config.h"
+#include <asapp/interfaces/tribemanager.h>
 
 namespace llpp::core
 {
@@ -20,16 +21,16 @@ namespace llpp::core
 
     StationResult TeleportStation::complete()
     {
-        const StationResult res(this, begin(), get_time_taken<std::chrono::seconds>());
+        const StationResult res(this, begin(false), get_time_taken<>());
         set_completed();
         return res;
     }
 
-    bool TeleportStation::begin(bool check_logs)
+    bool TeleportStation::begin(const bool check_logs)
     {
         last_started_ = std::chrono::system_clock::now();
 
-        try { asa::entities::local_player->teleport_to(start_tp_, is_default_); }
+        try { asa::entities::local_player->teleport_to(start_tp_, get_teleport_flags()); }
         catch (const asa::interfaces::DestinationNotFound& e) {
             std::cerr << e.what() << std::endl;
             discord::get_bot()->message_create(
@@ -37,6 +38,19 @@ namespace llpp::core
             set_state(State::DISABLED);
             return false;
         }
+        if (check_logs) {
+            asa::interfaces::tribe_manager->update_tribelogs(
+                discord::handle_tribelog_events);
+            asa::core::sleep_for(std::chrono::seconds(1));
+        }
         return true;
+    }
+
+    TeleportFlags TeleportStation::get_teleport_flags() const
+    {
+        TeleportFlags flags = 0;
+        if (is_default_) { flags |= TeleportFlags_UseDefaultOption; }
+        if (teleport_unsafe_) { flags |= TeleportFlags_UnsafeLoad; }
+        return flags;
     }
 }

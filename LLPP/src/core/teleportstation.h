@@ -1,9 +1,7 @@
 #pragma once
-#include <asapp/structures/cavelootcrate.h>
+#include <asapp/entities/localplayer.h>
 #include <asapp/structures/teleporter.h>
-
 #include "basestation.h"
-
 
 namespace llpp::core
 {
@@ -29,9 +27,13 @@ namespace llpp::core
         /**
          * @brief Starts the station by tping there, does not check logs.
          */
-        [[nodiscard]] bool begin(bool check_logs = false) override;
+        [[nodiscard]] bool begin(bool check_logs) override;
+
+        [[nodiscard]] TeleportFlags get_teleport_flags() const;
 
         bool is_default_ = false;
+        bool teleport_unsafe_ = false;
+
         asa::structures::Teleporter start_tp_;
     };
 }

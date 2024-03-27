@@ -32,7 +32,7 @@ namespace llpp::bots::paste
         return res;
     }
 
-    bool PasteStation::empty(asa::entities::DinoEnt& achatina)
+    bool PasteStation::empty(asa::entities::DinoEntity& achatina)
     {
         try { asa::entities::local_player->access(achatina); }
         catch (const asa::entities::EntityNotAccessed& e) {

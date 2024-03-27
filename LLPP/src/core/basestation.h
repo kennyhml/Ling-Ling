@@ -93,7 +93,7 @@ namespace llpp::core
          */
         [[nodiscard]] virtual bool begin(bool check_logs) = 0;
 
-        template <typename T>
+        template <typename T = std::chrono::seconds>
         T get_time_taken() const { return util::get_elapsed<T>(last_started_); }
 
         /**

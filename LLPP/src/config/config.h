@@ -4,6 +4,7 @@
 #include "managedvar.h"
 #include <filesystem>
 #include "../bots/drops/config.h"
+#include "../bots/metal/config.h"
 #include "../bots/parasaur/config.h"
 
 namespace llpp::config
@@ -248,4 +249,19 @@ namespace llpp::config
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::parasaur::ParasaurConfig>> configs;
     }
+
+    namespace bots::metal
+    {
+        inline const std::vector<std::string> BASE{"bots", "metal"};
+
+        inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
+        inline std::unordered_map<std::string, ManagedVar<
+                                      llpp::bots::metal::MetalManagerConfig>> configs;
+
+
+    }
+
+
 }

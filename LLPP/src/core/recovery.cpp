@@ -54,8 +54,6 @@ namespace llpp::core
         Sleep(1000);
         asa::interfaces::server_select->join_server(config::general::ark::server.get());
 
-        auto start = std::chrono::system_clock::now();
-
         while (true) {
             if (asa::entities::local_player->is_alive() || asa::interfaces::spawn_map->
                 is_open()) { break; }
