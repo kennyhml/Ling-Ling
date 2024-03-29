@@ -30,7 +30,7 @@ namespace llpp::core
     {
         last_started_ = std::chrono::system_clock::now();
 
-        try { asa::entities::local_player->teleport_to(start_tp_, get_teleport_flags()); }
+        try { asa::entities::local_player->teleport_to(start_tp_, flags_); }
         catch (const asa::interfaces::DestinationNotFound& e) {
             std::cerr << e.what() << std::endl;
             discord::get_bot()->message_create(
@@ -46,11 +46,16 @@ namespace llpp::core
         return true;
     }
 
-    TeleportFlags TeleportStation::get_teleport_flags() const
+    void TeleportStation::set_default_destination(const bool is_default)
     {
-        TeleportFlags flags = 0;
-        if (is_default_) { flags |= TeleportFlags_UseDefaultOption; }
-        if (teleport_unsafe_) { flags |= TeleportFlags_UnsafeLoad; }
-        return flags;
+        if (is_default) { flags_ |= TeleportFlags_UseDefaultOption; }
+        else { flags_ &= static_cast<TeleportFlags>(~TeleportFlags_UseDefaultOption); }
     }
+
+    void TeleportStation::set_unsafe_load(const bool unsafe_load)
+    {
+        if (unsafe_load) { flags_ |= TeleportFlags_UnsafeLoad; }
+        else { flags_ &= static_cast<TeleportFlags>(~TeleportFlags_UnsafeLoad); }
+    }
+
 }

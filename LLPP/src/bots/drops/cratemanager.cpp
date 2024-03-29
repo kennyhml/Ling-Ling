@@ -18,7 +18,7 @@ namespace llpp::bots::drops
         void set_group_cooldown(std::vector<TeleportCrateStation>& group)
         {
             for (auto& station : group) {
-                station.set_tp_is_default(false);
+                station.set_default_destination(false);
                 station.suspend_for(std::chrono::minutes(1));
             }
         }
@@ -192,7 +192,7 @@ namespace llpp::bots::drops
                     can_default_tp = false;
                     continue;
                 }
-                station.set_tp_is_default(can_default_tp);
+                station.set_default_destination(can_default_tp);
                 const auto result = station.complete();
                 set_group_rendered(teleport_stations_[i], true);
 

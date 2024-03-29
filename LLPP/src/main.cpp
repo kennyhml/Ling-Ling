@@ -13,6 +13,7 @@
 #include "core/taskmanager.h"
 #include <curl/curl.h>
 
+#include "bots/metal/MetalManager.h"
 #include "bots/metal/metalstation.h"
 #include "common/util.h"
 #include "discord/bot.h"
@@ -75,16 +76,11 @@ void llpp_main()
     }
     catch (const TerminatedError&) {}
 
-    auto anky = asa::entities::DinoEntity("ANKY");
-    asa::entities::local_player->mount(anky);
-    asa::entities::local_player->set_pitch(90);
+    llpp::bots::metal::MetalManagerConfig config("METAL", 0, 40, 30, false, nullptr);
+    llpp::bots::metal::MetalManager manager(&config);
 
-    for (int i = 0; i < 25; i++) {
-        auto station = llpp::bots::metal::MetalStation(llpp::util::add_num_to_prefix
-        ("METAL", i), std::chrono::minutes(120));
+    manager.run();
 
-        station.complete();
-    }
 
     return;
 

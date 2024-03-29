@@ -31,7 +31,7 @@ namespace llpp::bots::drops
             asa::entities::local_player->crouch();
         }
 
-        if (!is_default_) {
+        if (!(flags_ & TeleportFlags_UseDefaultOption)) {
             asa::entities::local_player->turn_up(60, std::chrono::milliseconds(500));
         }
 

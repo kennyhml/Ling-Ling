@@ -109,7 +109,7 @@ namespace llpp::bots::parasaur
         asa::core::sleep_for(std::chrono::seconds(start_load.get()));
 
         asa::entities::local_player->crouch();
-        next_tp_.set_tp_is_default(true);
+        next_tp_.set_default_destination(true);
         return next_tp_.complete().success;
     }
 }
