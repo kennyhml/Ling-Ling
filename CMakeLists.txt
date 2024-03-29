@@ -163,6 +163,10 @@ add_executable(LLPP WIN32
         LLPP/src/bots/metal/data.h
         LLPP/src/bots/metal/metalmanager.cpp
         LLPP/src/bots/metal/metalmanager.h
+        LLPP/src/bots/metal/unloadstation.cpp
+        LLPP/src/bots/metal/unloadstation.h
+        LLPP/src/bots/metal/collectstation.cpp
+        LLPP/src/bots/metal/collectstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

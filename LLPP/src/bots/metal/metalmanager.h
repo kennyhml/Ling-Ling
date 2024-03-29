@@ -1,8 +1,10 @@
 #pragma once
 #include <asapp/structures/dedicatedstorage.h>
 
+#include "collectstation.h"
 #include "config.h"
 #include "metalstation.h"
+#include "unloadstation.h"
 #include "../../core/bedstation.h"
 #include "../../core/istationmanager.h"
 
@@ -23,21 +25,16 @@ namespace llpp::bots::metal
     private:
         bool mount_anky();
 
-        void unload();
-
-        void collect();
-
         MetalManagerConfig* config_;
-
-        core::BedStation mount_bed_;
-        core::BedStation collect_bed_;
-
-        core::TeleportStation unload_tp_;
-        core::TeleportStation start_tp_;
 
         std::shared_ptr<asa::entities::DinoEntity> anky_;
 
+        core::BedStation mount_bed_;
+        core::TeleportStation start_tp_;
+
+        UnloadStation unload_station_;
+        CollectStation collect_station_;
+
         std::vector<std::unique_ptr<MetalStation>> stations_;
-        std::vector<asa::structures::DedicatedStorage> dedis_;
     };
 }

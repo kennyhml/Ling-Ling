@@ -17,7 +17,7 @@ namespace llpp::bots::metal
         /**
          * @brief Swings the amount of times previously determined by count_swings.
          */
-        void swing();
+        void harvest_metal();
 
         /**
          * @brief Returns whether logs should be checked considering the last time
@@ -34,7 +34,12 @@ namespace llpp::bots::metal
          *
          * @return The amount of times that we successfully hit ANY resource.
          */
-        int count_swings();
+        [[nodiscard]] int count_required_swings() const;
+
+        /**
+         * @brief Drops the undesired items from the anky.
+         */
+        void drop_trash();
 
         inline static std::chrono::system_clock::time_point last_logs_;
         inline static std::chrono::seconds log_cd_{60};

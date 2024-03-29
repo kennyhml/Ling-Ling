@@ -25,19 +25,19 @@ namespace llpp::bots::metal
             return {this, false, get_time_taken<>(), {}};
         }
         if (check_logs) { last_logs_ = std::chrono::system_clock::now(); }
-        else { asa::core::sleep_for(std::chrono::milliseconds(500)); }
+        else { asa::core::sleep_for(500ms); }
 
-        swing();
+        harvest_metal();
 
         while (!asa::interfaces::hud->can_default_teleport()) {
-            anky_->go_back(std::chrono::milliseconds(20));
-            asa::core::sleep_for(std::chrono::milliseconds(200));
+            anky_->go_back(20ms);
+            asa::core::sleep_for(200ms);
         }
         set_completed();
         return {this, true, get_time_taken<>(), {}};
     }
 
-    void MetalStation::swing()
+    void MetalStation::harvest_metal()
     {
         // load the amount of times to swing from our config if we havent yet
         if (!swing_times_) { swing_times_ = get_swings(get_name()); }
@@ -45,19 +45,21 @@ namespace llpp::bots::metal
         // been determined. Check it here and remember it for next time.
         // This should only have to be done once per station ever.
         if (!swing_times_) {
-            swing_times_ = count_swings();
+            swing_times_ = count_required_swings();
             set_swings(get_name(), swing_times_);
             return;
         }
         // Make sure we either press W or S on every swing for the default popup.
         for (int i = 0; i < swing_times_; i++) {
             anky_->primary_attack();
-            asa::core::sleep_for(std::chrono::milliseconds(2800));
-            anky_->go_back(std::chrono::milliseconds(20));
+            asa::core::sleep_for(2800ms);
+            anky_->go_back(20ms);
+
+            if (asa::interfaces::hud->is_mount_capped()) { drop_trash(); }
         }
     }
 
-    int MetalStation::count_swings()
+    int MetalStation::count_required_swings() const
     {
         static asa::window::Rect roi(21, 445, 113, 301);
         int hit_count = 0;
@@ -68,14 +70,21 @@ namespace llpp::bots::metal
             // Wait to harvest an item, give it up to 10 seconds in case of lag.
             if (!util::await([]() -> bool {
                 return asa::interfaces::HUD::item_added(roi);
-            }, std::chrono::seconds(10))) { break; }
+            }, 10s)) { break; }
 
             hit_count++;
             // wait for the received popup to disappear.
             util::await([]() -> bool { return !asa::interfaces::HUD::item_added(roi); },
-                        std::chrono::seconds(10));
-            anky_->go_back(std::chrono::milliseconds(20));
+                        10s);
+            anky_->go_back(20ms);
         }
         return hit_count;
+    }
+
+    void MetalStation::drop_trash()
+    {
+        anky_->open_inventory();
+        anky_->get_inventory()->drop_all("o"); // stone, obsidian, wood
+        anky_->get_inventory()->close();
     }
 }
