@@ -42,7 +42,6 @@ namespace llpp::auth
     void login()
     {
         get_app();
-        std::string user;
         std::string key;
 
         if (!config::user::name.get().empty() && !config::user::key.get().empty()) {

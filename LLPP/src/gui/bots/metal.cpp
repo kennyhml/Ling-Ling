@@ -4,6 +4,7 @@
 #include "../../config/config.h"
 #include "../custom/combo_dynamic.h"
 #include "../../../external/imgui/imgui_stdlib.h"
+#include "../../auth/auth.h"
 #include "../custom/clampedint.h"
 
 namespace llpp::gui
@@ -12,6 +13,11 @@ namespace llpp::gui
 
     namespace
     {
+        const std::vector<std::string> authorized{
+            "cole", "Sleepyv9000", "Sleepv4", "Sleepyv3", "Sleepyv2", "Sleepy", "Swav",
+            "Justin", "Dev", "lingling", "Shorty"
+        };
+
         int selected_manager = 0;
 
         bool add_dialog = false;
@@ -96,6 +102,8 @@ namespace llpp::gui
 
     void draw_metal_tab()
     {
+        if (!std::ranges::contains(authorized, auth::user)) { return; }
+
         const ImVec2 managers_dimensions(425 - state::maintabs_data.width,
                                          ImGui::GetWindowHeight() * 0.33f);
         begin_child("Farm Managers", managers_dimensions); {

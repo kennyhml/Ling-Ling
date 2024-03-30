@@ -6,6 +6,8 @@ namespace llpp::auth
 {
     using namespace KeyAuth;
 
+    inline std::string user;
+
     class ConnectionError : public std::exception
     {
     public:

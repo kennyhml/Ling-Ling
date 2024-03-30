@@ -18,6 +18,7 @@
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
+#include "discord/tribelogs/handler.h"
 
 static bool running = false;
 

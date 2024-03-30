@@ -21,13 +21,13 @@ namespace llpp::bots::metal
         asa::entities::local_player->set_pitch(90);
         asa::core::sleep_for(500ms);
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 12; j++) {
                 asa::entities::local_player->pick_up_all();
                 asa::entities::local_player->turn_right(360 / 12);
                 asa::entities::local_player->pick_up_all();
             }
-            asa::entities::local_player->turn_up(90 / 8);
+            asa::entities::local_player->turn_up(45 / 8);
         }
 
         asa::entities::local_player->set_pitch(30);
