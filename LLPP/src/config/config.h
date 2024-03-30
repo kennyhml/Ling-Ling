@@ -250,9 +250,9 @@ namespace llpp::config
                                       llpp::bots::parasaur::ParasaurConfig>> configs;
     }
 
-    namespace bots::metal
+    namespace bots::farm
     {
-        inline const std::vector<std::string> BASE{"bots", "metal"};
+        inline const std::vector<std::string> BASE{"bots", "farm"};
 
         inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
 

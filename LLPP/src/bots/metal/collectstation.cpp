@@ -40,6 +40,7 @@ namespace llpp::bots::metal
         asa::core::sleep_for(1s);
         asa::controls::press(asa::settings::use);
 
+        asa::entities::local_player->suicide();
         return {this, true, get_time_taken<>(), {}};
     }
 }

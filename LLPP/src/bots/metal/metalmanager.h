@@ -11,7 +11,7 @@
 
 namespace llpp::bots::metal
 {
-    class MetalManager final : core::IStationManager
+    class MetalManager final : public core::IStationManager
     {
     public:
         explicit MetalManager(MetalManagerConfig* t_config);

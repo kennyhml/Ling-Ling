@@ -1,8 +1,6 @@
-#include <asapp/core/state.h>
-#include <asapp/items/items.h>
-
 #include "metalmanager.h"
 #include "../../common/util.h"
+#include "../../config/config.h"
 
 namespace llpp::bots::metal
 {
@@ -36,6 +34,9 @@ namespace llpp::bots::metal
         for (const auto& station: stations_) {
             station->complete();
         }
+        // Save here already since the metal is now farmed.
+        config_->last_completed = util::time_t_now();
+        if (config_->on_changed) { config_->on_changed(); }
 
         // TODO: Add error handling here, e.g if unload fails act accordingly.
         unload_station_.complete();
@@ -43,24 +44,23 @@ namespace llpp::bots::metal
         start_tp_.complete();
         collect_station_.complete();
 
-        config_->last_completed = util::time_t_now();
-        if (config_->on_changed) { config_->on_changed(); }
         return true;
     }
 
     bool MetalManager::is_ready_to_run()
     {
-        if (!(mount_bed_.is_ready() && collect_station_.is_ready())) { return false; }
+        if (config_->disabled || config::bots::farm::disabled.get()
+            || !(mount_bed_.is_ready() && collect_station_.is_ready())) { return false; }
 
         return util::timedout(
             std::chrono::system_clock::from_time_t(config_->last_completed),
-            std::chrono::minutes(config_->interval_minutes_));
+            std::chrono::minutes(config_->interval));
     }
 
     std::chrono::minutes MetalManager::get_time_left_until_ready() const
     {
         const auto next = std::chrono::system_clock::from_time_t(config_->last_completed)
-                          + std::chrono::minutes(config_->interval_minutes_);
+                          + std::chrono::minutes(config_->interval);
 
         return util::get_time_left_until<std::chrono::minutes>(next);
     }

@@ -70,17 +70,9 @@ void llpp_main()
     inform_started();
 
     try {
-        // asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
+        asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_state();
     } catch (const TerminatedError&) {}
-
-    llpp::bots::metal::MetalManagerConfig config("METAL", 0, 40, 30, false, nullptr);
-    llpp::bots::metal::MetalManager manager(&config);
-
-    manager.run();
-
-
-    return;
 
     while (running) {
         try { taskmanager.execute_next(); } catch (asa::core::ShooterGameError& e) {

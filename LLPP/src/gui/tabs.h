@@ -49,11 +49,11 @@ namespace llpp::gui
         SAP,
         CRAFTING,
         PARASAUR,
-        METAL,
+        FARM,
     };
 
     inline std::vector BOT_TAB_NAMES{
-        "Paste", "Crates", "Crops", "Sap", "Crafting", "Parasaur", "Metal"
+        "Paste", "Crates", "Crops", "Sap", "Crafting", "Parasaur", "Farm"
     };
 
 }

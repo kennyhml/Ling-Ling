@@ -2,6 +2,8 @@
 
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
+#include <asapp/interfaces/spawnmap.h>
+
 #include "../bots/drops/cratemanager.h"
 #include "../bots/farm/farmbot.h"
 #include "../bots/kitchen/cropmanager.h"
@@ -11,6 +13,8 @@
 #include "../bots/common/suicidestation.h"
 #include "../config/config.h"
 #include "../bots/parasaur/parasaurmanager.h"
+#include "../bots/metal/metalmanager.h"
+
 
 namespace llpp::core
 {
@@ -25,6 +29,9 @@ namespace llpp::core
         {
             static asa::structures::SimpleBed generic_bed("generic bed");
 
+            // Player is currently dead.
+            if (asa::interfaces::spawn_map->is_open()) { return false; }
+
             const auto& p = asa::entities::local_player;
             if (p->is_out_of_food() || p->is_out_of_water() || p->is_broken_bones()) {
                 return true;
@@ -38,7 +45,7 @@ namespace llpp::core
             auto& info = p->get_inventory()->info;
             p->get_inventory()->open();
             const bool ret = info.get_health_level() < 0.7f || info.get_water_level() <
-                0.5f || info.get_food_level() < 0.5f;
+                             0.5f || info.get_food_level() < 0.5f;
             asa::entities::local_player->get_inventory()->close();
             asa::core::sleep_for(std::chrono::seconds(1));
             last_inv_check = std::chrono::system_clock::now();
@@ -62,10 +69,16 @@ namespace llpp::core
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
 
-        for (auto& [key, config] : config::bots::drops::configs) {
+        for (auto& [key, config]: config::bots::farm::configs) {
+            tasks_.emplace_back(
+                key, std::make_unique<metal::MetalManager>(config.get_ptr()));
+        }
+
+        for (auto& [key, config]: config::bots::drops::configs) {
             tasks_.emplace_back(
                 key, std::make_unique<drops::CrateManager>(config.get_ptr()));
         }
+
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());
         tasks_.emplace_back("SAP", std::make_unique<kitchen::SapManager>());

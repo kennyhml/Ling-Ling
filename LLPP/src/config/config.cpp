@@ -60,9 +60,9 @@ namespace llpp::config
                         llpp::bots::drops::CrateManagerConfig());
                 }
             }
-            for (auto& manager: bots::metal::managers.get()) {
-                if (!bots::metal::configs.contains(manager)) {
-                    auto& obj = bots::metal::configs[manager] = ManagedVar(
+            for (auto& manager: bots::farm::managers.get()) {
+                if (!bots::farm::configs.contains(manager)) {
+                    auto& obj = bots::farm::configs[manager] = ManagedVar(
                                     {"bots", "metal", manager}, save,
                                     llpp::bots::metal::MetalManagerConfig());
 

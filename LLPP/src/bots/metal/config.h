@@ -7,12 +7,13 @@ namespace llpp::bots::metal
     {
         std::string prefix;
 
-        int64_t last_completed;
+        int64_t last_completed{0};
 
-        uint32_t num_stations;
-        uint32_t interval_minutes_;
+        int32_t num_stations{0};
+        int32_t interval{120};
 
-        bool disabled;
+        bool disabled{false};
+        bool check_logs{true};
 
         std::function<void()> on_changed = nullptr;
     };
