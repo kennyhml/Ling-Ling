@@ -85,6 +85,7 @@ namespace llpp::bots::metal
     {
         anky_->open_inventory();
         anky_->get_inventory()->drop_all("o"); // stone, obsidian, wood
+        anky_->get_inventory()->drop_all("f"); // flint
         anky_->get_inventory()->close();
     }
 }

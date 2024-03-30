@@ -23,15 +23,13 @@ namespace llpp::config
             const auto path = get_appdata_path() / "llpp\\config\\config.json";
 
             std::cout << "[+] Verifying config exists at " << path << "... ";
-            if (exists(path)) { std::cout << "Done.\n"; }
-            else {
+            if (exists(path)) { std::cout << "Done.\n"; } else {
                 std::cout << "\n\t[-] Configuration files not found, creating... ";
                 create_directories(path.parent_path());
                 std::ofstream f(path);
                 if (!f.is_open()) {
                     std::cerr << "\n\t[!] Failed to create the config files\n";
-                }
-                else {
+                } else {
                     f << std::setw(4) << nlohmann::ordered_json::parse(required_data);
                     std::cout << "Done.\n";
                     f.close();
@@ -55,29 +53,29 @@ namespace llpp::config
 
         if (!has_loaded_dynamic_maps) {
             has_loaded_dynamic_maps = true;
-            for (auto& manager : bots::drops::managers.get()) {
+            for (auto& manager: bots::drops::managers.get()) {
                 if (!bots::drops::configs.contains(manager)) {
                     bots::drops::configs[manager] = ManagedVar(
                         {"bots", "drops", manager}, save,
                         llpp::bots::drops::CrateManagerConfig());
                 }
             }
-            for (auto& manager : bots::metal::managers.get()) {
+            for (auto& manager: bots::metal::managers.get()) {
                 if (!bots::metal::configs.contains(manager)) {
-                    bots::metal::configs[manager] = ManagedVar(
-                        {"bots", "metal", manager}, save,
-                        llpp::bots::metal::MetalManagerConfig());
+                    auto& obj = bots::metal::configs[manager] = ManagedVar(
+                                    {"bots", "metal", manager}, save,
+                                    llpp::bots::metal::MetalManagerConfig());
+
+                    obj.get_ptr()->on_changed = [&obj]() { return obj.save(); };
                 }
             }
 
-            for (auto& station : bots::parasaur::stations.get()) {
+            for (auto& station: bots::parasaur::stations.get()) {
                 if (!bots::parasaur::configs.contains(station)) {
                     auto& obj = bots::parasaur::configs[station] = ManagedVar(
-                        {"bots", "parasaur", station}, save,
-                        llpp::bots::parasaur::ParasaurConfig());
-                    bots::parasaur::configs[station].get_ptr()->on_changed = [&obj]() {
-                        return obj.save();
-                    };
+                                    {"bots", "parasaur", station}, save,
+                                    llpp::bots::parasaur::ParasaurConfig());
+                    obj.get_ptr()->on_changed = [&obj]() { return obj.save(); };
                 }
             }
         }

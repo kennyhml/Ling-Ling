@@ -62,8 +62,7 @@ void llpp_main()
         llpp::discord::init();
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
-    }
-    catch (const llpp::config::BadConfigurationError& e) {
+    } catch (const llpp::config::BadConfigurationError& e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
@@ -73,8 +72,7 @@ void llpp_main()
     try {
         // asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_state();
-    }
-    catch (const TerminatedError&) {}
+    } catch (const TerminatedError&) {}
 
     llpp::bots::metal::MetalManagerConfig config("METAL", 0, 40, 30, false, nullptr);
     llpp::bots::metal::MetalManager manager(&config);
@@ -85,8 +83,7 @@ void llpp_main()
     return;
 
     while (running) {
-        try { taskmanager.execute_next(); }
-        catch (asa::core::ShooterGameError& e) {
+        try { taskmanager.execute_next(); } catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
         } catch (const TerminatedError&) { break; } catch (const std::exception& e) {

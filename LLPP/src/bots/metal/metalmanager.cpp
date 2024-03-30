@@ -31,16 +31,20 @@ namespace llpp::bots::metal
         if (!mount_anky()) {
             // Make sure we suicide, we wont be able to use the bed below the anky.
             asa::entities::local_player->suicide();
-            return true;
+            return false;
         }
-        for (const auto& station : stations_) {
+        for (const auto& station: stations_) {
             station->complete();
         }
 
         // TODO: Add error handling here, e.g if unload fails act accordingly.
         unload_station_.complete();
+        start_tp_.set_default_destination(true);
         start_tp_.complete();
         collect_station_.complete();
+
+        config_->last_completed = util::time_t_now();
+        if (config_->on_changed) { config_->on_changed(); }
         return true;
     }
 
@@ -56,7 +60,7 @@ namespace llpp::bots::metal
     std::chrono::minutes MetalManager::get_time_left_until_ready() const
     {
         const auto next = std::chrono::system_clock::from_time_t(config_->last_completed)
-            + std::chrono::minutes(config_->interval_minutes_);
+                          + std::chrono::minutes(config_->interval_minutes_);
 
         return util::get_time_left_until<std::chrono::minutes>(next);
     }
