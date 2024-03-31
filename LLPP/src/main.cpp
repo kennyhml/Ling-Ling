@@ -21,6 +21,7 @@
 #include "discord/tribelogs/handler.h"
 
 static bool running = false;
+static bool paused = false;
 
 class TerminatedError : public std::exception
 {
@@ -28,7 +29,7 @@ public:
     using exception::exception;
 };
 
-void check_terminated() { if (!running) { throw TerminatedError(); } }
+void check_terminated() { while(running && paused) { asa::core::sleep_for(10ms); } if (!running) { throw TerminatedError(); } }
 
 #include <opencv2/core/utils/logger.hpp>
 
@@ -139,7 +140,18 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
 
         if ((GetAsyncKeyState(VK_F1) & 0x1) && !running) {
             running = true;
+            paused = false;
             std::thread(llpp_main).detach();
+        }
+
+        if ((GetAsyncKeyState(VK_F5) & 0x1) && running) {
+            if(!paused) {
+                std::cout << "[+] Pause signal sent, please give it a few seconds...\n";
+                paused = true;
+            } else {
+                std::cout << "[+] Unpause signal sent, please give it a few seconds...\n";
+                paused = false;
+            }
         }
 
         if ((GetAsyncKeyState(VK_F3) & 0x1) && running) {
