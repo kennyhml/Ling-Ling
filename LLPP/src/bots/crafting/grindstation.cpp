@@ -1,4 +1,6 @@
 #include "grindstation.h"
+
+#include <iostream>
 #include <asapp/core/state.h>
 #include <asapp/items/items.h>
 #include "embeds.h"

@@ -114,10 +114,6 @@ namespace llpp::discord
                 const auto& next = events[i + 1];
                 if (next.type == TribeLogMessage::TRIBE_DINO_KILLED &&
                     next.timestamp == events[i].timestamp) {
-                    dpp::message msg(std::format(
-                        "Hey stupid bitch, this is probably your fault.\n`{}`",
-                        events[i].content));
-                    get_bot()->direct_message_create(287586791144554496, msg);
                     bad.emplace(i + 1);
                 } else {
                     ret.push_back(events[i]);

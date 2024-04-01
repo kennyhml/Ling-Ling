@@ -30,7 +30,7 @@ namespace llpp::bots::metal
         harvest_metal();
 
         while (!asa::interfaces::hud->can_default_teleport()) {
-            anky_->go_back(20ms);
+            anky_->go_back(200ms);
             asa::core::sleep_for(200ms);
         }
         set_completed();
@@ -53,7 +53,7 @@ namespace llpp::bots::metal
         for (int i = 0; i < swing_times_; i++) {
             anky_->primary_attack();
             asa::core::sleep_for(2800ms);
-            anky_->go_back(20ms);
+            anky_->go_back(200ms);
 
             if (asa::interfaces::hud->is_mount_capped()) { drop_trash(); }
         }
@@ -76,16 +76,18 @@ namespace llpp::bots::metal
             // wait for the received popup to disappear.
             util::await([]() -> bool { return !asa::interfaces::HUD::item_added(roi); },
                         10s);
-            anky_->go_back(20ms);
+            if (asa::interfaces::hud->is_mount_capped()) { drop_trash(); }
+            anky_->go_back(200ms);
         }
         return hit_count;
     }
 
-    void MetalStation::drop_trash()
+    void MetalStation::drop_trash() const
     {
         anky_->open_inventory();
         anky_->get_inventory()->drop_all("o"); // stone, obsidian, wood
         anky_->get_inventory()->drop_all("f"); // flint
         anky_->get_inventory()->close();
+        asa::core::sleep_for(1s);
     }
 }

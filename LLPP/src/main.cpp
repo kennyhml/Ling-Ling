@@ -19,6 +19,8 @@
 #include "discord/bot.h"
 #include "discord/embeds.h"
 #include "discord/tribelogs/handler.h"
+#include <asapp/interfaces/dinoinfo.h>
+#include <asapp/items/items.h>
 
 static bool running = false;
 

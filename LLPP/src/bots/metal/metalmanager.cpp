@@ -1,4 +1,10 @@
 #include "metalmanager.h"
+
+#include <iostream>
+#include <asapp/core/state.h>
+#include <asapp/interfaces/console.h>
+#include <asapp/items/items.h>
+
 #include "../../common/util.h"
 #include "../../config/config.h"
 
@@ -25,7 +31,6 @@ namespace llpp::bots::metal
     bool MetalManager::run()
     {
         if (!is_ready_to_run()) { return false; }
-
         if (!mount_anky()) {
             // Make sure we suicide, we wont be able to use the bed below the anky.
             asa::entities::local_player->suicide();
@@ -43,7 +48,6 @@ namespace llpp::bots::metal
         start_tp_.set_default_destination(true);
         start_tp_.complete();
         collect_station_.complete();
-
         return true;
     }
 
@@ -68,10 +72,18 @@ namespace llpp::bots::metal
     bool MetalManager::mount_anky()
     {
         if (!mount_bed_.complete().success) { return false; }
-        asa::entities::local_player->turn_up(90, 1s);
 
+        asa::interfaces::console->execute("reconnect");
+        util::await([]() -> bool {
+            return asa::entities::local_player->is_in_connect_screen();
+        }, 1min);
+
+        util::await([this]() -> bool {
+            return asa::entities::local_player->can_ride(*anky_);
+        }, 30s);
         asa::entities::local_player->mount(*anky_);
         asa::entities::local_player->set_pitch(90);
+        asa::entities::local_player->turn_left();
         return true;
     }
 }

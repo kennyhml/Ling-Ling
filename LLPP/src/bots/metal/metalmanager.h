@@ -1,12 +1,12 @@
 #pragma once
-#include <asapp/structures/dedicatedstorage.h>
-
 #include "collectstation.h"
 #include "config.h"
 #include "metalstation.h"
 #include "unloadstation.h"
 #include "../../core/bedstation.h"
 #include "../../core/istationmanager.h"
+#include "../common/renderstation.h"
+#include <asapp/structures/dedicatedstorage.h>
 
 
 namespace llpp::bots::metal

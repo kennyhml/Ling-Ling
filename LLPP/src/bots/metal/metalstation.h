@@ -39,7 +39,7 @@ namespace llpp::bots::metal
         /**
          * @brief Drops the undesired items from the anky.
          */
-        void drop_trash();
+        void drop_trash() const;
 
         inline static std::chrono::system_clock::time_point last_logs_;
         inline static std::chrono::seconds log_cd_{60};
