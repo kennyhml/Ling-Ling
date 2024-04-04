@@ -131,6 +131,7 @@ namespace llpp::config
 
             if (!curr.contains(k)) { set(default_); }
             value_.prefix = curr[k].value("prefix", default_.prefix);
+            value_.type = curr[k].value("type", default_.type);
             value_.interval = curr[k].value("interval", default_.interval);
             value_.num_stations = curr[k].value("num_stations", default_.num_stations);
             value_.last_completed = curr[k].value("last_completed",
@@ -208,6 +209,7 @@ namespace llpp::config
         const std::string k = path_.back();
 
         curr[k]["prefix"] = value_.prefix;
+        curr[k]["type"] = value_.type;
         curr[k]["interval"] = value_.interval;
         curr[k]["num_stations"] = value_.num_stations;
         curr[k]["last_completed"] = value_.last_completed;

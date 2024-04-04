@@ -20,11 +20,13 @@ namespace llpp::bots::farm
 
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
+        void unload();
+
+
     private:
 
         void get_chainsaw() const;
 
-        void unload();
 
         FarmConfig* config_;
 

@@ -1,4 +1,7 @@
-#include "metal.h"
+#include "farm.h"
+
+#include <set>
+
 #include "../common.h"
 #include "../state.h"
 #include "../../config/config.h"
@@ -23,6 +26,11 @@ namespace llpp::gui
         bool add_dialog = false;
         bool del_dialog = false;
         bool rename_dialog = false;
+
+        std::set<std::string> type_loaded_for;
+
+        int selected_type = 0;
+        const std::vector TYPES{"METAL", "OBSIDIAN", "WOOD"};
 
         auto const MANAGER_TOOLTIP =
                 "Create, remove or rename your Farm Managers here.\n"
@@ -98,6 +106,16 @@ namespace llpp::gui
             };
             return &configs[name];
         }
+
+        void load_type_index(const std::string& curr)
+        {
+            // not yet set, just use default (0)
+            if (curr.empty()) { return; }
+
+            if (const auto it = std::ranges::find(TYPES, curr); it != TYPES.end()) {
+                selected_type = static_cast<int>(std::distance(TYPES.begin(), it));
+            }
+        }
     }
 
     void draw_metal_tab()
@@ -149,18 +167,30 @@ namespace llpp::gui
                     active->save();
                 }
 
+                load_type_index(active->get_ptr()->type);
                 ImGui::SetCursorPos({10, 45});
-                ImGui::Text("Stations:");
+                ImGui::Text("Farm Type:");
                 ImGui::SetCursorPos({130, 42});
+                ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+
+                if (ImGui::Combo("##farm_type", &selected_type, TYPES.data(),
+                                 TYPES.size())) {
+                    active->get_ptr()->type = TYPES[selected_type];
+                    active->save();
+                }
+
+                ImGui::SetCursorPos({10, 76});
+                ImGui::Text("Stations:");
+                ImGui::SetCursorPos({130, 73});
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 if (custom::ClampedInputInt("##farm_stations",
                                             &active->get_ptr()->num_stations, 1, 200)) {
                     active->save();
                 }
 
-                ImGui::SetCursorPos({10, 76});
+                ImGui::SetCursorPos({10, 107});
                 ImGui::Text("Interval (min):");
-                ImGui::SetCursorPos({130, 73});
+                ImGui::SetCursorPos({130, 104});
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
                 if (custom::ClampedInputInt("##farm_interval",
                                             &active->get_ptr()->interval, 30, 300)) {

@@ -154,8 +154,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/drops/lootresult.h
         LLPP/src/bots/drops/checkmark_green.h
         LLPP/src/bots/parasaur/parasaur_station_result.h
-        LLPP/src/gui/bots/metal.cpp
-        LLPP/src/gui/bots/metal.h
+        LLPP/src/gui/bots/farm.cpp
+        LLPP/src/gui/bots/farm.h
         LLPP/src/bots/farm/common/config.h
         LLPP/src/bots/farm/metal/metalstation.cpp
         LLPP/src/bots/farm/metal/metalstation.h

@@ -50,7 +50,6 @@ namespace llpp::bots::farm
         anky_->get_inventory()->drop_all("f"); // flint
         anky_->get_inventory()->drop_all("ry"); // berries and crystal
         anky_->get_inventory()->drop_all("thatch");
-
         collect_station_.complete();
         return true;
     }

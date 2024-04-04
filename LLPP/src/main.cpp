@@ -5,6 +5,8 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/console.h>
 #include <asapp/interfaces/tribemanager.h>
+#include <asapp/items/items.h>
+
 #include "bots/farm/swingbot/commands.h"
 #include "auth/auth.h"
 #include "gui/gui.h"
@@ -12,6 +14,8 @@
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include <curl/curl.h>
+
+#include "bots/farm/wood/woodmanager.h"
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
@@ -26,7 +30,11 @@ public:
     using exception::exception;
 };
 
-void check_terminated() { while(running && paused) { asa::core::sleep_for(10ms); } if (!running) { throw TerminatedError(); } }
+void check_terminated()
+{
+    while (running && paused) { asa::core::sleep_for(10ms); }
+    if (!running) { throw TerminatedError(); }
+}
 
 #include <opencv2/core/utils/logger.hpp>
 
@@ -142,7 +150,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         }
 
         if ((GetAsyncKeyState(VK_F5) & 0x1) && running) {
-            if(!paused) {
+            if (!paused) {
                 std::cout << "[+] Pause signal sent, please give it a few seconds...\n";
                 paused = true;
             } else {

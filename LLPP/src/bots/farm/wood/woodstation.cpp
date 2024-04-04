@@ -20,7 +20,7 @@ namespace llpp::bots::farm
     core::StationResult WoodStation::complete()
     {
         set_default_destination(false);
-        if (!begin(true)) {
+        if (!begin(false)) {
             return {this, false, get_time_taken<>(), {}};
         }
         asa::core::sleep_for(1s);

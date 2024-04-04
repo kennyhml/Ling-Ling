@@ -63,7 +63,7 @@ namespace llpp::config
             for (auto& manager: bots::farm::managers.get()) {
                 if (!bots::farm::configs.contains(manager)) {
                     auto& obj = bots::farm::configs[manager] = ManagedVar(
-                                    {"bots", "metal", manager}, save,
+                                    {"bots", "farm", manager}, save,
                                     llpp::bots::farm::FarmConfig());
 
                     obj.get_ptr()->on_changed = [&obj]() { return obj.save(); };

@@ -26,7 +26,6 @@ namespace llpp::bots::farm
         // We dont need any cooldown on the metal stations because the manager
         // handles that part, the stations themselves have no cooldown as they use
         // teleporters, not beds.
-        constexpr std::chrono::minutes cd(0);
         for (int i = 0; i < config_->num_stations; i++) {
             const std::string name = util::add_num_to_prefix(config_->prefix, i + 1);
             stations_.push_back(std::make_unique<WoodStation>(name));
@@ -45,12 +44,18 @@ namespace llpp::bots::farm
             if (at_start) { get_chainsaw(); }
 
             const auto result = stations_[current_station]->complete();
-            if (result.success) { at_start = false; }
-            // The teleport either failed entirely, in which case we just skip the station
-            // or we are not blackweight yet, so while the station is done, there is no
-            // reason to unload just yet.
-            if ((!result.success || !asa::interfaces::hud->is_player_capped())
-                && current_station != stations_.size() - 1) {
+            const bool was_blackweight = asa::interfaces::hud->is_player_capped();
+
+            //The teleport either failed entirely, in which case we just skip the station
+            if (!result.success) {
+                current_station++;
+                continue;
+            }
+            at_start = false;
+
+            // We dont want to unload unless blackweighted, unless its the last
+            // station anyways, then its fine to unload.
+            if (!was_blackweight && current_station != stations_.size() - 1) {
                 current_station++;
                 continue;
             }
@@ -59,22 +64,29 @@ namespace llpp::bots::farm
             start_tp_.set_default_destination(true);
             start_tp_.complete();
             at_start = true;
-            current_station++;
+
+            // if this was the last station, exit now if we didnt get blackweighted
+            // on the previous tree (meaning its done)
+            if (current_station == stations_.size() - 1) {
+                current_station += !was_blackweight;
+            }
         }
         config_->last_completed = util::time_t_now();
         if (config_->on_changed) { config_->on_changed(); }
 
         // Put the chainsaw / gas away, we are done.
         asa::entities::local_player->access(fabricator_);
+        asa::entities::local_player->get_inventory()->drop_all("thatch");
+        asa::core::sleep_for(1s);
         asa::entities::local_player->get_inventory()->transfer_all();
         fabricator_.get_inventory()->close();
         asa::core::sleep_for(1s);
+        asa::entities::local_player->crouch();
         return true;
     }
 
     void WoodManager::get_chainsaw() const
     {
-        asa::entities::local_player->set_pitch(0);
         asa::entities::local_player->access(fabricator_);
 
         if (asa::entities::local_player->get_inventory()->find_item(
@@ -96,7 +108,7 @@ namespace llpp::bots::farm
 
         fabricator_.get_inventory()->select_slot(*saw);
         asa::controls::press(asa::settings::use);
-        asa::core::sleep_for(5s);
+        asa::core::sleep_for(3s);
         fabricator_.get_inventory()->take_slot(*saw);
         asa::core::sleep_for(1s);
 
@@ -139,8 +151,8 @@ namespace llpp::bots::farm
         asa::entities::local_player->turn_right(40);
         deposit();
 
-        asa::entities::local_player->set_pitch(0);
         asa::entities::local_player->set_yaw(0);
+        asa::entities::local_player->set_pitch(0);
     }
 
     bool WoodManager::is_ready_to_run()

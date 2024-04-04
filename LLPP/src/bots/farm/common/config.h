@@ -7,6 +7,7 @@ namespace llpp::bots::farm
     struct FarmConfig final
     {
         std::string prefix;
+        std::string type{"METAL"};
 
         int64_t last_completed{0};
 

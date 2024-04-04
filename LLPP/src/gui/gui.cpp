@@ -8,7 +8,7 @@
 #include "custom.h"
 #include "bots/parasaur.h"
 #include "bots/paste.h"
-#include "bots/metal.h"
+#include "bots/farm.h"
 #include "state.h"
 
 #include "../../external/imgui/imgui.h"

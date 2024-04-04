@@ -14,7 +14,7 @@
 #include "../config/config.h"
 #include "../bots/parasaur/parasaurmanager.h"
 #include "../bots/farm/metal/metalmanager.h"
-
+#include "../bots/farm/wood/woodmanager.h"
 
 namespace llpp::core
 {
@@ -70,8 +70,13 @@ namespace llpp::core
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
 
         for (auto& [key, config]: config::bots::farm::configs) {
-            tasks_.emplace_back(
-                key, std::make_unique<farm::MetalManager>(config.get_ptr()));
+            if (config.get_ptr()->type == "METAL") {
+                tasks_.emplace_back(
+                    key, std::make_unique<farm::MetalManager>(config.get_ptr()));
+            } else if (config.get_ptr()->type == "WOOD") {
+                tasks_.emplace_back(
+                    key, std::make_unique<farm::WoodManager>(config.get_ptr()));
+            }
         }
 
         for (auto& [key, config]: config::bots::drops::configs) {
