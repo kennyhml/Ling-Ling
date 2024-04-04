@@ -28,9 +28,9 @@ namespace llpp::gui
                 "Create, remove or rename your Farm Managers here.\n"
                 "A Farm Manager handles the completion of a group of farm teleporters.";
 
-        bots::metal::MetalManagerConfig get_default_config()
+        bots::farm::FarmConfig get_default_config()
         {
-            bots::metal::MetalManagerConfig _default;
+            bots::farm::FarmConfig _default;
             _default.prefix = "";
             _default.last_completed = 0;
             _default.num_stations = 1;
@@ -85,7 +85,7 @@ namespace llpp::gui
             configs.erase(old_name);
         }
 
-        config::ManagedVar<bots::metal::MetalManagerConfig>* get_active_manager()
+        config::ManagedVar<bots::farm::FarmConfig>* get_active_manager()
         {
             // No stations exist at all.
             if (managers.get_ref().empty()) { return nullptr; }

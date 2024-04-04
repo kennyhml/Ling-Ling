@@ -5,7 +5,7 @@
 #include <asapp/interfaces/spawnmap.h>
 
 #include "../bots/drops/cratemanager.h"
-#include "../bots/farm/farmbot.h"
+#include "../bots/farm/swingbot/farmbot.h"
 #include "../bots/kitchen/cropmanager.h"
 #include "../bots/kitchen/sapmanager.h"
 #include "../bots/paste/pastemanager.h"
@@ -13,7 +13,7 @@
 #include "../bots/common/suicidestation.h"
 #include "../config/config.h"
 #include "../bots/parasaur/parasaurmanager.h"
-#include "../bots/metal/metalmanager.h"
+#include "../bots/farm/metal/metalmanager.h"
 
 
 namespace llpp::core
@@ -71,7 +71,7 @@ namespace llpp::core
 
         for (auto& [key, config]: config::bots::farm::configs) {
             tasks_.emplace_back(
-                key, std::make_unique<metal::MetalManager>(config.get_ptr()));
+                key, std::make_unique<farm::MetalManager>(config.get_ptr()));
         }
 
         for (auto& [key, config]: config::bots::drops::configs) {

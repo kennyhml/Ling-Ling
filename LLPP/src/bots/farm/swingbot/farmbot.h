@@ -1,8 +1,7 @@
 #pragma once
 #include <asapp/entities/dinoentity.h>
-#include <asapp/structures/cavelootcrate.h>
 #include <asapp/structures/simplebed.h>
-#include "../../discord/bot.h"
+#include "../../../discord/bot.h"
 
 namespace llpp::bots::farm
 {

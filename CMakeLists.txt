@@ -42,10 +42,10 @@ add_executable(LLPP WIN32
         LLPP/src/bots/drops/embeds.h
         LLPP/src/bots/drops/cratestation.cpp
         LLPP/src/bots/drops/cratestation.h
-        LLPP/src/bots/farm/commands.cpp
-        LLPP/src/bots/farm/commands.h
-        LLPP/src/bots/farm/farmbot.cpp
-        LLPP/src/bots/farm/farmbot.h
+        LLPP/src/bots/farm/swingbot/commands.cpp
+        LLPP/src/bots/farm/swingbot/commands.h
+        LLPP/src/bots/farm/swingbot/farmbot.cpp
+        LLPP/src/bots/farm/swingbot/farmbot.h
         LLPP/src/bots/kitchen/cropmanager.cpp
         LLPP/src/bots/kitchen/cropmanager.h
         LLPP/src/bots/kitchen/cropstation.cpp
@@ -156,17 +156,23 @@ add_executable(LLPP WIN32
         LLPP/src/bots/parasaur/parasaur_station_result.h
         LLPP/src/gui/bots/metal.cpp
         LLPP/src/gui/bots/metal.h
-        LLPP/src/bots/metal/config.h
-        LLPP/src/bots/metal/metalstation.cpp
-        LLPP/src/bots/metal/metalstation.h
-        LLPP/src/bots/metal/data.cpp
-        LLPP/src/bots/metal/data.h
-        LLPP/src/bots/metal/metalmanager.cpp
-        LLPP/src/bots/metal/metalmanager.h
-        LLPP/src/bots/metal/unloadstation.cpp
-        LLPP/src/bots/metal/unloadstation.h
-        LLPP/src/bots/metal/collectstation.cpp
-        LLPP/src/bots/metal/collectstation.h
+        LLPP/src/bots/farm/common/config.h
+        LLPP/src/bots/farm/metal/metalstation.cpp
+        LLPP/src/bots/farm/metal/metalstation.h
+        LLPP/src/bots/farm/common/data.cpp
+        LLPP/src/bots/farm/common/data.h
+        LLPP/src/bots/farm/metal/metalmanager.cpp
+        LLPP/src/bots/farm/metal/metalmanager.h
+        LLPP/src/bots/farm/common/unloadstation.cpp
+        LLPP/src/bots/farm/common/unloadstation.h
+        LLPP/src/bots/farm/common/collectstation.cpp
+        LLPP/src/bots/farm/common/collectstation.h
+        LLPP/src/bots/farm/common/data.h
+        LLPP/src/bots/farm/common/config.h
+        LLPP/src/bots/farm/common/data.h
+        LLPP/src/bots/farm/common/unloadstation.h
+        LLPP/src/bots/farm/common/mountstation.cpp
+        LLPP/src/bots/farm/common/mountstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

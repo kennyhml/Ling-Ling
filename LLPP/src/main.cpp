@@ -5,22 +5,17 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/console.h>
 #include <asapp/interfaces/tribemanager.h>
-#include "bots/farm/commands.h"
+#include "bots/farm/swingbot/commands.h"
 #include "auth/auth.h"
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include <curl/curl.h>
-
-#include "bots/metal/MetalManager.h"
-#include "bots/metal/metalstation.h"
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/embeds.h"
-#include "discord/tribelogs/handler.h"
-#include <asapp/interfaces/dinoinfo.h>
-#include <asapp/items/items.h>
+
 
 static bool running = false;
 static bool paused = false;

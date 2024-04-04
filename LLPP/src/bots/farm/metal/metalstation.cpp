@@ -1,9 +1,9 @@
 #include "metalstation.h"
+#include "../common/data.h"
 #include <asapp/core/state.h>
 #include <asapp/interfaces/hud.h>
-#include "data.h"
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     MetalStation::MetalStation(std::string t_name, const std::chrono::minutes t_interval,
                                const bool t_is_first,
@@ -63,8 +63,9 @@ namespace llpp::bots::metal
     {
         static asa::window::Rect roi(21, 445, 113, 301);
         int hit_count = 0;
+        const auto start = std::chrono::system_clock::now();
 
-        while (true) {
+        while (!util::timedout(start, 1min)) {
             anky_->primary_attack();
 
             // Wait to harvest an item, give it up to 10 seconds in case of lag.

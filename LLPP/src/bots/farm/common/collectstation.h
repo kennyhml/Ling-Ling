@@ -1,8 +1,8 @@
 #pragma once
 #include <asapp/structures/dedicatedstorage.h>
-#include "../../core/bedstation.h"
+#include "../../../core/bedstation.h"
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     class CollectStation final : public core::BedStation
     {
@@ -10,7 +10,7 @@ namespace llpp::bots::metal
         explicit CollectStation(const std::string& t_name);
 
         /**
-         * @brief Completes the station by spawning there and collecting the metal.
+         * @brief Completes the station by spawning there and collecting the resources.
          *
          * @return The result of the station completion.
          */

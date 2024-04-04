@@ -4,7 +4,7 @@
 #include "managedvar.h"
 #include <filesystem>
 #include "../bots/drops/config.h"
-#include "../bots/metal/config.h"
+#include "../bots/farm/common/config.h"
 #include "../bots/parasaur/config.h"
 
 namespace llpp::config
@@ -258,7 +258,7 @@ namespace llpp::config
 
         inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
         inline std::unordered_map<std::string, ManagedVar<
-                                      llpp::bots::metal::MetalManagerConfig>> configs;
+                                      llpp::bots::farm::FarmConfig>> configs;
 
 
     }

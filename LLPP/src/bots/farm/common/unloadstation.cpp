@@ -2,7 +2,7 @@
 
 #include <asapp/core/state.h>
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     UnloadStation::UnloadStation(const std::string& t_name,
                                  std::shared_ptr<asa::entities::DinoEntity> t_anky)
@@ -16,12 +16,12 @@ namespace llpp::bots::metal
             return {this, false, get_time_taken<>(), {}};
         }
 
-        asa::core::sleep_for(10s);
+        asa::core::sleep_for(5s);
 
         // The clicking is needed to be able to popcorn after searching,
         // ideally we would add some sort of flag for this to asapp.
         anky_->open_inventory();
-        asa::core::sleep_for(500ms);
+        asa::core::sleep_for(1s);
         anky_->get_inventory()->search_bar.search_for("metal");
         asa::core::sleep_for(500ms);
 

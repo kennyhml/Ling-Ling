@@ -5,7 +5,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     namespace
     {

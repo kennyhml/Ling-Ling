@@ -4,7 +4,7 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/hud.h>
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     CollectStation::CollectStation(const std::string& t_name) : BedStation(
         t_name, std::chrono::minutes(5)) {}

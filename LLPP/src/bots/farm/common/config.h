@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
+#include <functional>
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
-    struct MetalManagerConfig final
+    struct FarmConfig final
     {
         std::string prefix;
 

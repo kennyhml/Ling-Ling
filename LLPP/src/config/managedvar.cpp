@@ -1,7 +1,7 @@
 #include "managedvar.h"
 #include "../bots/drops/config.h"
 #include "../bots/parasaur/config.h"
-#include "../bots/metal/config.h"
+#include "../bots/farm/common/config.h"
 
 
 #include <iostream>
@@ -120,7 +120,7 @@ namespace llpp::config
     }
 
     template<>
-    bots::metal::MetalManagerConfig ManagedVar<bots::metal::MetalManagerConfig>::get()
+    bots::farm::FarmConfig ManagedVar<bots::farm::FarmConfig>::get()
     {
         if (initial_loaded_) { return value_; }
         initial_loaded_ = true;
@@ -201,7 +201,7 @@ namespace llpp::config
     }
 
     template<>
-    void ManagedVar<bots::metal::MetalManagerConfig>::save()
+    void ManagedVar<bots::farm::FarmConfig>::save()
     {
         std::lock_guard<std::mutex> guard(save_mutex);
         nlohmann::ordered_json& curr = walk_json(get_data(), true);
@@ -259,7 +259,7 @@ namespace llpp::config
     template struct ManagedVar<std::vector<int> >;
     template struct ManagedVar<std::vector<const char*> >;
     template struct ManagedVar<bots::drops::CrateManagerConfig>;
-    template struct ManagedVar<bots::metal::MetalManagerConfig>;
+    template struct ManagedVar<bots::farm::FarmConfig>;
     template struct ManagedVar<bots::parasaur::ParasaurConfig>;
 
 

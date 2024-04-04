@@ -1,20 +1,17 @@
 #pragma once
-#include "collectstation.h"
-#include "config.h"
 #include "metalstation.h"
-#include "unloadstation.h"
-#include "../../core/bedstation.h"
-#include "../../core/istationmanager.h"
-#include "../common/renderstation.h"
-#include <asapp/structures/dedicatedstorage.h>
+#include "../common/config.h"
+#include "../common/collectstation.h"
+#include "../common/unloadstation.h"
+#include "../common/mountstation.h"
+#include "../../../core/istationmanager.h"
 
-
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     class MetalManager final : public core::IStationManager
     {
     public:
-        explicit MetalManager(MetalManagerConfig* t_config);
+        explicit MetalManager(FarmConfig* t_config);
 
         bool run() override;
 
@@ -23,17 +20,16 @@ namespace llpp::bots::metal
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
     private:
-        bool mount_anky();
-
-        MetalManagerConfig* config_;
+        FarmConfig* config_;
 
         std::shared_ptr<asa::entities::DinoEntity> anky_;
 
-        core::BedStation mount_bed_;
         core::TeleportStation start_tp_;
 
         UnloadStation unload_station_;
         CollectStation collect_station_;
+
+        farm::MountStation mount_station_;
 
         std::vector<std::unique_ptr<MetalStation>> stations_;
     };

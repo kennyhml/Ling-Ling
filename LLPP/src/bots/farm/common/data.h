@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
     [[nodiscard]] int get_swings(const std::string& for_station);
 

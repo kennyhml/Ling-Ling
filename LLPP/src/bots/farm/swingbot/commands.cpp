@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "../../discord/bot.h"
+#include "../../../discord/bot.h"
 #include "farmbot.h"
 
 namespace llpp::bots::farm

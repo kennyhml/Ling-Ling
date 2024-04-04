@@ -1,22 +1,19 @@
 #include "metalmanager.h"
-
-#include <iostream>
-#include <asapp/core/state.h>
+#include "../../../common/util.h"
+#include "../../../config/config.h"
 #include <asapp/interfaces/console.h>
-#include <asapp/items/items.h>
 
-#include "../../common/util.h"
-#include "../../config/config.h"
-
-namespace llpp::bots::metal
+namespace llpp::bots::farm
 {
-    MetalManager::MetalManager(MetalManagerConfig* t_config)
+    MetalManager::MetalManager(FarmConfig* t_config)
         : config_(t_config),
           anky_(std::make_shared<asa::entities::DinoEntity>(config_->prefix + "::ANKY")),
-          mount_bed_(config_->prefix + "::MOUNT", 5min),
           start_tp_(config_->prefix + "::START", 0min),
           unload_station_(config_->prefix + "::UNLOAD", anky_),
-          collect_station_(config_->prefix + "::COLLECT")
+          collect_station_(config_->prefix + "::COLLECT"),
+          mount_station_(config_->prefix + "::MOUNT", anky_,
+                         std::make_unique<RenderStation>(
+                             config_->prefix + "::RENDER::SRC", 30s, true))
     {
         // We dont need any cooldown on the metal stations because the manager
         // handles that part, the stations themselves have no cooldown as they use
@@ -31,7 +28,7 @@ namespace llpp::bots::metal
     bool MetalManager::run()
     {
         if (!is_ready_to_run()) { return false; }
-        if (!mount_anky()) {
+        if (!mount_station_.complete().success) {
             // Make sure we suicide, we wont be able to use the bed below the anky.
             asa::entities::local_player->suicide();
             return false;
@@ -47,6 +44,13 @@ namespace llpp::bots::metal
         unload_station_.complete();
         start_tp_.set_default_destination(true);
         start_tp_.complete();
+
+        anky_->open_inventory();
+        anky_->get_inventory()->drop_all("o"); // stone, obsidian, wood
+        anky_->get_inventory()->drop_all("f"); // flint
+        anky_->get_inventory()->drop_all("ry"); // berries and crystal
+        anky_->get_inventory()->drop_all("thatch");
+
         collect_station_.complete();
         return true;
     }
@@ -54,7 +58,9 @@ namespace llpp::bots::metal
     bool MetalManager::is_ready_to_run()
     {
         if (config_->disabled || config::bots::farm::disabled.get()
-            || !(mount_bed_.is_ready() && collect_station_.is_ready())) { return false; }
+            || !(mount_station_.is_ready() && collect_station_.is_ready())) {
+            return false;
+        }
 
         return util::timedout(
             std::chrono::system_clock::from_time_t(config_->last_completed),
@@ -67,23 +73,5 @@ namespace llpp::bots::metal
                           + std::chrono::minutes(config_->interval);
 
         return util::get_time_left_until<std::chrono::minutes>(next);
-    }
-
-    bool MetalManager::mount_anky()
-    {
-        if (!mount_bed_.complete().success) { return false; }
-
-        asa::interfaces::console->execute("reconnect");
-        util::await([]() -> bool {
-            return asa::entities::local_player->is_in_connect_screen();
-        }, 1min);
-
-        util::await([this]() -> bool {
-            return asa::entities::local_player->can_ride(*anky_);
-        }, 30s);
-        asa::entities::local_player->mount(*anky_);
-        asa::entities::local_player->set_pitch(90);
-        asa::entities::local_player->turn_left();
-        return true;
     }
 }
