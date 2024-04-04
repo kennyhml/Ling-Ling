@@ -1,4 +1,6 @@
 #include "woodstation.h"
+
+#include <asapp/core/state.h>
 #include <asapp/interfaces/hud.h>
 
 namespace llpp::bots::farm
@@ -21,16 +23,15 @@ namespace llpp::bots::farm
         if (!begin(true)) {
             return {this, false, get_time_taken<>(), {}};
         }
-
+        asa::core::sleep_for(1s);
         asa::entities::local_player->set_pitch(0);
-        bool any_harvested = false;
+        asa::core::sleep_for(1s);
 
         while (can_keep_harvesting()) {
-            any_harvested = true;
             asa::controls::mouse_down(asa::controls::LEFT);
         }
         asa::controls::mouse_up(asa::controls::LEFT);
 
-        return {this, true, get_time_taken<>(), {{"Wood", any_harvested}}};
+        return {this, true, get_time_taken<>(), {}};
     }
 }
