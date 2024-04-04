@@ -173,6 +173,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/farm/common/unloadstation.h
         LLPP/src/bots/farm/common/mountstation.cpp
         LLPP/src/bots/farm/common/mountstation.h
+        LLPP/src/bots/farm/wood/woodstation.cpp
+        LLPP/src/bots/farm/wood/woodstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
