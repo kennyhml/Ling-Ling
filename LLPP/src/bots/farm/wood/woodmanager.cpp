@@ -1,4 +1,7 @@
 #include "woodmanager.h"
+
+#include <iostream>
+
 #include "../../../common/util.h"
 #include "../../../config/config.h"
 #include <asapp/core/state.h>
@@ -14,6 +17,21 @@ namespace llpp::bots::farm
             asa::core::sleep_for(500ms);
             asa::controls::press(asa::settings::use);
             asa::core::sleep_for(500ms);
+        }
+
+        bool is_chainsaw_low_durability()
+        {
+            asa::entities::local_player->get_inventory()->open();
+            const auto slot = asa::entities::local_player->get_inventory()->find_item(
+                *asa::items::weapons::chainsaw);
+
+            float durability = 0.f;
+            if (slot->get_item_durability(durability)) {
+                std::cout << "Chainsaw dura: " << durability * 100 << "%" << std::endl;
+            } else { std::cerr << "Failed to check chainsaw durability." << std::endl; }
+            asa::entities::local_player->get_inventory()->close();
+            asa::core::sleep_for(1s);
+            return durability <= 0.4;
         }
     }
 
@@ -43,45 +61,40 @@ namespace llpp::bots::farm
         while (current_station < stations_.size()) {
             if (at_start) { get_chainsaw(); }
 
-            const auto result = stations_[current_station]->complete();
-            const bool was_blackweight = asa::interfaces::hud->is_player_capped();
-
-            //The teleport either failed entirely, in which case we just skip the station
-            if (!result.success) {
+            // Station was not teleported to, just skip it entirely and go next.
+            if (!stations_[current_station]->complete().success) {
                 current_station++;
                 continue;
             }
             at_start = false;
+            // Whether we are blackweighted or not lets us determine if we need
+            // to go back to the station we were just at, if we finished without being
+            // capped on wood then that means the tree was fully harvested
+            const bool was_blackweight = asa::interfaces::hud->is_player_capped();
 
-            // We dont want to unload unless blackweighted, unless its the last
+            // We dont want to unload unless blackweighted, UNLESS its the last
             // station anyways, then its fine to unload.
             if (!was_blackweight && current_station != stations_.size() - 1) {
                 current_station++;
                 continue;
             }
-
             unload();
-            start_tp_.set_default_destination(true);
-            start_tp_.complete();
-            at_start = true;
-
-            // if this was the last station, exit now if we didnt get blackweighted
-            // on the previous tree (meaning its done)
+            // To avoid repairing the chainsaw every single time at like ~70% of its dura
+            // check if its below 40% and repair only then.
+            if (is_chainsaw_low_durability()) {
+                start_tp_.set_default_destination(true);
+                start_tp_.complete();
+                at_start = true;
+            }
+            // Make sure to handle the case where we did not cap at the last station but
+            // also have no more stations to run.
             if (current_station == stations_.size() - 1) {
                 current_station += !was_blackweight;
             }
         }
         config_->last_completed = util::time_t_now();
         if (config_->on_changed) { config_->on_changed(); }
-
-        // Put the chainsaw / gas away, we are done.
-        asa::entities::local_player->access(fabricator_);
-        asa::entities::local_player->get_inventory()->drop_all("thatch");
-        asa::core::sleep_for(1s);
-        asa::entities::local_player->get_inventory()->transfer_all();
-        fabricator_.get_inventory()->close();
-        asa::core::sleep_for(1s);
-        asa::entities::local_player->crouch();
+        deposit_chainsaw();
         return true;
     }
 
@@ -127,6 +140,7 @@ namespace llpp::bots::farm
         }
     }
 
+
     void WoodManager::unload()
     {
         unload_tp.set_default_destination(true);
@@ -153,6 +167,19 @@ namespace llpp::bots::farm
 
         asa::entities::local_player->set_yaw(0);
         asa::entities::local_player->set_pitch(0);
+    }
+
+    void WoodManager::deposit_chainsaw() const
+    {
+        asa::entities::local_player->access(fabricator_);
+        asa::entities::local_player->get_inventory()->drop_all("thatch");
+        asa::core::sleep_for(1s);
+        asa::entities::local_player->get_inventory()->transfer_all();
+        fabricator_.get_inventory()->close();
+        asa::core::sleep_for(1s);
+
+        // crouch so that we can access the bed below the tp
+        asa::entities::local_player->crouch();
     }
 
     bool WoodManager::is_ready_to_run()

@@ -22,11 +22,10 @@ namespace llpp::bots::farm
 
         void unload();
 
-
     private:
-
         void get_chainsaw() const;
 
+        void deposit_chainsaw() const;
 
         FarmConfig* config_;
 
