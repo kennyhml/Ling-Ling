@@ -25,6 +25,7 @@ namespace llpp::bots::farm
         std::shared_ptr<asa::entities::DinoEntity> anky_;
 
         core::TeleportStation start_tp_;
+        core::TeleportStation load_tp_;
 
         UnloadStation unload_station_;
         CollectStation collect_station_;

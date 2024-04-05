@@ -1,4 +1,7 @@
 #include "metalmanager.h"
+
+#include <asapp/core/state.h>
+
 #include "../../../common/util.h"
 #include "../../../config/config.h"
 #include <asapp/interfaces/console.h>
@@ -9,6 +12,7 @@ namespace llpp::bots::farm
         : config_(t_config),
           anky_(std::make_shared<asa::entities::DinoEntity>(config_->prefix + "::ANKY")),
           start_tp_(config_->prefix + "::START", 0min),
+          load_tp_(config_->prefix + "::LOAD", 0min),
           unload_station_(config_->prefix + "::UNLOAD", anky_),
           collect_station_(config_->prefix + "::COLLECT"),
           mount_station_(config_->prefix + "::MOUNT", anky_,
@@ -33,9 +37,15 @@ namespace llpp::bots::farm
             asa::entities::local_player->suicide();
             return false;
         }
+
+        load_tp_.set_default_destination(true);
+        load_tp_.complete();
+        asa::core::sleep_for(15s);
+
         for (const auto& station: stations_) {
             station->complete();
         }
+
         // Save here already since the metal is now farmed.
         config_->last_completed = util::time_t_now();
         if (config_->on_changed) { config_->on_changed(); }
