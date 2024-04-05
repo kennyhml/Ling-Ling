@@ -14,9 +14,9 @@ namespace llpp::bots::farm
     {
         void deposit()
         {
-            asa::core::sleep_for(500ms);
+            asa::core::sleep_for(300ms);
             asa::controls::press(asa::settings::use);
-            asa::core::sleep_for(500ms);
+            asa::core::sleep_for(300ms);
         }
 
         bool is_chainsaw_low_durability()

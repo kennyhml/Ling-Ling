@@ -17,6 +17,23 @@ namespace llpp::bots::farm
         core::StationResult complete() override;
 
     private:
+        /**
+         * @brief Gets the whip from the vault, if broken it will be repaired by pulling
+         * from nearby dedis while attempting to equip it.
+         */
+        void get_whip() const;
+
+        /**
+         * @brief Puts the whip back into the vault.
+         */
+        void put_away_whip() const;
+
+        /**
+         * @brief Deposits the collected metal into the dedis.
+         */
+        void deposit() const;
+
+        asa::structures::Container vault_;
         std::vector<asa::structures::DedicatedStorage> dedis_;
     };
 }
