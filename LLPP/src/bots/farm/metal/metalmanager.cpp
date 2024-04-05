@@ -15,9 +15,9 @@ namespace llpp::bots::farm
           load_tp_(config_->prefix + "::LOAD", 0min),
           unload_station_(config_->prefix + "::UNLOAD", anky_),
           collect_station_(config_->prefix + "::COLLECT"),
-          mount_station_(config_->prefix + "::MOUNT", anky_,
-                         std::make_unique<RenderStation>(
-                             config_->prefix + "::RENDER::SRC", 30s, true))
+          mount_station_(config_->prefix + "::MOUNT", anky_, nullptr,
+                         std::make_unique<core::BedStation>(
+                             config_->prefix + "::REPOSITION", 0min))
     {
         // We dont need any cooldown on the metal stations because the manager
         // handles that part, the stations themselves have no cooldown as they use
@@ -54,12 +54,6 @@ namespace llpp::bots::farm
         unload_station_.complete();
         start_tp_.set_default_destination(true);
         start_tp_.complete();
-
-        anky_->open_inventory();
-        anky_->get_inventory()->drop_all("o"); // stone, obsidian, wood
-        anky_->get_inventory()->drop_all("f"); // flint
-        anky_->get_inventory()->drop_all("ry"); // berries and crystal
-        anky_->get_inventory()->drop_all("thatch");
         collect_station_.complete();
         return true;
     }

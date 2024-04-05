@@ -55,6 +55,8 @@ namespace llpp::bots::farm
         if (!is_ready_to_run()) { return false; }
 
         start_bed_.complete();
+        start_tp_.set_default_destination(true);
+
         bool at_start = true;
         int current_station = 0;
 
@@ -82,7 +84,6 @@ namespace llpp::bots::farm
             // To avoid repairing the chainsaw every single time at like ~70% of its dura
             // check if its below 40% and repair only then.
             if (is_chainsaw_low_durability()) {
-                start_tp_.set_default_destination(true);
                 start_tp_.complete();
                 at_start = true;
             }
@@ -94,6 +95,7 @@ namespace llpp::bots::farm
         }
         config_->last_completed = util::time_t_now();
         if (config_->on_changed) { config_->on_changed(); }
+        if (!at_start) { start_tp_.complete(); }
         deposit_chainsaw();
         return true;
     }

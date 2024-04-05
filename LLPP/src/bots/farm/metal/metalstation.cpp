@@ -24,14 +24,15 @@ namespace llpp::bots::farm
             set_completed();
             return {this, false, get_time_taken<>(), {}};
         }
-        if (check_logs) { last_logs_ = std::chrono::system_clock::now(); }
-        else { asa::core::sleep_for(500ms); }
+        if (check_logs) { last_logs_ = std::chrono::system_clock::now(); } else {
+            asa::core::sleep_for(500ms);
+        }
 
         harvest_metal();
 
         while (!asa::interfaces::hud->can_default_teleport()) {
             anky_->go_back(200ms);
-            asa::core::sleep_for(200ms);
+            util::await([] { return asa::interfaces::hud->can_default_teleport(); }, 5s);
         }
         set_completed();
         return {this, true, get_time_taken<>(), {}};

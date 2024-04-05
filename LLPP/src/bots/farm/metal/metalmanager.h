@@ -30,7 +30,7 @@ namespace llpp::bots::farm
         UnloadStation unload_station_;
         CollectStation collect_station_;
 
-        farm::MountStation mount_station_;
+        MountStation mount_station_;
 
         std::vector<std::unique_ptr<MetalStation>> stations_;
     };

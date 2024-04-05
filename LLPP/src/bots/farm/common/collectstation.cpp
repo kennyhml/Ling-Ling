@@ -21,8 +21,6 @@ namespace llpp::bots::farm
 
     core::StationResult CollectStation::complete()
     {
-        static asa::window::Rect roi(21, 445, 113, 301);
-
         asa::entities::local_player->suicide();
 
         if (!begin(false)) {
@@ -31,13 +29,14 @@ namespace llpp::bots::farm
         }
         // This is most likely inside our main crafting area, so lets give it some
         // time to load properly
-        asa::core::sleep_for(10s);
+        asa::core::sleep_for(3s);
         get_whip();
 
         // Look down to whip the metal up, didnt really seem to matter too much
         // as far as I can tell but just feels most natural.
         asa::entities::local_player->set_pitch(90);
         asa::entities::local_player->primary_attack();
+        asa::core::sleep_for(1s);
         asa::entities::local_player->set_pitch(0);
 
         put_away_whip();
@@ -68,6 +67,7 @@ namespace llpp::bots::farm
             asa::controls::press(asa::settings::use);
             asa::core::sleep_for(1s);
         }
+        asa::core::sleep_for(1s);
     }
 
     void CollectStation::put_away_whip() const
