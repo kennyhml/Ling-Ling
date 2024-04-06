@@ -53,7 +53,7 @@ namespace llpp::gui
     };
 
     inline std::vector BOT_TAB_NAMES{
-        "Paste", "Crates", "Crops", "Sap", "Crafting", "Parasaur", "Farm"
+        "Paste", "Crates", "Crops", "Sap", "Processing", "Parasaur", "Farm"
     };
 
 }

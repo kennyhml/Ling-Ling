@@ -87,6 +87,7 @@ void llpp_main()
             llpp::core::recover();
         } catch (const TerminatedError&) { break; } catch (const std::exception& e) {
             inform_crashed(e, taskmanager.get_previous_task()->get_name());
+            std::cout << e.what() << std::endl;
             running = false;
         }
     }
@@ -98,24 +99,18 @@ void llpp_main()
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
                    _In_ PSTR cmd_line, _In_ int cmd_show)
 {
-    // Then the logging level can be set with the following function
     cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
     if (!AllocConsole()) { return false; }
 
     FILE* pFile;
     if (freopen_s(&pFile, "CONIN$", "r", stdin) != 0) {
-        // Handle error, if any
         return false;
     }
-
     if (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0) {
-        // Handle error, if any
         return false;
     }
-
     if (freopen_s(&pFile, "CONOUT$", "w", stderr) != 0) {
-        // Handle error, if any
         return false;
     }
 

@@ -249,9 +249,16 @@ namespace llpp::config
         inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
         inline std::unordered_map<std::string, ManagedVar<
                                       llpp::bots::farm::FarmConfig>> configs;
-
-
     }
 
+    namespace bots::forges
+    {
+        inline const std::vector<std::string> BASE{"bots", "forges"};
 
+        inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+
+        inline ManagedVar<int> metal_loadups(BASE, "metal_loadups", save, 1);
+        inline ManagedVar<int> wood_loadups(BASE, "wood_loadups", save, 1);
+    }
 }

@@ -15,6 +15,7 @@
 #include "../bots/parasaur/parasaurmanager.h"
 #include "../bots/farm/metal/metalmanager.h"
 #include "../bots/farm/wood/woodmanager.h"
+#include "../bots/forges/forgemanager.h"
 
 namespace llpp::core
 {
@@ -84,6 +85,7 @@ namespace llpp::core
                 key, std::make_unique<drops::CrateManager>(config.get_ptr()));
         }
 
+        tasks_.emplace_back("FORGES", std::make_unique<forges::ForgeManager>());
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());
         tasks_.emplace_back("SAP", std::make_unique<kitchen::SapManager>());

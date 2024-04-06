@@ -8,6 +8,7 @@
 
 #include "util.h"
 #include "common.h"
+#include "custom/clampedint.h"
 
 namespace llpp::gui
 {
@@ -140,8 +141,7 @@ namespace llpp::gui
 
     void draw_general_ark_tabs()
     {
-        begin_child("Game Settings", ImVec2(300, ImGui::GetWindowHeight()));
-        {
+        begin_child("Game Settings", ImVec2(300, ImGui::GetWindowHeight())); {
             // CONFIG FOR THE ARK ROOT DIRECTORY
             ImGui::SetCursorPos({10, 14});
             ImGui::TextColored(path_color, "Directory:");
@@ -195,8 +195,7 @@ namespace llpp::gui
 
     void draw_general_bot_tabs()
     {
-        begin_child("Environment", ImVec2(375, ImGui::GetWindowHeight() * 0.5));
-        {
+        begin_child("Environment", ImVec2(375, ImGui::GetWindowHeight() * 0.5)); {
             // CONFIG FOR THE ARK ROOT DIRECTORY
             ImGui::SetCursorPos({10, 14});
             ImGui::TextColored(assets_path_col, "Assets directory:");
@@ -223,9 +222,10 @@ namespace llpp::gui
                 ImGui::SetTooltip("Select the directory.");
             }
             bool valid = std::filesystem::exists(config::general::bot::assets_dir.get())
-                || exists(
-                    std::filesystem::current_path() / config::general::bot::assets_dir.
-                    get());
+                         || exists(
+                             std::filesystem::current_path() /
+                             config::general::bot::assets_dir.
+                             get());
             assets_path_col = valid
                                   ? ImVec4(0.f, 1.f, 0.f, 1.f)
                                   : ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -245,8 +245,8 @@ namespace llpp::gui
                 ImGui::SetTooltip("The path to the itemdata shipped with ling ling.");
             }
             valid = std::filesystem::exists(config::general::bot::itemdata.get()) ||
-                exists(std::filesystem::current_path() /
-                    config::general::bot::itemdata.get());
+                    exists(std::filesystem::current_path() /
+                           config::general::bot::itemdata.get());
             itemdata_col = valid
                                ? ImVec4(0.f, 1.f, 0.f, 1.f)
                                : ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -265,8 +265,8 @@ namespace llpp::gui
                 ImGui::SetTooltip("The path to the tessdata shipped with ling ling.");
             }
             valid = std::filesystem::exists(config::general::bot::tessdata_dir.get()) ||
-                exists(std::filesystem::current_path() /
-                    config::general::bot::tessdata_dir.get());
+                    exists(std::filesystem::current_path() /
+                           config::general::bot::tessdata_dir.get());
             tessdata_col = valid
                                ? ImVec4(0.f, 1.f, 0.f, 1.f)
                                : ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -279,8 +279,7 @@ namespace llpp::gui
 
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.5) + 5);
         begin_child("Additional Configuration",
-                    ImVec2(375, ImGui::GetWindowHeight() * 0.5));
-        {
+                    ImVec2(375, ImGui::GetWindowHeight() * 0.5)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::TextColored(assets_path_col, "Commands:");
 
@@ -308,8 +307,7 @@ namespace llpp::gui
     void draw_discord_bot_config()
     {
         begin_child("Bot settings",
-                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
-        {
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight())); {
             // TOKEN SHITS
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Discord Bot token:");
@@ -480,8 +478,7 @@ namespace llpp::gui
 
             end_child();
             ImGui::SameLine();
-            begin_child("Advanced", ImVec2(205, ImGui::GetWindowHeight()));
-            {
+            begin_child("Advanced", ImVec2(205, ImGui::GetWindowHeight())); {
                 ImGui::SetCursorPos({10, 11});
                 if (ImGui::Checkbox("Use ephemeral replies",
                                     config::discord::advanced::ephemeral_replies.
@@ -497,8 +494,7 @@ namespace llpp::gui
     {
         begin_child("Roles / People",
                     ImVec2(475 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() / 2));
-        {
+                           ImGui::GetWindowHeight() / 2)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Helpers [No Access]:");
             ImGui::SameLine();
@@ -544,8 +540,7 @@ namespace llpp::gui
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
         begin_child("Channels",
                     ImVec2(475 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() / 2));
-        {
+                           ImGui::GetWindowHeight() / 2)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Info Channel:");
             ImGui::SameLine();
@@ -590,8 +585,7 @@ namespace llpp::gui
     {
         begin_child("Configuration",
                     ImVec2(475 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() / 2));
-        {
+                           ImGui::GetWindowHeight() / 2)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Ping cooldown (s):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -707,8 +701,7 @@ namespace llpp::gui
         }
         end_child();
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
-        {
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight())); {
             ImGui::SetCursorPos({10, 11});
             if (ImGui::Checkbox("Flush tribelogs",
                                 config::discord::advanced::flush_logs.get_ptr())) {
@@ -724,8 +717,7 @@ namespace llpp::gui
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() / 2) + 5);
         begin_child("Roles & Channels",
                     ImVec2(475 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() / 2));
-        {
+                           ImGui::GetWindowHeight() / 2)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Logs channel:");
             ImGui::SameLine();
@@ -781,8 +773,7 @@ namespace llpp::gui
     {
         begin_child("Crate Managers",
                     ImVec2(425 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() * 0.33));
-        {
+                           ImGui::GetWindowHeight() * 0.33)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Selected Manager:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -863,8 +854,7 @@ namespace llpp::gui
                 selected_manager];
             if (config::bots::drops::configs.contains(selected)) {
                 active = &config::bots::drops::configs[selected];
-            }
-            else {
+            } else {
                 config::bots::drops::configs[selected] = config::ManagedVar(
                     {"bots", "drops", selected}, config::save,
                     bots::drops::CrateManagerConfig());
@@ -872,8 +862,7 @@ namespace llpp::gui
         }
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(270, ImGui::GetWindowHeight() * 0.53));
-        {
+        begin_child("Advanced", ImVec2(270, ImGui::GetWindowHeight() * 0.53)); {
             if (active) {
                 ImGui::SetCursorPos({10, 11});
                 if (ImGui::Checkbox("Allow partial completion",
@@ -959,8 +948,7 @@ namespace llpp::gui
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.33) + 5);
         begin_child("Configuration",
                     ImVec2(425 - state::maintabs_data.width,
-                           ImGui::GetWindowHeight() * 0.66));
-        {
+                           ImGui::GetWindowHeight() * 0.66)); {
             if (active) {
                 ImGui::SetCursorPos({10, 14});
                 ImGui::Text("Station prefix:");
@@ -1046,8 +1034,7 @@ namespace llpp::gui
         end_child();
         ImGui::SameLine();
         ImGui::SetCursorPosY((ImGui::GetWindowHeight() * 0.53) + 5);
-        begin_child("Rerolling", ImVec2(270, ImGui::GetWindowHeight() * 0.47));
-        {
+        begin_child("Rerolling", ImVec2(270, ImGui::GetWindowHeight() * 0.47)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Loot Channel:");
             ImGui::SameLine();
@@ -1106,8 +1093,7 @@ namespace llpp::gui
     void draw_bots_crops_tabs()
     {
         begin_child("Station Configuration",
-                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
-        {
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight())); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Longrass stations:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1174,8 +1160,7 @@ namespace llpp::gui
         end_child();
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
-        {
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight())); {
             ImGui::SetCursorPos({10, 11});
             if (ImGui::Checkbox("Disable station completion",
                                 config::bots::crops::disabled.get_ptr())) {
@@ -1195,8 +1180,7 @@ namespace llpp::gui
     void draw_bots_sap_tabs()
     {
         begin_child("Station Configuration",
-                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight()));
-        {
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight())); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Station prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1241,8 +1225,7 @@ namespace llpp::gui
         end_child();
 
         ImGui::SameLine();
-        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight()));
-        {
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight())); {
             ImGui::SetCursorPos({10, 11});
             if (ImGui::Checkbox("Disable station completion",
                                 config::bots::sap::disabled.get_ptr())) {
@@ -1263,8 +1246,7 @@ namespace llpp::gui
     {
         begin_child("Sparkpowder",
                     ImVec2((ImGui::GetWindowWidth() * 0.42),
-                           ImGui::GetWindowHeight() * 0.47));
-        {
+                           ImGui::GetWindowHeight() * 0.47)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1327,8 +1309,7 @@ namespace llpp::gui
         ImGui::SameLine();
         begin_child("Gunpowder",
                     ImVec2((ImGui::GetWindowWidth() * 0.41),
-                           ImGui::GetWindowHeight() * 0.47));
-        {
+                           ImGui::GetWindowHeight() * 0.47)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1392,8 +1373,7 @@ namespace llpp::gui
         end_child();
         begin_child("Paste Grinding",
                     ImVec2((ImGui::GetWindowWidth() * 0.42),
-                           ImGui::GetWindowHeight() * 0.47));
-        {
+                           ImGui::GetWindowHeight() * 0.47)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1445,8 +1425,7 @@ namespace llpp::gui
         ImGui::SameLine();
         begin_child("Advanced Rifle Bullets",
                     ImVec2((ImGui::GetWindowWidth() * 0.41),
-                           ImGui::GetWindowHeight() * 0.47));
-        {
+                           ImGui::GetWindowHeight() * 0.47)); {
             ImGui::SetCursorPos({10, 14});
             ImGui::Text("Prefix:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -1491,6 +1470,44 @@ namespace llpp::gui
             if (ImGui::Checkbox("Disabled",
                                 config::bots::crafting::arb::disabled.get_ptr())) {
                 config::bots::crafting::arb::disabled.save();
+            }
+        }
+        end_child();
+        begin_child("Forges",
+                    ImVec2((ImGui::GetWindowWidth() * 0.42),
+                           ImGui::GetWindowHeight() * 0.47)); {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Forge stations:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({120, 11});
+            if (custom::ClampedInputInt("##forges_count",
+                                        config::bots::forges::num_stations.get_ptr(), 1,
+                                        99)) {
+                config::bots::forges::num_stations.save();
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Metal loadups:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({120, 42});
+            if (custom::ClampedInputInt("##metal_loadups",
+                                        config::bots::forges::metal_loadups.get_ptr(), 1,
+                                        10)) {
+                config::bots::forges::metal_loadups.save();
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("wood_loadups:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({120, 73});
+            if (custom::ClampedInputInt("##wood_loadups",
+                                        config::bots::forges::wood_loadups.get_ptr(), 1,
+                                        10)) {
+                config::bots::forges::wood_loadups.save();
+            }
+
+            if (ImGui::Checkbox("Disabled", config::bots::forges::disabled.get_ptr())) {
+                config::bots::forges::disabled.save();
             }
         }
         end_child();

@@ -1,5 +1,4 @@
 #pragma once
-#include "config.h"
 #include "loadupstation.h"
 #include "unloadstation.h"
 #include "../../core/bedstation.h"
@@ -11,16 +10,19 @@ namespace llpp::bots::forges
     class ForgeStation : public core::BedStation
     {
     public:
-        ForgeStation(ForgeConfig* t_config,
+        ForgeStation(const std::string& t_name,
+                     int32_t t_view_diff,
                      std::shared_ptr<std::vector<LoadupStation> > t_loadup_stations,
                      std::shared_ptr<std::vector<UnloadStation> > t_unload_stations);
 
         core::StationResult complete() override;
 
+        bool is_ready() override { return has_finished_cooking(); }
+
         /**
          * @brief Checks whether the station is currently cooking any material.
          */
-        [[nodiscard]] bool is_empty() const { return config_->cooking_material.empty(); }
+        [[nodiscard]] bool is_empty() const;
 
         /**
          * @brief Checks whether the was cooking any material but has finished.
@@ -42,12 +44,13 @@ namespace llpp::bots::forges
 
         void fill(const asa::structures::Container& forge);
 
-        void set_cooking(const std::string& material) const;
+        std::string get_last_material() const;
+
+        int64_t get_last_filled() const;
 
         [[nodiscard]] std::chrono::minutes get_current_material_cook_time() const;
 
-        ForgeConfig* config_;
-
+        int32_t view_diff_;
         core::TeleportStation fill_tp_;
 
         std::shared_ptr<std::vector<LoadupStation> > loadup_stations_;

@@ -4,6 +4,7 @@
 #include <asapp/core/state.h>
 #include <asapp/network/server.h>
 
+#include "data.h"
 #include "../../common/util.h"
 
 namespace llpp::bots::forges
@@ -21,38 +22,45 @@ namespace llpp::bots::forges
     }
 
     ForgeStation::ForgeStation(
-        ForgeConfig* t_config,
+        const std::string& t_name,
+        const int32_t t_view_diff,
         std::shared_ptr<std::vector<LoadupStation> > t_loadup_stations,
         std::shared_ptr<std::vector<UnloadStation> > t_unload_stations)
-        : BedStation(t_config->prefix + "::EMPTY", 5min), config_(t_config),
-          fill_tp_(config_->prefix + "::FILL", 0min),
+        : BedStation(t_name + "::EMPTY", 5min),
+          view_diff_(t_view_diff),
+          fill_tp_(t_name + "::FILL", 0min),
           loadup_stations_(std::move(t_loadup_stations)),
           unload_stations_(std::move(t_unload_stations)),
-          forges_(create_forges(config_->prefix)) {}
+          forges_(create_forges(t_name)) {}
 
     core::StationResult ForgeStation::complete()
     {
         bool at_unload = false;
         if (!is_empty() && has_finished_cooking()) {
             if (!empty_forges()) { return {this, false, get_time_taken<>(), {}}; }
-            const std::string emptied_material = config_->cooking_material;
+            const std::string emptied_material = get_last_material();
             // Best to mark it as empty here already, even if its about to just get
             // filled with another material.
-            set_cooking("");
+            set_cooking(get_name(), "");
             unload(emptied_material);
             at_unload = true;
         }
         if (std::string material; loadup(at_unload, material)) {
             fill_all();
-            set_cooking(material);
+            set_cooking(get_name(), material);
         }
         return {this, true, get_time_taken<>(), {}};
+    }
+
+    bool ForgeStation::is_empty() const
+    {
+        return get_last_material().empty();
     }
 
     bool ForgeStation::has_finished_cooking() const
     {
         return is_empty() || util::timedout(
-                   std::chrono::system_clock::from_time_t(config_->last_filled),
+                   std::chrono::system_clock::from_time_t(get_last_filled()),
                    get_current_material_cook_time());
     }
 
@@ -101,7 +109,7 @@ namespace llpp::bots::forges
 
     void ForgeStation::unload(const std::string& material)
     {
-        asa::entities::local_player->set_yaw(config_->view_difference);
+        asa::entities::local_player->set_yaw(view_diff_);
         mediator_station_.set_default_destination(true);
         mediator_station_.complete();
 
@@ -124,7 +132,7 @@ namespace llpp::bots::forges
             mediator_station_.complete();
             // Remember that, if we didnt empty the forges beforehand, we never did the
             // turn to compensate for the direction difference. Need to do it here.
-            asa::entities::local_player->set_yaw(config_->view_difference);
+            asa::entities::local_player->set_yaw(view_diff_);
         }
         // We are now either at the mediator tp or the unload tp, either way we can tp
         // as long as we are standing (the unload tp want to fast travel when crouched)
@@ -134,6 +142,7 @@ namespace llpp::bots::forges
         // to cook. If we cannot get a cap then we wont refill the station just yet.
         for (LoadupStation& station: *loadup_stations_) {
             if (!station.is_ready()) { continue; }
+            station.set_default_destination(true);
 
             const auto result = station.complete();
             if (result.success && result.obtained_items.at(station.get_material()) > 0) {
@@ -163,20 +172,29 @@ namespace llpp::bots::forges
         asa::core::sleep_for(1s);
     }
 
-    void ForgeStation::set_cooking(const std::string& material) const
+    std::string ForgeStation::get_last_material() const
     {
-        config_->cooking_material = material;
-        if (!material.empty()) {config_->last_filled = util::time_t_now();}
-        if (config_->on_changed) { config_->on_changed(); }
+        std::string mat;
+        int64_t _;
+        get_cooking(get_name(), mat, _);
+        return mat;
+    }
+
+    int64_t ForgeStation::get_last_filled() const
+    {
+        std::string _;
+        int64_t last_filled;
+        get_cooking(get_name(), _, last_filled);
+        return last_filled;
     }
 
     std::chrono::minutes ForgeStation::get_current_material_cook_time() const
     {
+        const std::string material = get_last_material();
         // Metal takes 4h 8min, so allow 4h 20min cause of lag & extra slot
-        if (config_->cooking_material == "METAL") { return 4h + 8min; }
+        if (material == "METAL") { return 4h + 8min; }
         // Wood takes 2h 45min, so allow 15min longer to account for lag & the extra slot.
-        if (config_->cooking_material == "WOOD") { return 3h; }
-
+        if (material == "WOOD") { return 3h; }
         return 0min;
     }
 }

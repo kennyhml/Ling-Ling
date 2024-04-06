@@ -179,11 +179,12 @@ add_executable(LLPP WIN32
         LLPP/src/bots/forges/forgestation.h
         LLPP/src/bots/forges/forgemanager.cpp
         LLPP/src/bots/forges/forgemanager.h
-        LLPP/src/bots/forges/config.h
         LLPP/src/bots/forges/unloadstation.cpp
         LLPP/src/bots/forges/unloadstation.h
         LLPP/src/bots/forges/loadupstation.cpp
         LLPP/src/bots/forges/loadupstation.h
+        LLPP/src/bots/forges/data.h
+        LLPP/src/bots/forges/data.cpp
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
