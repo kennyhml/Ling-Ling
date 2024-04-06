@@ -177,6 +177,15 @@ add_executable(LLPP WIN32
         LLPP/src/bots/farm/wood/woodstation.h
         LLPP/src/bots/farm/wood/woodmanager.cpp
         LLPP/src/bots/farm/wood/woodmanager.h
+        LLPP/src/bots/forges/forgestation.cpp
+        LLPP/src/bots/forges/forgestation.h
+        LLPP/src/bots/forges/forgemanager.cpp
+        LLPP/src/bots/forges/forgemanager.h
+        LLPP/src/bots/forges/config.h
+        LLPP/src/bots/forges/unloadstation.cpp
+        LLPP/src/bots/forges/unloadstation.h
+        LLPP/src/bots/forges/loadupstation.cpp
+        LLPP/src/bots/forges/loadupstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
