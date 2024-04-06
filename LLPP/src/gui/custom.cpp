@@ -1494,57 +1494,5 @@ namespace llpp::gui
             }
         }
         end_child();
-        begin_child("Forges",
-                    ImVec2((ImGui::GetWindowWidth() * 0.42),
-                           ImGui::GetWindowHeight() * 0.47));
-        {
-            ImGui::SetCursorPos({10, 14});
-            ImGui::Text("Prefix:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-            ImGui::SetCursorPos({120, 11});
-            if (ImGui::InputText("##forges_prefix",
-                                 config::bots::crafting::forges::prefix.get_ptr())) {
-                config::bots::crafting::forges::prefix.save();
-            }
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip("Specifies the prefix for your forges beds.");
-            }
-
-            ImGui::SetCursorPos({10, 45});
-            ImGui::Text("Stations:");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-            ImGui::SetCursorPos({120, 42});
-            if (ImGui::InputInt("##forges_count",
-                                config::bots::crafting::forges::num_stations.get_ptr(), 1,
-                                5)) {
-                config::bots::crafting::forges::num_stations.save();
-            }
-            int* num_stations = config::bots::crafting::forges::num_stations.get_ptr();
-            *num_stations = std::clamp(*num_stations, 1, 100);
-
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip("The number of forges stations you have.");
-            }
-
-            ImGui::SetCursorPos({10, 76});
-            ImGui::Text("Interval (m):");
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-            ImGui::SetCursorPos({120, 73});
-            if (ImGui::InputInt("##forges_interval",
-                                config::bots::crafting::forges::interval.get_ptr(), 1,
-                                5)) { config::bots::crafting::forges::interval.save(); }
-            int* interval = config::bots::crafting::forges::interval.get_ptr();
-            *interval = std::clamp(*interval, 5, 180);
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip(
-                    "The interval to complete the station at (in minutes).");
-            }
-            ImGui::SetCursorPos({10, 107});
-            if (ImGui::Checkbox("Disabled",
-                                config::bots::crafting::forges::disabled.get_ptr())) {
-                config::bots::crafting::forges::disabled.save();
-            }
-        }
-        end_child();
     }
 }
