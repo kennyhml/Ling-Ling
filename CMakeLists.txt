@@ -98,8 +98,6 @@ add_executable(LLPP WIN32
         LLPP/src/gui/gui.cpp
         LLPP/src/gui/gui.h
         LLPP/src/main.cpp
-        LLPP/src/bots/crafting/forgestation.cpp
-        LLPP/src/bots/crafting/forgestation.h
         LLPP/src/bots/crafting/arbstation.cpp
         LLPP/src/bots/crafting/arbstation.h
         LLPP/src/bots/crafting/arbstation.cpp

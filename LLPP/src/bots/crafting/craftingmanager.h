@@ -4,7 +4,6 @@
 #include "sparkpowderstation.h"
 #include "gunpowderstation.h"
 #include "grindstation.h"
-#include "forgestation.h"
 #include "arbstation.h"
 #include <dpp/dpp.h>
 
@@ -34,18 +33,13 @@ namespace llpp::bots::crafting
 
         void run_grinding() const;
 
-        void run_forges() const;
-
         void run_arb() const;
-
 
         [[nodiscard]] bool is_spark_ready() const;
 
         [[nodiscard]] bool is_gunpowder_ready() const;
 
         [[nodiscard]] bool is_grinding_ready() const;
-
-        [[nodiscard]] bool is_forges_ready() const;
 
         [[nodiscard]] bool is_arb_ready() const;
 
@@ -56,7 +50,6 @@ namespace llpp::bots::crafting
         std::vector<std::unique_ptr<SparkpowderStation>> spark_stations_;
         std::vector<std::unique_ptr<GunpowderStation>> gunpowder_stations_;
         std::vector<std::unique_ptr<GrindStation>> grinding_stations_;
-        std::vector<std::unique_ptr<ForgeStation>> forge_stations_;
         std::vector<std::unique_ptr<ARBStation>> arb_stations_;
 
 
