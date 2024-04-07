@@ -174,7 +174,7 @@ namespace llpp::bots::drops
 
     void CrateManager::run_teleport_stations()
     {
-        bool any_looted = false;
+        std::vector<LootResult> loot;
         bool can_default_tp = true;
 
         spawn_on_align_bed();
@@ -197,7 +197,8 @@ namespace llpp::bots::drops
                 set_group_rendered(teleport_stations_[i], true);
 
                 if (result.success) {
-                    any_looted = true;
+                    const auto& new_loot = station.get_previous_loot();
+                    loot.insert(loot.end(), new_loot.begin(), new_loot.end());
                     stats_per_group[i].add_looted();
                     set_group_cooldown(teleport_stations_[i]);
                     can_default_tp = (&station == &teleport_stations_[i].back());
@@ -206,12 +207,8 @@ namespace llpp::bots::drops
                 can_default_tp = true;
             }
         }
-
-        teleport_to_dropoff();
-        // if we have nothing to drop off make sure we load the align
-        // so that we dont get any render issues on the bed / tp
-        if (any_looted) { dropoff_items(); }
-        else { asa::core::sleep_for(std::chrono::seconds(config_->render_align_for)); }
+        dropoff_.set_to_sort(loot);
+        dropoff_.complete();
     }
 
     bool CrateManager::is_ready_to_run()
@@ -230,29 +227,6 @@ namespace llpp::bots::drops
                               ? teleport_stations_[0][0].get_next_completion()
                               : bed_stations_[0][0].get_next_completion();
         return util::get_time_left_until<std::chrono::minutes>(next);
-    }
-
-    void CrateManager::dropoff_items()
-    {
-        asa::entities::local_player->turn_up(50, std::chrono::milliseconds(500));
-        asa::entities::local_player->turn_right(90);
-
-        asa::entities::local_player->access(dropoff_vault_);
-        asa::entities::local_player->get_inventory()->transfer_all();
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-
-        const auto slots = static_cast<float>(dropoff_vault_.get_last_known_slots());
-        vaults_filled_[dropoff_vault_.get_name()] = slots / 350.f;
-
-        dropoff_vault_.get_inventory()->close();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-
-    void CrateManager::teleport_to_dropoff()
-    {
-        auto result = teleport_dropoff_station_.complete();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        asa::entities::local_player->stand_up();
     }
 
     void CrateManager::spawn_on_align_bed()

@@ -76,14 +76,13 @@ namespace llpp::bots::drops
             contents = take_high_priority_items();
             if (!has_folder) { crate_.get_inventory()->make_new_folder("checked"); }
             crate_.get_inventory()->close();
-        }
-        else {
+        } else {
             // Take all of the items from the drop, let it vanish so a new one can spawn.
             contents = get_valuable_tooltips();
-            do { crate_.get_inventory()->transfer_all(); }
-            while (!util::await([this]() -> bool {
-                return !crate_.get_inventory()->is_open();
-            }, std::chrono::seconds(10)));
+            do { crate_.get_inventory()->transfer_all(); } while (!util::await(
+                [this]() -> bool {
+                    return !crate_.get_inventory()->is_open();
+                }, std::chrono::seconds(10)));
         }
         // Closing the drop or despawning it often causes a frame-drop
         asa::core::sleep_for(std::chrono::seconds(2));
@@ -95,20 +94,19 @@ namespace llpp::bots::drops
         const auto items = crate_.get_inventory()->get_current_page_items();
         std::vector<LootResult> res(items.size());
 
-        for (const auto& slot : crate_.get_inventory()->slots) {
-            if (slot.is_folder()) { folder_offset++; }
-            else { break; }
+        for (const auto& slot: crate_.get_inventory()->slots) {
+            if (slot.is_folder()) { folder_offset++; } else { break; }
         }
 
         for (size_t i = 0; i < items.size(); i++) {
-            res[i] = {get_repr(items[i]), false, nullptr};
+            res[i] = {get_repr(items[i]), true, std::nullopt};
         }
 
         // Take the items based on their priority in the priority order.
         std::pmr::unordered_set<size_t> checked(items.size());
         for (int slot_ = 0; slot_ < items.size(); slot_++) {
             bool item_found = false;
-            for (const auto& priority : get_priority_order()) {
+            for (const auto& priority: get_priority_order()) {
                 if (item_found) { break; }
                 for (size_t i = 0; i < items.size(); i++) {
                     if (checked.contains(i) || !items[i] || *items[i] != priority) {
@@ -118,7 +116,9 @@ namespace llpp::bots::drops
                     if (inspect_tooltip(items[i]->get_data())) {
                         auto& slot = crate_.get_inventory()->slots[i + folder_offset];
                         crate_.get_inventory()->select_slot(slot, true, true);
-                        res[i].tooltip = std::move(slot.get_tooltip());
+                        if (const auto& tt = slot.get_tooltip(); tt) {
+                            res[i].tooltip = *tt;
+                        }
                     }
                     item_found = true;
                     break;
@@ -136,20 +136,19 @@ namespace llpp::bots::drops
         std::vector<LootResult> res(items.size());
         std::vector<int> offsets(res.size());
 
-        for (const auto& slot : crate_.get_inventory()->slots) {
-            if (slot.is_folder()) { folder_offset++; }
-            else { break; }
+        for (const auto& slot: crate_.get_inventory()->slots) {
+            if (slot.is_folder()) { folder_offset++; } else { break; }
         }
 
         for (size_t i = 0; i < items.size(); i++) {
-            res[i] = {get_repr(items[i]), false, nullptr};
+            res[i] = {get_repr(items[i]), false, std::nullopt};
         }
 
         // Take the items based on their priority in the priority order.
         const size_t original_size = items.size();
         for (int slot_ = 0; slot_ < original_size - 1; slot_++) {
             bool item_found = false;
-            for (const auto& priority : get_priority_order()) {
+            for (const auto& priority: get_priority_order()) {
                 if (item_found) { break; }
                 for (size_t i = 0; i < items.size(); i++) {
                     if (!items[i] || *items[i] != priority) { continue; }
@@ -157,7 +156,9 @@ namespace llpp::bots::drops
                     if (inspect_tooltip(items[i]->get_data())) {
                         auto& slot = crate_.get_inventory()->slots[i + folder_offset];
                         crate_.get_inventory()->select_slot(slot, true, true);
-                        res[i + offsets[i]].tooltip = std::move(slot.get_tooltip());
+                        if (const auto& tt = slot.get_tooltip(); tt) {
+                            res[i + offsets[i]].tooltip = *tt;
+                        }
                     }
 
                     crate_.get_inventory()->take_slot(i + folder_offset);
@@ -175,4 +176,5 @@ namespace llpp::bots::drops
         }
         return res;
     }
+
 }

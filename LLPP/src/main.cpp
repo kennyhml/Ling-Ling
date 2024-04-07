@@ -6,7 +6,7 @@
 #include <asapp/interfaces/console.h>
 #include <asapp/interfaces/tribemanager.h>
 #include <asapp/items/items.h>
-
+#include <asapp/game/resources.h>
 #include "bots/farm/swingbot/commands.h"
 #include "auth/auth.h"
 #include "gui/gui.h"

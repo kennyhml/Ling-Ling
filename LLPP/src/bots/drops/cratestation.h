@@ -22,6 +22,11 @@ namespace llpp::bots::drops
          */
         void set_rendered(const bool rendered) { is_rendered_ = rendered; }
 
+        [[nodiscard]] const std::vector<LootResult>& get_previous_loot() const
+        {
+            return previous_loot_;
+        }
+
     protected:
         CrateStation(CrateManagerConfig* t_config, asa::structures::CaveLootCrate t_crate,
                      bool t_is_first_crate, bool t_is_first_of_group);
@@ -75,6 +80,7 @@ namespace llpp::bots::drops
          */
         void loot(cv::Mat& loot_img_out, std::vector<LootResult>& contents);
 
+
         asa::structures::CaveLootCrate crate_;
 
         CrateManagerConfig* config_;
@@ -86,6 +92,8 @@ namespace llpp::bots::drops
 
         bool is_rendered_{false};
         bool is_up_{false};
+
+        std::vector<LootResult> previous_loot_;
 
         std::chrono::system_clock::time_point last_found_up_{};
         std::chrono::minutes buff_max_wait_{15};

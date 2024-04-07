@@ -46,6 +46,7 @@ namespace llpp::bots::drops
         const auto quality = crate_.get_crate_quality();
 
         loot(loot_image, contents);
+        previous_loot_ = contents;
         set_completed();
 
         const core::StationResult res(this, true, get_time_taken<std::chrono::seconds>(),

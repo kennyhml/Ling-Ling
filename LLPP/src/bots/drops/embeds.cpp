@@ -4,7 +4,6 @@
 #include "../../core/basestation.h"
 #include "../../discord/bot.h"
 #include <format>
-#include <asapp/core/config.h>
 #include <opencv2/highgui.hpp>
 #include "checkmark_green.h"
 #include "../../discord/helpers.h"
@@ -122,7 +121,8 @@ namespace llpp::bots::drops
                                     const cv::Mat& loot_image,
                                     const asa::structures::CaveLootCrate::Quality
                                     drop_quality, int total_times_looted,
-                                    const std::vector<LootResult>& contents)
+                                    const std::vector<LootResult>& contents,
+                                    const bool reroll)
     {
         // default values for drops we couldnt figure out
         auto color = dpp::colors::white;
@@ -138,7 +138,7 @@ namespace llpp::bots::drops
                                     contents[i].tooltip->get_durability_area()->to_cv());
                 paste_dura(edited_image, i, dura);
             }
-            if (contents[i].looted) {
+            if (contents[i].looted && reroll) {
                 paste_checkmark(edited_image, i);
             }
         }
@@ -181,8 +181,8 @@ namespace llpp::bots::drops
         // The reroll request message is essentially the same as the looted message
         // with some minor modifications, so to avoid boilerplate just modify a
         // looted message instead.
-        auto message = get_looted_message(data, loot_image, drop_quality, 0, looted);
-        dpp::embed& embed = message.embeds[0];
+        auto msg = get_looted_message(data, loot_image, drop_quality, 0, looted, true);
+        dpp::embed& embed = msg.embeds[0];
 
         embed.set_title(std::format("Crate '{}' is up!", data.station->get_name()));
         embed.set_description("If the timer expires, the drop will be looted.");
@@ -190,12 +190,12 @@ namespace llpp::bots::drops
         embed.fields[0] = {"Expires:", std::format("<t:{}:R>", time_left), true};
 
         if (!config::bots::drops::reroll_role.get().empty()) {
-            message.content = dpp::utility::role_mention(
+            msg.content = dpp::utility::role_mention(
                 config::bots::drops::reroll_role.get());
         }
 
-        message.set_allowed_mentions(false, true, false, false, {}, {});
-        return message;
+        msg.set_allowed_mentions(false, true, false, false, {}, {});
+        return msg;
     }
 
 

@@ -6,6 +6,8 @@
 #include "../../core/istationmanager.h"
 #include <dpp/dpp.h>
 
+#include "dropoffstation.h"
+
 namespace llpp::bots::drops
 {
     using QualityFlags = int;
@@ -53,6 +55,8 @@ namespace llpp::bots::drops
 
         inline static bool has_registered_reroll_command_ = false;
 
+        inline static DropoffStation dropoff_;
+
     private:
         static void reroll_mode_callback(const dpp::slashcommand_t&);
 
@@ -60,8 +64,6 @@ namespace llpp::bots::drops
 
         void run_bed_stations();
 
-        void dropoff_items();
-        void teleport_to_dropoff();
         void spawn_on_align_bed();
         void register_slash_commands();
     };

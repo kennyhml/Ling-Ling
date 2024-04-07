@@ -11,7 +11,8 @@ namespace llpp::bots::drops
                                     const cv::Mat& loot_image,
                                     asa::structures::CaveLootCrate::Quality drop_quality,
                                     int total_times_looted,
-                                    const std::vector<LootResult>& contents);
+                                    const std::vector<LootResult>& contents,
+                                    bool reroll = false);
 
     dpp::message get_reroll_message(const core::StationResult& data,
                                     const cv::Mat& loot_image,

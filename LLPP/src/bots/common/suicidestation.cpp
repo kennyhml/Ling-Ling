@@ -16,9 +16,8 @@ namespace llpp::bots
         }
 
         asa::entities::local_player->suicide();
-        const auto result = respawn_station_.complete();
         set_completed();
 
-        return {this, result.success, get_time_taken<std::chrono::seconds>(), {}};
+        return {this, true, get_time_taken<std::chrono::seconds>(), {}};
     }
 }

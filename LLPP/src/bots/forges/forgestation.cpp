@@ -116,12 +116,15 @@ namespace llpp::bots::forges
         for (UnloadStation& station: *unload_stations_) {
             if (station.get_material() != material || !station.is_ready()) { continue; }
 
-            std::cout << "Unloading at: " << station.get_name() << std::endl;
             station.set_default_destination(false);
             if (!station.complete().success) { throw std::exception("Unload failed"); }
-            return;
+
+            // Only if we have no items left on us we are done, otherwise we need to go to
+            // the next available unload station.
+            if (util::await([] { return !asa::entities::local_player->is_overweight(); },
+                            10s)) { return; }
         }
-        throw std::exception("Could not find an unload station!");
+        throw std::exception("All unload stations full / none are available!");
     }
 
     bool ForgeStation::loadup(const bool is_at_unload, std::string& material_out)
@@ -140,15 +143,22 @@ namespace llpp::bots::forges
 
         // Go through all loads up stations until we manage to get a slotcap of resources
         // to cook. If we cannot get a cap then we wont refill the station just yet.
+        bool any_not_ready = false;
         for (LoadupStation& station: *loadup_stations_) {
-            if (!station.is_ready()) { continue; }
-            station.set_default_destination(true);
+            if (!station.is_ready()) {
+                any_not_ready = true;
+                continue;
+            }
+            station.set_default_destination(!any_not_ready);
 
             const auto result = station.complete();
             if (result.success && result.obtained_items.at(station.get_material()) > 0) {
                 material_out = station.get_material();
                 return true;
             }
+            // This station did not have anything for us to fill, suspend it so that
+            // we dont check it again this completion.
+            station.suspend_for(5min);
         }
         // None of the loadup stations were able to get us a cap of items.
         return false;
@@ -192,7 +202,7 @@ namespace llpp::bots::forges
     {
         const std::string material = get_last_material();
         // Metal takes 4h 8min, so allow 4h 20min cause of lag & extra slot
-        if (material == "METAL") { return 4h + 8min; }
+        if (material == "METAL") { return 4h + 20min; }
         // Wood takes 2h 45min, so allow 15min longer to account for lag & the extra slot.
         if (material == "WOOD") { return 3h; }
         return 0min;

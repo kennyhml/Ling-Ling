@@ -10,7 +10,7 @@ namespace llpp::bots::drops
     public:
         std::string name;
         bool looted{false};
-        std::unique_ptr<asa::interfaces::components::ItemTooltip> tooltip;
+        std::optional<asa::interfaces::components::ItemTooltip> tooltip;
     };
 }
 

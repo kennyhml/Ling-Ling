@@ -187,6 +187,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/forges/data.cpp
         LLPP/src/discord/dashboard.cpp
         LLPP/src/discord/dashboard.h
+        LLPP/src/bots/drops/dropoffstation.cpp
+        LLPP/src/bots/drops/dropoffstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

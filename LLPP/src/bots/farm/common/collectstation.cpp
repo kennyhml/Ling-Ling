@@ -76,6 +76,7 @@ namespace llpp::bots::farm
         asa::entities::local_player->get_inventory()->transfer_all("whip");
         asa::core::sleep_for(1s);
         vault_.get_inventory()->close();
+        asa::core::sleep_for(2s);
     }
 
     void CollectStation::deposit() const

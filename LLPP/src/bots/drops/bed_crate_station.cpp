@@ -34,6 +34,7 @@ namespace llpp::bots::drops
         const auto quality = crate_.get_crate_quality();
 
         loot(loot_image, contents);
+        previous_loot_ = contents;
         // only deposit items if we actually got any.
         if (!should_reroll() || any_looted(contents)) { deposit_items(); }
 
