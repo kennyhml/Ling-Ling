@@ -18,6 +18,7 @@
 #include "bots/farm/wood/woodmanager.h"
 #include "common/util.h"
 #include "discord/bot.h"
+#include "discord/dashboard.h"
 #include "discord/embeds.h"
 
 
@@ -67,6 +68,7 @@ void llpp_main()
         asa::window::get_handle();
         asa::window::set_foreground();
         llpp::discord::init();
+        llpp::discord::reset_dashboard();
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
     } catch (const llpp::config::BadConfigurationError& e) {
@@ -76,13 +78,18 @@ void llpp_main()
     llpp::discord::get_bot()->start(dpp::st_return);
     inform_started();
 
+    llpp::discord::update_dashboard();
+
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_state();
     } catch (const TerminatedError&) {}
 
     while (running) {
-        try { taskmanager.execute_next(); } catch (asa::core::ShooterGameError& e) {
+        try {
+            taskmanager.execute_next();
+            llpp::discord::update_dashboard();
+        } catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
         } catch (const TerminatedError&) { break; } catch (const std::exception& e) {

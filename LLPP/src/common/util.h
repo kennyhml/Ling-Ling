@@ -43,5 +43,6 @@ namespace llpp::util
 
 	cv::Mat bytes_to_mat(const uchar* data, int width, int height, int channels);
 
+	std::string make_counter(std::chrono::system_clock::duration duration);
 }
 

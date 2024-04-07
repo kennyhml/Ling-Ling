@@ -71,6 +71,30 @@ namespace llpp::util
     cv::Mat bytes_to_mat(const uchar* data, const int width, const int height,
                          const int channels)
     {
-        return cv::Mat(height, width, CV_8UC(channels), (uchar*)data).clone();
+        return cv::Mat(height, width, CV_8UC(channels), (uchar*) data).clone();
+    }
+
+    std::string make_counter(const std::chrono::system_clock::duration duration)
+    {
+        using namespace std::chrono;
+        using namespace std::chrono_literals;
+        std::ostringstream oss;
+
+        const auto d = duration_cast<days>(duration);
+        const auto h = duration_cast<hours>(duration % 24h);
+        const auto m = duration_cast<minutes>(duration % 60min);
+        const auto s = duration_cast<seconds>(duration % 60s);
+
+        if (d.count() > 0) {
+            oss << std::setw(2) << std::setfill('0') << d.count() << ":";
+        }
+        if (h.count() > 0 || d.count() > 0) {
+            oss << std::setw(2) << std::setfill('0') << h.count() << ":";
+        }
+        if (m.count() > 0 || h.count() > 0 || d.count() > 0) {
+            oss << std::setw(2) << std::setfill('0') << m.count() << ":";
+        }
+        oss << std::setw(2) << std::setfill('0') << s.count();
+        return oss.str().size() <= 2 ? "-:-:-" : oss.str();
     }
 }

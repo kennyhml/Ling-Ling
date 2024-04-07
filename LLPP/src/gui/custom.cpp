@@ -557,20 +557,33 @@ namespace llpp::gui
             }
 
             ImGui::SetCursorPos({10, 45});
-            ImGui::Text("Error Channel:");
+            ImGui::Text("Dashboard Channel:");
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
             ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputText("##dashboard_channel",
+                                 config::discord::channels::dashboard.get_ptr())) {
+                config::discord::channels::dashboard.save();
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Error Channel:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 73});
             if (ImGui::InputText("##error_channel",
                                  config::discord::channels::error.get_ptr())) {
                 config::discord::channels::error.save();
-            }
+                                 }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip(
                     "[OPTIONAL] - Errors and warnings will be posted here "
                     "(game crashed, vaults full..)\nIf empty these messages "
                     "will fall back to the info channel.");
             }
+
+
+
         }
         end_child();
     }
@@ -1497,7 +1510,7 @@ namespace llpp::gui
             }
 
             ImGui::SetCursorPos({10, 76});
-            ImGui::Text("wood_loadups:");
+            ImGui::Text("Wood loadups:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 73});
             if (custom::ClampedInputInt("##wood_loadups",

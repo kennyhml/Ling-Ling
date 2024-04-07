@@ -95,6 +95,7 @@ namespace llpp::config
             inline const std::vector<std::string> BASE{"discord", "channels"};
             using channel = ManagedVar<std::string>;
 
+            inline channel dashboard(BASE, "dashboard", save, "");
             inline channel info(BASE, "info", save, "");
             inline channel error(BASE, "error", save, "");
             inline channel alert(BASE, "alert", save, "");

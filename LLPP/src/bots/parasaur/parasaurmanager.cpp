@@ -17,16 +17,16 @@ namespace llpp::bots::parasaur
           spawn_tp_(teleport_start.get(), std::chrono::minutes(5)),
           next_tp_("PARASAUR::NEXT", std::chrono::minutes(0))
     {
-        for (auto& [name, data] : configs) {
+        for (auto& [name, data]: configs) {
             if (data.get_ptr()->is_teleporter) {
                 tp_stations_.emplace_back(
                     std::make_unique<TeleportParasaurStation>(name, data.get_ptr()));
-            }
-            else {
+            } else {
                 bed_stations_.emplace_back(
                     std::make_unique<BedParasaurStation>(name, data.get_ptr()));
             }
         }
+        update_dashboard_component();
     }
 
     bool ParasaurManager::run()
@@ -39,7 +39,7 @@ namespace llpp::bots::parasaur
         bool started_teleporters = false;
         const auto start = std::chrono::system_clock::now();
 
-        for (const auto& station : tp_stations_) {
+        for (const auto& station: tp_stations_) {
             if (!station->is_ready()) {
                 results.emplace_back(false, station.get(), station->get_last_alert());
                 continue;
@@ -55,13 +55,12 @@ namespace llpp::bots::parasaur
 
         if (started_teleporters) { spawn_tp_.complete(); }
 
-        for (const auto& station : bed_stations_) {
+        for (const auto& station: bed_stations_) {
             if (station->is_ready()) {
                 any_ran = true;
                 station->complete();
                 results.emplace_back(true, station.get(), station->get_last_alert());
-            }
-            else {
+            } else {
                 results.emplace_back(false, station.get(), station->get_last_alert());
             }
         }
@@ -70,6 +69,7 @@ namespace llpp::bots::parasaur
                 util::get_elapsed<std::chrono::seconds>(start), results);
             discord::get_bot()->message_create(summary);
         }
+        last_completed_ = std::chrono::system_clock::now();
         return any_ran;
     }
 
@@ -86,8 +86,8 @@ namespace llpp::bots::parasaur
 
         if (start_criteria.get() == "MIN READY") {
             int ready = 0;
-            for (const auto& station : tp_stations_) { ready += station->is_ready(); }
-            for (const auto& station : bed_stations_) {
+            for (const auto& station: tp_stations_) { ready += station->is_ready(); }
+            for (const auto& station: bed_stations_) {
                 ready += station->BedStation::is_ready();
             }
             return ready >= start_min_ready.get();
@@ -111,5 +111,27 @@ namespace llpp::bots::parasaur
         asa::entities::local_player->crouch();
         next_tp_.set_default_destination(true);
         return next_tp_.complete().success;
+    }
+
+    void ParasaurManager::update_dashboard_component()
+    {
+        if (!dashboard_field_) {
+            dashboard_field_ = std::make_shared<dpp::embed_field>();
+            discord::register_dashboard_field(dashboard_field_);
+        }
+        std::string next = "**`Now`**";
+        if (const auto time_left = get_time_left_until_ready(); time_left.count() > 0) {
+            next = std::format("**<t:{}:R>**", next);
+        }
+        std::string last = "**`-`**";
+        if (last_completed_ != std::chrono::system_clock::time_point()) {
+            last = std::format("**<t:{}:R>**", last_completed_);
+        }
+
+        dashboard_field_->name = "__Parasaurs:__";
+        dashboard_field_->value = std::format(
+            ">>> Last: {}"
+            "\nNext: {}", last, next);
+        dashboard_field_->is_inline = true;
     }
 }

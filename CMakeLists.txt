@@ -185,6 +185,8 @@ add_executable(LLPP WIN32
         LLPP/src/bots/forges/loadupstation.h
         LLPP/src/bots/forges/data.h
         LLPP/src/bots/forges/data.cpp
+        LLPP/src/discord/dashboard.cpp
+        LLPP/src/discord/dashboard.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
