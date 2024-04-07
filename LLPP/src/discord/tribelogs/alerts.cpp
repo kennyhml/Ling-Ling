@@ -45,7 +45,9 @@ namespace llpp::discord
     {
         std::chrono::system_clock::time_point last_ping;
 
-        const std::vector<std::string> ALWAYS_IGNORE{"Anti-meshing", "decay", "Baby"};
+        const std::vector<std::string> ALWAYS_IGNORE{
+            "anti-meshing", "decay", "baby", "thatch", "baby", "die", "y trap"
+        };
 
         const char* get_event_icon(const TribeLogMessage::EventType event)
         {
