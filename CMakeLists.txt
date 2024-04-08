@@ -189,6 +189,10 @@ add_executable(LLPP WIN32
         LLPP/src/discord/dashboard.h
         LLPP/src/bots/drops/dropoffstation.cpp
         LLPP/src/bots/drops/dropoffstation.h
+        LLPP/src/bots/farm/obsidian/obsidianstation.cpp
+        LLPP/src/bots/farm/obsidian/obsidianstation.h
+        LLPP/src/bots/farm/obsidian/obsidianmanager.cpp
+        LLPP/src/bots/farm/obsidian/obsidianmanager.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
