@@ -13,11 +13,20 @@ namespace llpp::bots::forges
 
         [[nodiscard]] const std::string& get_material() const { return material_; }
 
-    private:
+        /**
+         * @brief Checks whether this loadup station was empty in the last 15min.
+         */
+        [[nodiscard]] bool was_recently_empty() const
+        {
+            return !util::timedout(last_empty_, 15min);
+        };
 
+    private:
         bool get_slotcap();
 
         std::string material_;
         std::array<asa::structures::DedicatedStorage, 6> dedis_;
+
+        std::chrono::system_clock::time_point last_empty_;
     };
 }

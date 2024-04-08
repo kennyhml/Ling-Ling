@@ -38,6 +38,9 @@ namespace llpp::bots::forges
         const int32_t original_yaw = asa::entities::local_player->get_yaw();
 
         const bool success = get_slotcap();
+        if (!success) {
+            last_empty_ = std::chrono::system_clock::now();
+        }
         asa::entities::local_player->set_yaw(original_yaw);
         asa::entities::local_player->set_pitch(0);
 
