@@ -9,6 +9,19 @@
 
 namespace llpp::bots::crafting
 {
+
+    namespace
+    {
+        void deposit()
+        {
+            asa::core::sleep_for(200ms);
+            asa::controls::press(asa::settings::use);
+            asa::core::sleep_for(200ms);
+        }
+
+    }
+
+
     GrindStation::GrindStation(std::string name, const std::chrono::minutes interval) :
         BedStation(std::move(name), interval), grinder_(name_ + "::GRINDER", 120),
         paste_dedi_(name_ + "::PASTE") {}
@@ -43,8 +56,8 @@ namespace llpp::bots::crafting
     {
         using asa::interfaces::DedicatedStorageInfo;
 
-        asa::entities::local_player->turn_left(90);
-        asa::entities::local_player->turn_down(20);
+        asa::entities::local_player->set_yaw(-90);
+        asa::entities::local_player->set_pitch(20);
         asa::entities::local_player->crouch();
         asa::entities::local_player->access(paste_dedi_);
 
@@ -54,16 +67,15 @@ namespace llpp::bots::crafting
         }
 
         paste_dedi_.get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::core::sleep_for(1s);
     }
 
     void GrindStation::put_paste_and_grind()
     {
-        std::cout << "[+] Putting paste away..\n";
-        asa::entities::local_player->stand_up();
-        asa::entities::local_player->turn_left(90);
+        asa::entities::local_player->set_yaw(-180);
+        asa::core::sleep_for(500ms);
         asa::entities::local_player->access(grinder_);
-        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::core::sleep_for(1s);
 
         asa::entities::local_player->get_inventory()->transfer_all();
         util::await([]() {
@@ -78,47 +90,46 @@ namespace llpp::bots::crafting
 
         grinder_.get_inventory()->craft(0, 1000);
         grinder_.get_inventory()->transfer_all(*asa::items::resources::chitin);
-        asa::core::sleep_for(std::chrono::seconds(1));
         grinder_.get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::core::sleep_for(1s);
     }
 
     void GrindStation::empty_grinder()
     {
-        asa::entities::local_player->turn_right(180);
-        asa::entities::local_player->access(grinder_);
-        asa::core::sleep_for(std::chrono::milliseconds(300));
-        grinder_.get_inventory()->transfer_all();
-        asa::core::sleep_for(std::chrono::milliseconds(300));
-        grinder_.get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::entities::local_player->set_yaw(180);
+        asa::entities::local_player->crouch();
+        asa::core::sleep_for(1s);
 
-        asa::entities::local_player->turn_left(180);
+        asa::entities::local_player->access(grinder_);
+        grinder_.get_inventory()->transfer_all();
+        grinder_.get_inventory()->close();
+        asa::core::sleep_for(1s);
+
+        asa::entities::local_player->set_yaw(0);
     }
 
     void GrindStation::deposit_items()
     {
-        asa::entities::local_player->crouch();
-        asa::entities::local_player->turn_down(20, std::chrono::milliseconds(600));
+        asa::entities::local_player->turn_down(20);
 
-        asa::entities::local_player->turn_left(20, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_left(20);
+        deposit();
 
-        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_right(40);
+        deposit();
 
         asa::entities::local_player->stand_up();
-        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_up(20);
+        deposit();
 
-        asa::entities::local_player->turn_left(40, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_left(40);
+        deposit();
 
-        asa::entities::local_player->turn_up(20, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_up(20);
+        deposit();
 
-        asa::entities::local_player->turn_right(40, std::chrono::milliseconds(600));
-        asa::controls::press(asa::settings::use);
+        asa::entities::local_player->turn_right(40);
+        deposit();
 
         asa::entities::local_player->set_yaw(0);
         asa::entities::local_player->set_pitch(0);

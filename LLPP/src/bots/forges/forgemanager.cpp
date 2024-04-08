@@ -45,7 +45,7 @@ namespace llpp::bots::forges
 
     bool ForgeManager::is_ready_to_run()
     {
-        if (!disabled.get()) { return false; }
+        if (disabled.get()) { return false; }
         static auto lambda = [](const std::unique_ptr<ForgeStation>& station) {
             return station->is_ready();
         };

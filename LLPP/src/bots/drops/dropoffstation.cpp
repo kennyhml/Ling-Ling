@@ -127,6 +127,7 @@ namespace llpp::bots::drops
                 break;
             } catch (const std::exception& e) {
                 std::cerr << e.what() << std::endl;
+                asa::controls::release(asa::settings::use);
             }
         }
         asa::core::sleep_for(5s);
