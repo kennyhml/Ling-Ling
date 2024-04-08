@@ -9,8 +9,8 @@ namespace llpp::bots::forges
 
     ForgeManager::ForgeManager()
     {
-        loadups_ = std::make_shared<std::vector<LoadupStation>>();
-        unloads_ = std::make_shared<std::vector<UnloadStation>>();
+        loadups_ = std::make_shared<std::vector<LoadupStation> >();
+        unloads_ = std::make_shared<std::vector<UnloadStation> >();
         int unload = 0;
         int loadup = 0;
         for (int i = 0; i < metal_loadups.get(); i++) {
@@ -45,6 +45,7 @@ namespace llpp::bots::forges
 
     bool ForgeManager::is_ready_to_run()
     {
+        if (!disabled.get()) { return false; }
         static auto lambda = [](const std::unique_ptr<ForgeStation>& station) {
             return station->is_ready();
         };
