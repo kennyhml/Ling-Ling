@@ -13,7 +13,7 @@ namespace llpp::bots::farm
           anky_(std::make_shared<asa::entities::DinoEntity>(config_->prefix + "::ANKY")),
           start_tp_(config_->prefix + "::START", 0min),
           load_tp_(config_->prefix + "::LOAD", 0min),
-          unload_station_(config_->prefix + "::UNLOAD", anky_),
+          unload_station_(config_->prefix + "::UNLOAD", "metal", anky_),
           collect_station_(config_->prefix + "::COLLECT"),
           mount_station_(config_->prefix + "::MOUNT", anky_, nullptr,
                          std::make_unique<core::BedStation>(

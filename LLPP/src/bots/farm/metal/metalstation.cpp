@@ -53,7 +53,7 @@ namespace llpp::bots::farm
         // Make sure we either press W or S on every swing for the default popup.
         for (int i = 0; i < swing_times_; i++) {
             anky_->primary_attack();
-            asa::core::sleep_for(2800ms);
+            asa::core::sleep_for(2200ms);
             anky_->go_back(200ms);
 
             if (asa::interfaces::hud->is_mount_capped()) { drop_trash(); }

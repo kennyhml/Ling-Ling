@@ -53,6 +53,9 @@ namespace llpp::bots::farm
 
         const asa::structures::Container vault(get_name() + "::WHIP VAULT", 350);
 
+        util::await(
+            [&vault] { return asa::entities::local_player->can_access(vault); }, 60s);
+
         asa::entities::local_player->access(vault);
         vault.get_inventory()->take_slot(0);
 

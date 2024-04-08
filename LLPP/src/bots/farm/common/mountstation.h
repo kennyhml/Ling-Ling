@@ -21,9 +21,5 @@ namespace llpp::bots::farm
         std::shared_ptr<asa::entities::DinoEntity> anky_;
         std::unique_ptr<RenderStation> render_station_;
         std::unique_ptr<BedStation> reposition_bed_;
-
-
-
-
     };
 }

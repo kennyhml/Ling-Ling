@@ -7,6 +7,7 @@ namespace llpp::bots::farm
     {
     public:
         UnloadStation(const std::string& t_name,
+                      std::string t_to_unload,
                       std::shared_ptr<asa::entities::DinoEntity> t_anky);
 
         /**
@@ -17,6 +18,7 @@ namespace llpp::bots::farm
         core::StationResult complete() override;
 
     private:
+        std::string to_unload_;
         std::shared_ptr<asa::entities::DinoEntity> anky_;
     };
 }

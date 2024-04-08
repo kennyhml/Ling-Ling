@@ -5,8 +5,10 @@
 namespace llpp::bots::farm
 {
     UnloadStation::UnloadStation(const std::string& t_name,
+                                 std::string t_to_unload,
                                  std::shared_ptr<asa::entities::DinoEntity> t_anky)
-        : TeleportStation(t_name, std::chrono::minutes(0)), anky_(std::move(t_anky)) {}
+        : TeleportStation(t_name, std::chrono::minutes(0)), anky_(std::move(t_anky)),
+          to_unload_(std::move(t_to_unload)) {}
 
     core::StationResult UnloadStation::complete()
     {
@@ -22,7 +24,7 @@ namespace llpp::bots::farm
         // ideally we would add some sort of flag for this to asapp.
         anky_->open_inventory();
         asa::core::sleep_for(1s);
-        anky_->get_inventory()->search_bar.search_for("metal");
+        anky_->get_inventory()->search_bar.search_for(to_unload_);
         asa::core::sleep_for(500ms);
 
         const auto pos = anky_->get_inventory()->slots[0].area.get_random_location(4);
