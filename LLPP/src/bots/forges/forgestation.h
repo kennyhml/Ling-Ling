@@ -17,7 +17,10 @@ namespace llpp::bots::forges
 
         core::StationResult complete() override;
 
-        bool is_ready() override { return has_finished_cooking(); }
+        bool is_ready() override
+        {
+            return BedStation::is_ready() && has_finished_cooking();
+        }
 
         /**
          * @brief Checks whether the station is currently cooking any material.

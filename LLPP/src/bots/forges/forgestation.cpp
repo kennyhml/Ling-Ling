@@ -1,10 +1,7 @@
 #include "forgestation.h"
-
-#include <iostream>
+#include "data.h"
 #include <asapp/core/state.h>
 #include <asapp/network/server.h>
-
-#include "data.h"
 #include "../../common/util.h"
 
 namespace llpp::bots::forges
@@ -37,7 +34,10 @@ namespace llpp::bots::forges
     {
         bool at_unload = false;
         if (!is_empty() && has_finished_cooking()) {
-            if (!empty_forges()) { return {this, false, get_time_taken<>(), {}}; }
+            if (!empty_forges()) {
+                set_completed();
+                return {this, false, get_time_taken<>(), {}};
+            }
             const std::string emptied_material = get_last_material();
             // Best to mark it as empty here already, even if its about to just get
             // filled with another material.
@@ -49,6 +49,7 @@ namespace llpp::bots::forges
             fill_all();
             set_cooking(get_name(), material);
         }
+        set_completed();
         return {this, true, get_time_taken<>(), {}};
     }
 
@@ -118,11 +119,12 @@ namespace llpp::bots::forges
 
             station.set_default_destination(false);
             if (!station.complete().success) { throw std::exception("Unload failed"); }
-
-            // Only if we have no items left on us we are done, otherwise we need to go to
-            // the next available unload station.
-            if (util::await([] { return !asa::entities::local_player->is_overweight(); },
-                            10s)) { return; }
+            asa::entities::local_player->get_inventory()->open();
+            const bool all_deposited = asa::entities::local_player->get_inventory()
+                    ->slots[5].is_empty();
+            asa::entities::local_player->get_inventory()->close();
+            asa::core::sleep_for(1s);
+            if (all_deposited) { return; }
         }
         throw std::exception("All unload stations full / none are available!");
     }
