@@ -49,7 +49,7 @@ namespace llpp::bots::farm
             return;
         }
         // Make sure we either press W or S on every swing for the default popup.
-        for (int i = 0; i < swing_times_; i++) {
+        for (int i = 0; i < swing_times_ + 1; i++) {
             anky_->primary_attack();
             asa::core::sleep_for(2200ms);
             anky_->go_back(200ms);

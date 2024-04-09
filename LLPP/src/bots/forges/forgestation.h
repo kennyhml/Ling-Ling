@@ -39,7 +39,7 @@ namespace llpp::bots::forges
 
         void fill_all();
 
-        void unload(const std::string& material);
+        bool unload(const std::string& material);
 
         bool loadup(bool is_at_unload, std::string& material_out);
 

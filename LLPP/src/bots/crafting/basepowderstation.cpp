@@ -49,8 +49,9 @@ namespace llpp::bots::crafting
         asa::entities::local_player->crouch();
 
         for (int i = 0; i < 3; i++) {
-            asa::core::sleep_for(std::chrono::milliseconds(500));
+            asa::core::sleep_for(300ms);
             asa::window::press(asa::settings::use);
+            asa::core::sleep_for(300ms);
 
             if (i == 0) { asa::entities::local_player->stand_up(); }
             else if (i == 1) { asa::entities::local_player->turn_up(50); }

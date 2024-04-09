@@ -1,5 +1,6 @@
 #include "unloadstation.h"
 #include <asapp/core/state.h>
+#include <asapp/interfaces/hud.h>
 
 
 namespace llpp::bots::forges
@@ -53,6 +54,16 @@ namespace llpp::bots::forges
 
         asa::entities::local_player->set_yaw(original_yaw);
         asa::entities::local_player->set_pitch(0);
+
+        asa::entities::local_player->get_inventory()->open();
+
+        if (!util::await([] {
+            return asa::entities::local_player->get_inventory()->slots[5].is_empty();
+        }, 10s)) {
+            last_full_ = std::chrono::system_clock::now();
+        }
+        asa::entities::local_player->get_inventory()->close();
+        asa::core::sleep_for(1s);
         return {this, true, get_time_taken<>(), {}};
     }
 }

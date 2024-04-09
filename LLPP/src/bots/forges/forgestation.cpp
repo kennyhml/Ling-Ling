@@ -16,6 +16,20 @@ namespace llpp::bots::forges
                 asa::structures::Container(prefix + "FORGE03", 100),
             };
         }
+
+        bool all_full(const std::vector<UnloadStation>& unload_stations_)
+        {
+            return std::ranges::all_of(unload_stations_, [](const UnloadStation& unload) {
+                return unload.was_recently_full();
+            });
+        }
+
+        bool all_empty(const std::vector<LoadupStation>& loadup_stations_)
+        {
+            return std::ranges::all_of(loadup_stations_, [](const LoadupStation& loadup) {
+                return loadup.was_recently_empty();
+            });
+        }
     }
 
     ForgeStation::ForgeStation(
@@ -68,7 +82,7 @@ namespace llpp::bots::forges
     bool ForgeStation::empty_forges()
     {
         // our station bed is the ::EMPTY bed right at the forges
-        if (!begin(true)) { return false; }
+        if (all_full(*unload_stations_) || !begin(true)) { return false; }
         asa::entities::local_player->crouch();
 
         // The bed is facing the middle forge, so we need to empty one in front,
@@ -108,29 +122,35 @@ namespace llpp::bots::forges
         fill(forges_[2]);
     }
 
-    void ForgeStation::unload(const std::string& material)
+    bool ForgeStation::unload(const std::string& material)
     {
+        if (std::ranges::all_of(*unload_stations_, [](const UnloadStation& unload) {
+            return unload.was_recently_full();
+        })) { return false; }
+
         asa::entities::local_player->set_yaw(view_diff_);
         mediator_station_.set_default_destination(true);
         mediator_station_.complete();
 
         for (UnloadStation& station: *unload_stations_) {
-            if (station.get_material() != material || !station.is_ready()) { continue; }
+            if (station.get_material() != material || !station.is_ready()
+                || station.was_recently_full()) { continue; }
 
             station.set_default_destination(false);
             if (!station.complete().success) { throw std::exception("Unload failed"); }
-            asa::entities::local_player->get_inventory()->open();
-            const bool all_deposited = asa::entities::local_player->get_inventory()
-                    ->slots[5].is_empty();
-            asa::entities::local_player->get_inventory()->close();
-            asa::core::sleep_for(1s);
-            if (all_deposited) { return; }
+            if (!station.was_recently_full()) { return true; }
         }
         throw std::exception("All unload stations full / none are available!");
     }
 
     bool ForgeStation::loadup(const bool is_at_unload, std::string& material_out)
     {
+        // Check if all of the loadups were recently empty, in which case we will just
+        // skip trying to refill for now and hope they get refilled soon.
+        if (std::ranges::all_of(*loadup_stations_, [](const LoadupStation& loadup) {
+            return loadup.was_recently_empty();
+        })) { return false; }
+
         if (!is_at_unload) {
             if (!begin(true)) { return false; }
             mediator_station_.set_default_destination(true);
@@ -147,20 +167,17 @@ namespace llpp::bots::forges
         // to cook. If we cannot get a cap then we wont refill the station just yet.
         bool any_not_ready = false;
         for (LoadupStation& station: *loadup_stations_) {
-            if (!station.is_ready()) {
+            if (!station.is_ready() || station.was_recently_empty()) {
                 any_not_ready = true;
                 continue;
             }
             station.set_default_destination(!any_not_ready);
 
             const auto result = station.complete();
-            if (result.success && result.obtained_items.at(station.get_material()) > 0) {
+            if (result.success && !station.was_recently_empty()) {
                 material_out = station.get_material();
                 return true;
             }
-            // This station did not have anything for us to fill, suspend it so that
-            // we dont check it again this completion.
-            station.suspend_for(5min);
         }
         // None of the loadup stations were able to get us a cap of items.
         return false;

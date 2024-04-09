@@ -80,7 +80,6 @@ void llpp_main()
 
     llpp::discord::update_dashboard();
 
-
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
         asa::entities::local_player->reset_state();

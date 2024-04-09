@@ -37,14 +37,13 @@ namespace llpp::bots::forges
         asa::entities::local_player->set_pitch(0);
         const int32_t original_yaw = asa::entities::local_player->get_yaw();
 
-        const bool success = get_slotcap();
-        if (!success) {
+        if (!get_slotcap()) {
             last_empty_ = std::chrono::system_clock::now();
         }
         asa::entities::local_player->set_yaw(original_yaw);
         asa::entities::local_player->set_pitch(0);
 
-        return {this, true, get_time_taken<>(), {{material_, success}}};
+        return {this, true, get_time_taken<>(), {}};
     }
 
     bool LoadupStation::get_slotcap()
