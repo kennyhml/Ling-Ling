@@ -71,12 +71,12 @@ namespace llpp::discord
     {
         for (const auto& command: commands_) {
             if (command.name == event.command.get_command_name()) {
-                return command.get_callback()(event);
+                return command.get_callback()(event, command.get_extra_data());
             }
         }
         for (const auto& command: static_commands_) {
             if (command.name == event.command.get_command_name()) {
-                return command.get_callback()(event);
+                return command.get_callback()(event, command.get_extra_data());
             }
         }
     }

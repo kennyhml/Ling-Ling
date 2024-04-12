@@ -1,10 +1,8 @@
 #include "metalmanager.h"
-
-#include <asapp/core/state.h>
-
 #include "../../../common/util.h"
 #include "../../../config/config.h"
 #include <asapp/interfaces/console.h>
+#include <asapp/core/state.h>
 
 namespace llpp::bots::farm
 {

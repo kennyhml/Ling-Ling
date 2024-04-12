@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "../../../discord/bot.h"
+#include "../../../discord/commands/commands.h"
 #include "farmbot.h"
 
 namespace llpp::bots::farm
@@ -27,7 +27,7 @@ namespace llpp::bots::farm
             throw std::runtime_error("Cannot stringify enum");
         }
 
-        void farm_command_callback(const dpp::slashcommand_t& event)
+        void farm_command_callback(const dpp::slashcommand_t& event, void*)
         {
             if (discord::handle_unauthorized_command(event)) { return; }
 
@@ -69,7 +69,7 @@ namespace llpp::bots::farm
     {
         if (registered) { return; }
 
-        dpp::slashcommand farm("farm", "Start or end a farming session", 0);
+        discord::ManagedCommand farm("farm", "Start or end a farming session", 0, farm_command_callback, true);
         farm.add_option(
             dpp::command_option(dpp::co_sub_command, "start",
                                 "Start a new farming session. Ling Ling++ will finish the current task and come to you.")
@@ -85,7 +85,7 @@ namespace llpp::bots::farm
         farm.add_option(dpp::command_option(dpp::co_sub_command, "end",
                                             "End an active farming session. Ling Ling++ will go back to regular tasks."));
 
-        discord::register_slash_command(farm, farm_command_callback);
+        discord::register_command(farm);
         registered = true;
     }
 }

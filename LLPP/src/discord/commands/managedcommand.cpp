@@ -6,7 +6,8 @@ namespace llpp::discord
                                    const std::string& t_description,
                                    const dpp::snowflake t_application_id,
                                    event_callback_t t_callback,
-                                   const bool t_is_static)
+                                   const bool t_is_static,
+                                   void* t_data)
         : slashcommand(t_name, t_description, t_application_id), is_static_(t_is_static),
-          callback_(std::move(t_callback)) {}
+          callback_(std::move(t_callback)), extra_data_(t_data) {}
 }

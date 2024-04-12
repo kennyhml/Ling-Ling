@@ -65,17 +65,18 @@ void llpp_main()
 
     auto taskmanager = llpp::core::TaskManager();
     try {
-        asa::window::get_handle();
-        asa::window::set_foreground();
         llpp::discord::init();
         llpp::discord::reset_dashboard();
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
+        llpp::discord::get_bot()->start(dpp::st_return);
+
+        asa::window::get_handle();
+        asa::window::set_foreground();
     } catch (const llpp::config::BadConfigurationError& e) {
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
-    llpp::discord::get_bot()->start(dpp::st_return);
     inform_started();
 
     llpp::discord::update_dashboard();

@@ -4,6 +4,7 @@
 #include "../../common/util.h"
 #include "../../config/config.h"
 #include "../../discord/bot.h"
+#include "../../discord/commands/commands.h"
 
 using namespace llpp::config::bots::crafting;
 
@@ -14,7 +15,7 @@ namespace llpp::bots::crafting
         CraftingManager* instance = nullptr;
 
         template<typename T>
-        void create(std::vector<std::unique_ptr<T>>& into, const int num,
+        void create(std::vector<std::unique_ptr<T> >& into, const int num,
                     const std::string& name, const std::chrono::minutes interval)
         {
             for (int i = 0; i < num; i++) {
@@ -25,14 +26,13 @@ namespace llpp::bots::crafting
 
         template<typename T>
         void add_station_choices(
-                const std::vector<std::unique_ptr<T>>& stations,
-                dpp::command_option& field)
+            const std::vector<std::unique_ptr<T> >& stations,
+            dpp::command_option& field)
         {
             for (const auto& station: stations) {
                 field.add_choice({station->get_name(), station->get_name()});
             }
         }
-
     }
 
     CraftingManager::CraftingManager()
@@ -69,8 +69,8 @@ namespace llpp::bots::crafting
     {
         if (spark::disabled.get()) { return; }
         for (const auto& station: spark_stations_) {
-            try { if (station->is_ready()) { station->complete(); }}
-            catch (const StationFullError&) {
+            try { if (station->is_ready()) { station->complete(); } } catch (const
+                StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
                 station->set_state(core::BaseStation::State::DISABLED);
             }
@@ -81,8 +81,8 @@ namespace llpp::bots::crafting
     {
         if (gunpowder::disabled.get()) { return; }
         for (const auto& station: gunpowder_stations_) {
-            try { if (station->is_ready()) { station->complete(); }}
-            catch (const StationFullError&) {
+            try { if (station->is_ready()) { station->complete(); } } catch (const
+                StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
                 station->set_state(core::BaseStation::State::DISABLED);
             }
@@ -101,8 +101,8 @@ namespace llpp::bots::crafting
     {
         if (arb::disabled.get()) { return; }
         for (const auto& station: arb_stations_) {
-            try { if (station->is_ready()) { station->complete(); }}
-            catch (const StationFullError&) {
+            try { if (station->is_ready()) { station->complete(); } } catch (const
+                StationFullError&) {
                 send_station_capped(station->get_name(), station->get_last_dedi_ss());
                 station->set_state(core::BaseStation::State::DISABLED);
             }
@@ -158,20 +158,21 @@ namespace llpp::bots::crafting
     std::chrono::minutes CraftingManager::get_time_left_until_ready() const
     {
         return util::get_time_left_until<std::chrono::minutes>(
-                spark_stations_[0]->get_next_completion());
+            spark_stations_[0]->get_next_completion());
     }
 
     bool CraftingManager::is_ready_to_run()
     {
-        return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready() || is_arb_ready();
+        return is_spark_ready() || is_gunpowder_ready() || is_grinding_ready() ||
+               is_arb_ready();
     }
 
     void CraftingManager::register_slash_commands()
     {
         if (has_registered_commands_) { return; }
 
-        dpp::slashcommand crafting("crafting", "Controls the crafting manager",
-                                   0);
+        discord::ManagedCommand crafting("crafting", "Controls the crafting manager",
+                                         0, slashcommand_callback, true);
 
         dpp::command_option enable(dpp::co_sub_command,
                                    "enable",
@@ -197,11 +198,11 @@ namespace llpp::bots::crafting
         crafting.add_option(disable.add_option(disable_field));
 
 
-        discord::register_slash_command(crafting, slashcommand_callback);
+        discord::register_command(crafting);
         has_registered_commands_ = true;
     }
 
-    void CraftingManager::slashcommand_callback(const dpp::slashcommand_t& event)
+    void CraftingManager::slashcommand_callback(const dpp::slashcommand_t& event, void*)
     {
         if (discord::handle_unauthorized_command(event)) { return; }
 

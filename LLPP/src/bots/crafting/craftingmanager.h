@@ -25,7 +25,7 @@ namespace llpp::bots::crafting
     private:
         void register_slash_commands();
 
-        static void slashcommand_callback(const dpp::slashcommand_t& event);
+        static void slashcommand_callback(const dpp::slashcommand_t& event, void*);
 
         void run_spark() const;
 

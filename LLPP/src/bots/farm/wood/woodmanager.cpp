@@ -103,10 +103,13 @@ namespace llpp::bots::farm
     void WoodManager::get_chainsaw() const
     {
         asa::entities::local_player->access(fabricator_);
+        fabricator_.get_inventory()->switch_to(
+            asa::interfaces::CraftingInventory::INVENTORY);
 
         if (asa::entities::local_player->get_inventory()->find_item(
             *asa::items::resources::thatch)) {
             asa::entities::local_player->get_inventory()->drop_all("thatch");
+            asa::core::sleep_for(500ms);
         }
 
         // put everything on us in the fabricator, so that we can reuse this behavior

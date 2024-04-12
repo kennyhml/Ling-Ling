@@ -3,7 +3,7 @@
 
 namespace llpp::discord
 {
-    using event_callback_t = std::function<void(const dpp::slashcommand_t&)>;
+    using event_callback_t = std::function<void(const dpp::slashcommand_t&, void* data)>;
 
     class ManagedCommand final : public dpp::slashcommand
     {
@@ -11,7 +11,8 @@ namespace llpp::discord
         ManagedCommand(const std::string& t_name, const std::string& t_description,
                        dpp::snowflake t_application_id,
                        event_callback_t t_callback,
-                       bool t_is_static = false
+                       bool t_is_static = false,
+                       void* t_data = nullptr
         );
 
         /**
@@ -32,7 +33,11 @@ namespace llpp::discord
          */
         [[nodiscard]] const event_callback_t& get_callback() const { return callback_; }
 
+        [[nodiscard]] void* get_extra_data() const { return extra_data_; }
+
     private:
+        void* extra_data_;
+
         bool is_static_;
         event_callback_t callback_;
     };

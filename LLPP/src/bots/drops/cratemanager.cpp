@@ -6,47 +6,49 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
+#include "../../discord/commands/commands.h"
+
 namespace llpp::bots::drops
 {
     namespace
     {
         void set_group_cooldown(std::vector<BedCrateStation>& group)
         {
-            for (auto& station : group) { station.suspend_for(std::chrono::minutes(1)); }
+            for (auto& station: group) { station.suspend_for(std::chrono::minutes(1)); }
         }
 
         void set_group_cooldown(std::vector<TeleportCrateStation>& group)
         {
-            for (auto& station : group) {
+            for (auto& station: group) {
                 station.set_default_destination(false);
                 station.suspend_for(std::chrono::minutes(1));
             }
         }
 
-        template <typename T>
+        template<typename T>
         void set_group_rendered(std::vector<T>& group, const bool rendered)
         {
-            for (auto& station : group) { station.set_rendered(rendered); }
+            for (auto& station: group) { station.set_rendered(rendered); }
         }
 
 
-        template <typename T>
-        bool all_ready(std::vector<std::vector<T>>& stations)
+        template<typename T>
+        bool all_ready(std::vector<std::vector<T> >& stations)
         {
             if (stations.empty()) { return false; }
 
-            for (auto& group : stations) {
-                for (auto& station : group) {
+            for (auto& group: stations) {
+                for (auto& station: group) {
                     if (!station.is_ready()) { return false; }
                 }
             }
             return true;
         }
 
-        template <typename T>
-        std::vector<std::vector<T>> parse_stations(CrateManagerConfig* config)
+        template<typename T>
+        std::vector<std::vector<T> > parse_stations(CrateManagerConfig* config)
         {
-            std::vector<std::vector<T>> ret;
+            std::vector<std::vector<T> > ret;
             std::vector<int> lefts;
             std::vector<int> rights;
 
@@ -56,8 +58,9 @@ namespace llpp::bots::drops
 
             // keep track of the positions of the left and right curly brackets
             for (int i = 0; i < str.size(); i++) {
-                if (str.at(i) == '{') { lefts.push_back(i); }
-                else if (str.at(i) == '}') { rights.push_back(i); }
+                if (str.at(i) == '{') { lefts.push_back(i); } else if (str.at(i) == '}') {
+                    rights.push_back(i);
+                }
             }
 
             if (lefts.size() != rights.size()) {
@@ -67,7 +70,7 @@ namespace llpp::bots::drops
 
             int group = 0;
             int num_station = 1;
-            for (int left : lefts) {
+            for (int left: lefts) {
                 std::string roi = str.substr(left + 1, rights[group] - left - 1);
                 std::vector<int> commas;
                 for (int j = 0; j < roi.size(); j++) {
@@ -111,8 +114,7 @@ namespace llpp::bots::drops
         if (config_->uses_teleporters) {
             teleport_stations_ = parse_stations<TeleportCrateStation>(config_);
             stats_per_group.resize(teleport_stations_.size());
-        }
-        else {
+        } else {
             bed_stations_ = parse_stations<BedCrateStation>(config_);
             stats_per_group.resize(bed_stations_.size());
         }
@@ -136,8 +138,9 @@ namespace llpp::bots::drops
 
         const auto start = std::chrono::system_clock::now();
 
-        if (config_->uses_teleporters) { run_teleport_stations(); }
-        else { run_bed_stations(); }
+        if (config_->uses_teleporters) { run_teleport_stations(); } else {
+            run_bed_stations();
+        }
 
         const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
         const auto next = std::chrono::system_clock::now() + get_time_left_until_ready();
@@ -152,7 +155,7 @@ namespace llpp::bots::drops
     {
         for (int i = 0; i < bed_stations_.size(); i++) {
             set_group_rendered(bed_stations_[i], false);
-            for (auto& station : bed_stations_[i]) {
+            for (auto& station: bed_stations_[i]) {
                 if (!station.is_ready()) { continue; }
 
                 const auto result = station.complete();
@@ -181,7 +184,7 @@ namespace llpp::bots::drops
 
         for (int i = 0; i < teleport_stations_.size(); i++) {
             set_group_rendered(teleport_stations_[i], false);
-            for (auto& station : teleport_stations_[i]) {
+            for (auto& station: teleport_stations_[i]) {
                 if (!station.is_ready()) {
                     if (i == 0 && &station == &teleport_stations_[i].front()) {
                         // Here we are in trouble, the first station currently
@@ -240,10 +243,9 @@ namespace llpp::bots::drops
 
     void CrateManager::register_slash_commands()
     {
-        dpp::slashcommand crate_commands("crates", "Controls all crate managers.", 0);
+        discord::ManagedCommand crate_commands("crates", "Controls all crate managers.",
+                                               0, reroll_mode_callback, true);
 
-        // reroll command must only be registered once for the first crate
-        // manager to be crated.
         if (!has_registered_reroll_command_) {
             dpp::command_option reroll_group(dpp::co_sub_command_group, "reroll",
                                              "Manage reroll mode test");
@@ -259,11 +261,11 @@ namespace llpp::bots::drops
             crate_commands.add_option(reroll_group);
 
             has_registered_reroll_command_ = true;
-            discord::register_slash_command(crate_commands, reroll_mode_callback);
+            discord::register_command(crate_commands);
         }
     }
 
-    void CrateManager::reroll_mode_callback(const dpp::slashcommand_t& event)
+    void CrateManager::reroll_mode_callback(const dpp::slashcommand_t& event, void*)
     {
         if (discord::handle_unauthorized_command(event)) { return; }
 

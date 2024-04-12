@@ -58,7 +58,7 @@ namespace llpp::bots::drops
         inline static DropoffStation dropoff_;
 
     private:
-        static void reroll_mode_callback(const dpp::slashcommand_t&);
+        static void reroll_mode_callback(const dpp::slashcommand_t&, void*);
 
         void run_teleport_stations();
 
