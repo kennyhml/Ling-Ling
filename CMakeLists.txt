@@ -193,6 +193,10 @@ add_executable(LLPP WIN32
         LLPP/src/bots/farm/obsidian/obsidianstation.h
         LLPP/src/bots/farm/obsidian/obsidianmanager.cpp
         LLPP/src/bots/farm/obsidian/obsidianmanager.h
+        LLPP/src/discord/commands/managedcommand.h
+        LLPP/src/discord/commands/managedcommand.cpp
+        LLPP/src/discord/commands/commands.cpp
+        LLPP/src/discord/commands/commands.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
