@@ -203,10 +203,10 @@ namespace llpp::bots::forges
 
     std::string ForgeStation::get_last_material() const
     {
-        std::string mat;
+        std::string material;
         int64_t _;
-        get_cooking(get_name(), mat, _);
-        return mat;
+        get_cooking(get_name(), material, _);
+        return material;
     }
 
     int64_t ForgeStation::get_last_filled() const

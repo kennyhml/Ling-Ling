@@ -75,4 +75,15 @@ namespace llpp::bots::farm
 
         return util::get_time_left_until<std::chrono::minutes>(next);
     }
+
+    void MetalManager::register_commands()
+    {
+
+
+
+
+
+
+
+    }
 }

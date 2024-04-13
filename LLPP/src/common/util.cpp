@@ -97,4 +97,11 @@ namespace llpp::util
         oss << std::setw(2) << std::setfill('0') << s.count();
         return oss.str().size() <= 2 ? "-:-:-" : oss.str();
     }
+
+    std::string lowercase(const std::string& string)
+    {
+        std::string result = string;
+        std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+        return result;
+    }
 }

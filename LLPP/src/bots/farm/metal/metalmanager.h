@@ -20,6 +20,8 @@ namespace llpp::bots::farm
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
 
     private:
+        void register_commands();
+
         FarmConfig* config_;
 
         std::shared_ptr<asa::entities::DinoEntity> anky_;

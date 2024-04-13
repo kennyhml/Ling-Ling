@@ -86,9 +86,8 @@ namespace llpp::core
 
         tasks_.emplace_back("FORGES", std::make_unique<forges::ForgeManager>());
 
-        for (auto& [key, config]: config::bots::drops::configs) {
-            tasks_.emplace_back(
-                key, std::make_unique<drops::CrateManager>(config.get_ptr()));
+        for (auto& manager: drops::create_crate_managers()) {
+            tasks_.emplace_back("", std::move(manager));
         }
 
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());

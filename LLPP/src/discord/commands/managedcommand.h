@@ -35,6 +35,7 @@ namespace llpp::discord
 
         [[nodiscard]] void* get_extra_data() const { return extra_data_; }
 
+
     private:
         void* extra_data_;
 

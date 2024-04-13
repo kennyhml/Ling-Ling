@@ -53,8 +53,6 @@ namespace llpp::bots::drops
         asa::structures::Container dropoff_vault_;
         std::map<std::string, float> vaults_filled_;
 
-        inline static bool has_registered_reroll_command_ = false;
-
         inline static DropoffStation dropoff_;
 
     private:
@@ -67,4 +65,8 @@ namespace llpp::bots::drops
         void spawn_on_align_bed();
         void register_slash_commands();
     };
+
+    std::vector<std::unique_ptr<CrateManager>> create_crate_managers();
+
+
 }
