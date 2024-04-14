@@ -5,6 +5,7 @@
 #include <asapp/core/state.h>
 #include <asapp/interfaces/spawnmap.h>
 #include <asapp/interfaces/tribemanager.h>
+#include <asapp/structures/exceptions.h>
 
 namespace llpp::core
 {
@@ -28,9 +29,19 @@ namespace llpp::core
 
     bool TeleportStation::begin(const bool check_logs)
     {
+        static asa::structures::SimpleBed bed("TP TRANSITION");
         last_started_ = std::chrono::system_clock::now();
-
-        try { asa::entities::local_player->teleport_to(start_tp_, flags_); }
+        try {
+            asa::entities::local_player->teleport_to(start_tp_, flags_);
+        }
+        catch (const asa::structures::StructureNotOpenedError& e) {
+            std::cerr << e.what() << std::endl;
+            if (bed.get_interface()->is_open()) {
+                asa::entities::local_player->fast_travel_to(bed);
+                return begin(check_logs);
+            }
+            throw;
+        }
         catch (const asa::interfaces::DestinationNotFound& e) {
             std::cerr << e.what() << std::endl;
             discord::get_bot()->message_create(
