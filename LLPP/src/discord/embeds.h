@@ -21,7 +21,7 @@ namespace llpp::discord
     * @brief Creates a message to display information about an error that occured
     * but was handled accordingly.
     */
-    dpp::message create_error_message(const std::exception& error, bool ping = true);
+    dpp::message create_error_message(const std::string& error, bool ping = true);
 
     /**
      * @brief Creates a message that displays information about a station having been

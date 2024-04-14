@@ -1,4 +1,7 @@
 #include "cratemanager.h"
+
+#include <asapp/core/exceptions.h>
+
 #include "embeds.h"
 #include "../../common/util.h"
 #include "../../config/config.h"
@@ -6,8 +9,10 @@
 #include "../../discord/commands/commands.h"
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
+#include <asapp/interfaces/spawnmap.h>
 
 #include "commands.h"
+#include "../../discord/embeds.h"
 
 namespace llpp::bots::drops
 {
@@ -140,8 +145,19 @@ namespace llpp::bots::drops
 
         const auto start = std::chrono::system_clock::now();
 
-        if (config_->uses_teleporters) { run_teleport_stations(); } else {
-            run_bed_stations();
+        try {
+            config_->uses_teleporters ? run_teleport_stations() : run_bed_stations();
+        } catch (const asa::core::ASAPPError& e) {
+            if (asa::interfaces::spawn_map->is_open()) {
+
+                const auto msg = discord::create_error_message(
+                    std::format("`{}` (caused by death)."
+                                "\nPlease remove the body and reenable the manager.",
+                                e.what()));
+                discord::get_bot()->message_create(msg);
+                config_->disabled = true;
+                return false;
+            }
         }
 
         const auto time_taken = util::get_elapsed<std::chrono::seconds>(start);
@@ -175,7 +191,6 @@ namespace llpp::bots::drops
 
         beds_out_station_.complete();
     }
-
 
     void CrateManager::run_teleport_stations()
     {

@@ -48,14 +48,14 @@ namespace llpp::discord
         return msg;
     }
 
-    dpp::message create_error_message(const std::exception& error, const bool ping)
+    dpp::message create_error_message(const std::string& error, const bool ping)
     {
         dpp::embed embed;
         embed.set_title("Ling Ling++ ran into a problem!");
         embed.set_color(dpp::colors::red);
         embed.set_thumbnail(REPAIR_BROWN_ICON);
         embed.set_description("The error was handled accordingly.");
-        embed.add_field("Error: ", error.what(), true);
+        embed.add_field("Error: ", error, true);
         embed.set_image("attachment://image.png");
         set_now_timestamp(embed);
 

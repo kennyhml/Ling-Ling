@@ -41,6 +41,13 @@ namespace llpp::bots::drops
         std::vector<CrateGroupStatistics> stats_per_group;
 
     private:
+
+        void run_teleport_stations();
+
+        void run_bed_stations();
+
+        void spawn_on_align_bed();
+
         CrateManagerConfig* config_;
 
         std::vector<std::vector<BedCrateStation>> bed_stations_;
@@ -54,13 +61,6 @@ namespace llpp::bots::drops
         std::map<std::string, float> vaults_filled_;
 
         inline static DropoffStation dropoff_;
-
-    private:
-        void run_teleport_stations();
-
-        void run_bed_stations();
-
-        void spawn_on_align_bed();
     };
 
     std::vector<std::unique_ptr<CrateManager>> create_crate_managers();
