@@ -28,7 +28,7 @@ namespace llpp::bots::kitchen
             }
         }
         catch (asa::structures::StructureNotOpenedError& e) {
-            discord::get_bot()->message_create(discord::create_error_message(e));
+            discord::get_bot()->message_create(discord::create_error_message(e.what()));
         }
         set_completed();
         return {this, success, get_time_taken<std::chrono::seconds>(), {}};
