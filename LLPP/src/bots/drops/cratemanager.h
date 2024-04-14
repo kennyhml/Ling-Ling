@@ -56,14 +56,11 @@ namespace llpp::bots::drops
         inline static DropoffStation dropoff_;
 
     private:
-        static void reroll_mode_callback(const dpp::slashcommand_t&, void*);
-
         void run_teleport_stations();
 
         void run_bed_stations();
 
         void spawn_on_align_bed();
-        void register_slash_commands();
     };
 
     std::vector<std::unique_ptr<CrateManager>> create_crate_managers();

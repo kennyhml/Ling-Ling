@@ -197,6 +197,8 @@ add_executable(LLPP WIN32
         LLPP/src/discord/commands/managedcommand.cpp
         LLPP/src/discord/commands/commands.cpp
         LLPP/src/discord/commands/commands.h
+        LLPP/src/bots/drops/commands.cpp
+        LLPP/src/bots/drops/commands.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

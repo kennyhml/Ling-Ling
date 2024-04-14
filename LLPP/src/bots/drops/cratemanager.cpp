@@ -7,58 +7,14 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 
+#include "commands.h"
+
 namespace llpp::bots::drops
 {
     using namespace config::bots::drops;
 
     namespace
     {
-        void command_callback(const dpp::slashcommand_t& event, void* data)
-        {
-            if (discord::handle_unauthorized_command(event)) { return; }
-
-            auto cmd_options = event.command.get_command_interaction();
-            auto subcommand = cmd_options.options[0];
-
-            if (subcommand.name == "disable" || subcommand.name == "enable") {
-                const std::string name = subcommand.get_value<std::string>(0);
-                if (!configs.contains(name)) {
-                    return event.reply("No manager of this name exists.");
-                }
-                auto& disabled = configs.at(name).get_ptr()->disabled;
-
-                if (subcommand.name == "disable") {
-                    if (disabled) { return event.reply("Already disabled."); }
-                    disabled = true;
-                    configs.at(name).save();
-                    return event.reply("Successfully disabled.");
-                } else {
-                    if (!disabled) { return event.reply("Already enabled"); }
-                    disabled = false;
-                    configs.at(name).save();
-                    return event.reply("Successfully enabled..");
-                }
-            }
-        }
-
-        dpp::command_option get_reroll_command()
-        {
-            dpp::command_option reroll(dpp::co_sub_command_group, "reroll",
-                                       "Toggle the reroll mode on / off.");
-
-            dpp::command_option set(dpp::co_sub_command, "set", "Set reroll mode");
-            set.add_option({dpp::co_boolean, "toggle", "Whether to reroll", true});
-
-            reroll.add_option(set)
-                  .add_option({dpp::co_sub_command, "get", "Get the reroll state"});
-
-            return reroll;
-        }
-
-        discord::ManagedCommand commands("crates", "Controls the Crate Managers.", 0,
-                                         command_callback, false);
-        bool has_registered_reroll = false;
-
         void set_group_cooldown(std::vector<BedCrateStation>& group)
         {
             for (auto& station: group) { station.suspend_for(std::chrono::minutes(1)); }
@@ -165,7 +121,6 @@ namespace llpp::bots::drops
             bed_stations_ = parse_stations<BedCrateStation>(config_);
             stats_per_group.resize(bed_stations_.size());
         }
-        register_slash_commands();
     }
 
     void CrateManager::CrateGroupStatistics::add_looted()
@@ -288,64 +243,15 @@ namespace llpp::bots::drops
         asa::core::sleep_for(std::chrono::seconds(config_->render_align_for));
     }
 
-    void CrateManager::register_slash_commands()
-    {
-        if (!has_registered_reroll) {
-            commands.add_option(get_reroll_command());
-            has_registered_reroll = true;
-        }
-    }
-
-    void CrateManager::reroll_mode_callback(const dpp::slashcommand_t& event, void*)
-    {
-        if (discord::handle_unauthorized_command(event)) { return; }
-
-        auto cmd_data = event.command.get_command_interaction();
-
-        auto& subcommand = cmd_data.options[0].options[0];
-
-        if (subcommand.name == "get") {
-            return event.reply(std::format("Reroll mode is currently off"));
-        }
-
-        const bool enable = subcommand.get_value<bool>(0);
-        std::string as_string = enable ? "true" : "false";
-
-        auto& reroll = reroll_mode;
-        if (reroll.get() == enable) {
-            return event.reply(std::format("`reroll mode` is already `{}`", as_string));
-        }
-        reroll.set(enable);
-        event.reply(std::format("`reroll mode` has been changed to `{}`", as_string));
-    }
-
     std::vector<std::unique_ptr<CrateManager> > create_crate_managers()
     {
-        commands.options.clear();
-        has_registered_reroll = false;
-
-        dpp::command_option disable(dpp::co_sub_command, "disable",
-                                    "Disable a crate manager");
-        dpp::command_option disable_field(dpp::co_string, "manager",
-                                          "The manager to disable", true);
-
-        dpp::command_option enable(dpp::co_sub_command, "enable",
-                                   "Disable a crate manager");
-        dpp::command_option enable_field(dpp::co_string, "manager",
-                                         "The manager to enable", true);
+        register_commands();
 
         std::vector<std::unique_ptr<CrateManager> > ret;
         for (auto& config: std::views::values(configs)) {
             ret.emplace_back(std::make_unique<CrateManager>(config.get_ptr()));
-            disable_field.add_choice({
-                config.get_ptr()->prefix, config.get_ptr()->prefix
-            });
-            enable_field.add_choice({config.get_ptr()->prefix, config.get_ptr()->prefix});
         }
 
-        commands.add_option(disable.add_option(disable_field));
-        commands.add_option(enable.add_option(enable_field));
-        discord::register_command(commands);
         return ret;
     }
 }
