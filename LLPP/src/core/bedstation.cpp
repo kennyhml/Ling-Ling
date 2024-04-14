@@ -5,6 +5,7 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/tribemanager.h>
 #include <asapp/entities/exceptions.h>
+#include <asapp/interfaces/hud.h>
 #include <asapp/interfaces/spawnmap.h>
 #include "../discord/bot.h"
 
@@ -28,21 +29,29 @@ namespace llpp::core
 
     bool BedStation::begin(const bool check_logs)
     {
+        static asa::structures::Teleporter tp("BED TRANSITION");
+
         last_started_ = std::chrono::system_clock::now();
 
         const auto flags = check_logs ? TravelFlags_NoTravelAnimation : TravelFlags_None;
         try {
             if (asa::interfaces::spawn_map->is_open()) {
                 asa::interfaces::spawn_map->spawn_at(spawn_bed_.get_name());
-            }
-            else {
+            } else {
                 asa::entities::local_player->fast_travel_to(
                     spawn_bed_, AccessFlags_Default, flags);
             }
-        }
-        catch (const asa::entities::FastTravelFailedError& e) {
+        } catch (const asa::entities::FastTravelFailedError& e) {
             std::cerr << e.what() << std::endl;
-            asa::entities::local_player->suicide();
+            // If we accessed a tp or can access one instead of a bed, use that tp
+            // to get to a bed and try again.
+            if (tp.get_interface()->is_open()) {
+                asa::entities::local_player->teleport_to(tp);
+                return begin(check_logs);
+            }
+            if (!asa::interfaces::spawn_map->is_open()) {
+                asa::entities::local_player->suicide();
+            }
             asa::interfaces::spawn_map->spawn_at(reset_bed_.get_name());
             return begin();
         } catch (const asa::interfaces::DestinationNotFound& e) {
