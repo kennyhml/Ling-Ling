@@ -199,6 +199,10 @@ add_executable(LLPP WIN32
         LLPP/src/discord/commands/commands.h
         LLPP/src/bots/drops/commands.cpp
         LLPP/src/bots/drops/commands.h
+        LLPP/src/bots/boss/common/crate_collect.cpp
+        LLPP/src/bots/boss/common/crate_collect.h
+        LLPP/src/bots/common/artifactstation.cpp
+        LLPP/src/bots/common/artifactstation.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
