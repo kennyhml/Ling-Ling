@@ -203,6 +203,12 @@ add_executable(LLPP WIN32
         LLPP/src/bots/boss/common/crate_collect.h
         LLPP/src/bots/common/artifactstation.cpp
         LLPP/src/bots/common/artifactstation.h
+        LLPP/src/bots/boss/brood/brood.cpp
+        LLPP/src/bots/boss/brood/brood.h
+        LLPP/src/bots/boss/brood/embeds.cpp
+        LLPP/src/bots/boss/brood/embeds.h
+        LLPP/src/bots/boss/common/element_deposit.cpp
+        LLPP/src/bots/boss/common/element_deposit.h
 )
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)

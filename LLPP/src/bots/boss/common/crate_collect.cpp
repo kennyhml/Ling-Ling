@@ -1,9 +1,10 @@
 #include "crate_collect.h"
 
-#include <iostream>
+#include <asapp/core/state.h>
+
+#include "../../../common/util.h"
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/hud.h>
-#include <asapp/util/util.h>
 
 namespace llpp::bots::boss
 {
@@ -18,7 +19,7 @@ namespace llpp::bots::boss
         }
     }
 
-    bool collect_element_crate(const CrateTier tier)
+    bool collect_element_crate(const CrateTier tier, cv::Mat& element_image_out)
     {
         std::chrono::system_clock::time_point last_access_attempt;
         const auto start = std::chrono::system_clock::now();
@@ -45,10 +46,13 @@ namespace llpp::bots::boss
 
             if (!asa::entities::local_player->turn_to_closest_waypoint(color, 20)) {
                 // TODO: Handle cases where we cant locate the crate (too far away?)
+                asa::entities::local_player->jump();
             }
         }
         asa::controls::key_up("w");
+        asa::core::sleep_for(500ms);
         // Take all from the crate until it disappears, just like a loot crate.
+        element_image_out = asa::window::screenshot({1193, 227, 574, 200});
         do {
             crate.get_inventory()->transfer_all();
         } while (!util::await([&crate] {

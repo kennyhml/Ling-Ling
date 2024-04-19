@@ -61,11 +61,11 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"discord", "authorization"};
 
-            inline ManagedVar<std::vector<const char*>> roles(
+            inline ManagedVar<std::vector<const char*> > roles(
                 BASE, "authorized_roles", save, {});
-            inline ManagedVar<std::vector<const char*>> channels(
+            inline ManagedVar<std::vector<const char*> > channels(
                 BASE, "command_channels", save, {});
-            inline ManagedVar<std::vector<const char*>> users(
+            inline ManagedVar<std::vector<const char*> > users(
                 BASE, "authorized_users", save, {});
         }
 
@@ -106,7 +106,7 @@ namespace llpp::config
         {
             inline const std::vector<std::string> BASE{"discord", "alert_rules"};
 
-            using filter = ManagedVar<std::vector<const char*>>;
+            using filter = ManagedVar<std::vector<const char*> >;
 
             inline ManagedVar<int> ping_cooldown(BASE, "ping_cooldown", save, 60);
             inline ManagedVar<int> ping_min_events(BASE, "ping_min_events", save, 1);
@@ -120,12 +120,12 @@ namespace llpp::config
     {
         inline const std::vector<std::string> BASE{"bots", "drops"};
 
-        inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+        inline ManagedVar<std::vector<const char*> > managers(BASE, "managers", save, {});
         inline ManagedVar<bool> reroll_mode(BASE, "reroll_mode", save, false);
         inline ManagedVar<int> vault_alert_threshold(BASE, "vault_alert_threshold", save,
                                                      70);
         inline std::unordered_map<std::string, ManagedVar<
-                                      llpp::bots::drops::CrateManagerConfig>> configs;
+            llpp::bots::drops::CrateManagerConfig> > configs;
 
         inline ManagedVar<std::string> loot_channel(BASE, "loot_channel", save, "");
         inline ManagedVar<std::string> reroll_role(BASE, "reroll_role", save, "");
@@ -148,14 +148,16 @@ namespace llpp::config
         inline ManagedVar<bool> allow_partial(BASE, "allow_partial", save, false);
         inline ManagedVar<bool> mute_pings(BASE, "mute_pings", save, false);
 
-        inline ManagedVar<std::vector<int64_t>> times(BASE, "completion_times", save, {});
+        inline ManagedVar<std::vector<int64_t> >
+        times(BASE, "completion_times", save, {});
     }
 
     namespace bots::sap
     {
         inline const std::vector<std::string> BASE{"bots", "sap"};
 
-        inline ManagedVar<std::vector<int64_t>> times(BASE, "completion_times", save, {});
+        inline ManagedVar<std::vector<int64_t> >
+        times(BASE, "completion_times", save, {});
 
         inline ManagedVar<std::string> prefix(BASE, "prefix", save, "SAP");
         inline ManagedVar<int> num_stations(BASE, "num_stations", save, 12);
@@ -225,7 +227,7 @@ namespace llpp::config
     {
         inline const std::vector<std::string> BASE{"bots", "parasaur"};
 
-        inline ManagedVar<std::vector<const char*>> stations(BASE, "stations", save, {});
+        inline ManagedVar<std::vector<const char*> > stations(BASE, "stations", save, {});
 
         inline ManagedVar<std::string> start_criteria(BASE, "start_criteria", save, "");
         inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
@@ -238,18 +240,18 @@ namespace llpp::config
                                                       "PARASAUR::START");
 
         inline std::unordered_map<std::string, ManagedVar<
-                                      llpp::bots::parasaur::ParasaurConfig>> configs;
+            llpp::bots::parasaur::ParasaurConfig> > configs;
     }
 
     namespace bots::farm
     {
         inline const std::vector<std::string> BASE{"bots", "farm"};
 
-        inline ManagedVar<std::vector<const char*>> managers(BASE, "managers", save, {});
+        inline ManagedVar<std::vector<const char*> > managers(BASE, "managers", save, {});
 
         inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
         inline std::unordered_map<std::string, ManagedVar<
-                                      llpp::bots::farm::FarmConfig>> configs;
+            llpp::bots::farm::FarmConfig> > configs;
     }
 
     namespace bots::forges
@@ -261,5 +263,15 @@ namespace llpp::config
 
         inline ManagedVar<int> metal_loadups(BASE, "metal_loadups", save, 1);
         inline ManagedVar<int> wood_loadups(BASE, "wood_loadups", save, 1);
+    }
+
+    namespace bots::boss
+    {
+        inline const std::vector<std::string> BASE{"bots", "boss"};
+
+        inline ManagedVar<int64_t> last_brood(BASE, "last_brood", save, 0);
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, false);
+
+        inline ManagedVar<int> ele_in_rexes(BASE, "ele_in_rexes", save, false);
     }
 }

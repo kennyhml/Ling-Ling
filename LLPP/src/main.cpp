@@ -4,9 +4,10 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/console.h>
+#include <asapp/interfaces/hud.h>
 #include <asapp/interfaces/tribemanager.h>
 #include <asapp/items/items.h>
-#include <asapp/game/resources.h>
+#include <asapp/structures/tributeable.h>
 #include "bots/farm/swingbot/commands.h"
 #include "auth/auth.h"
 #include "gui/gui.h"
@@ -14,13 +15,14 @@
 #include "core/recovery.h"
 #include "core/taskmanager.h"
 #include <curl/curl.h>
-
-#include "bots/farm/wood/woodmanager.h"
+#include "bots/boss/brood/brood.h"
 #include "common/util.h"
 #include "discord/bot.h"
 #include "discord/dashboard.h"
 #include "discord/embeds.h"
-
+#include <asapp/game/resources.h>
+#include <asapp/util/util.h>
+#include <opencv2/highgui.hpp>
 
 static bool running = false;
 static bool paused = false;
@@ -51,6 +53,12 @@ void inform_crashed(const std::exception& why, const std::string& task)
         llpp::discord::create_fatal_error_message(why, task));
 }
 
+bool isVertical(const std::vector<cv::Point>& contour) {
+    cv::Rect boundingRect = cv::boundingRect(contour);
+    return boundingRect.width > boundingRect.height; // Assuming vertical bars have greater height than width
+}
+
+
 void llpp_main()
 {
     using namespace llpp::config::bots;
@@ -80,6 +88,10 @@ void llpp_main()
     inform_started();
 
     llpp::discord::update_dashboard();
+
+    asa::entities::local_player->reset_state();
+
+    llpp::bots::boss::run_brood_if_ready();
 
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
@@ -123,7 +135,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    llpp::auth::login();
+    // llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

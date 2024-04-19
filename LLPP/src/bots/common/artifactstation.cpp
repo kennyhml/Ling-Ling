@@ -12,10 +12,10 @@ namespace llpp::bots
 
     core::StationResult ArtifactStation::complete()
     {
-
         if (!begin(false)) {
             return {this, false, get_time_taken<>(), {}};
         }
+
         asa::entities::local_player->stand_up();
         asa::core::sleep_for(500ms);
         asa::entities::local_player->crouch();

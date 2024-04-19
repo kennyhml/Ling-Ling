@@ -1,4 +1,5 @@
 #pragma once
+#include <opencv2/opencv.hpp>
 #include <cstdint>
 
 namespace llpp::bots::boss
@@ -16,5 +17,5 @@ namespace llpp::bots::boss
      * @param tier The tier of the boss that dropped the crate, used for waypoint color.
      * @return True if the crate was collected before the timer ran out, false otherwise.
      */
-    bool collect_element_crate(CrateTier tier);
+    bool collect_element_crate(CrateTier tier, cv::Mat& element_image_out);
 }
