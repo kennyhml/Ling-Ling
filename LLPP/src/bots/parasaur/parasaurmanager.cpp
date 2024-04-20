@@ -4,8 +4,6 @@
 #include "../../config/config.h"
 #include "../../common/util.h"
 #include <asapp/core/state.h>
-#include <asapp/entities/localplayer.h>
-
 #include "../../discord/bot.h"
 
 namespace llpp::bots::parasaur
@@ -13,9 +11,7 @@ namespace llpp::bots::parasaur
     using namespace config::bots::parasaur;
 
     ParasaurManager::ParasaurManager()
-        : spawn_bed_(teleport_start.get(), std::chrono::minutes(5)),
-          spawn_tp_(teleport_start.get(), std::chrono::minutes(5)),
-          next_tp_("PARASAUR::NEXT", std::chrono::minutes(0))
+        : spawn_bed_(teleport_start.get(), 5min), spawn_tp_(teleport_start.get(), 5min)
     {
         for (auto& [name, data]: configs) {
             if (data.get_ptr()->is_teleporter) {
@@ -75,7 +71,7 @@ namespace llpp::bots::parasaur
 
     bool ParasaurManager::is_ready_to_run()
     {
-        if (disabled.get() || !(spawn_bed_.is_ready() && next_tp_.is_ready())) {
+        if (disabled.get() || !(spawn_bed_.is_ready())) {
             return false;
         }
 
@@ -87,9 +83,7 @@ namespace llpp::bots::parasaur
         if (start_criteria.get() == "MIN READY") {
             int ready = 0;
             for (const auto& station: tp_stations_) { ready += station->is_ready(); }
-            for (const auto& station: bed_stations_) {
-                ready += station->BedStation::is_ready();
-            }
+            for (const auto& station: bed_stations_) { ready += station->is_ready(); }
             return ready >= start_min_ready.get();
         }
 
@@ -107,10 +101,7 @@ namespace llpp::bots::parasaur
     {
         if (!spawn_bed_.complete().success) { return false; }
         asa::core::sleep_for(std::chrono::seconds(start_load.get()));
-
-        asa::entities::local_player->crouch();
-        next_tp_.set_default_destination(true);
-        return next_tp_.complete().success;
+        return true;
     }
 
     void ParasaurManager::update_dashboard_component()

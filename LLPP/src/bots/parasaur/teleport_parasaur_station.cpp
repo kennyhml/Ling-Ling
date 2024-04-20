@@ -58,9 +58,6 @@ namespace llpp::bots::parasaur
             return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
 
-        asa::entities::local_player->stand_up();
-        asa::entities::local_player->crouch();
-
         // let the station load for at least 15s if we detected something at the previous
         // station in order to get rid of the lingering alert.
         int load_for = config_->load_for;

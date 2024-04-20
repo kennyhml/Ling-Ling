@@ -31,7 +31,6 @@ namespace llpp::bots::parasaur
         std::vector<std::unique_ptr<TeleportParasaurStation> > tp_stations_;
         core::BedStation spawn_bed_;
         core::TeleportStation spawn_tp_;
-        core::TeleportStation next_tp_;
 
         std::shared_ptr<dpp::embed_field> dashboard_field_;
     };
