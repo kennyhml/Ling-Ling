@@ -190,6 +190,8 @@ namespace llpp::bots::drops
         asa::entities::local_player->set_yaw(-80);
 
         asa::entities::local_player->access(fridge_);
+        fridge_.get_inventory()->transfer_all();
+        util::await([this] {return fridge_.get_inventory()->slots[0].is_empty();}, 20s);
         asa::entities::local_player->get_inventory()->transfer_all();
         fridge_.get_inventory()->close();
         asa::core::sleep_for(1s);
