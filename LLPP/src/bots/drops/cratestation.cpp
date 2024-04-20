@@ -20,9 +20,10 @@ namespace llpp::bots::drops
             return item ? item->info() : "???";
         }
 
-        bool inspect_tooltip(const asa::items::ItemData& data)
+        bool inspect_tooltip(const asa::items::Item& item)
         {
-            return data.is_blueprint && data.has_armor_value;
+            return !item.get_name().contains("Saddle") && item.get_data().is_blueprint
+                   && item.get_data().has_armor_value;
         }
     }
 
@@ -113,7 +114,7 @@ namespace llpp::bots::drops
                         continue;
                     }
                     checked.emplace(i);
-                    if (inspect_tooltip(items[i]->get_data())) {
+                    if (inspect_tooltip(*items[i])) {
                         auto& slot = crate_.get_inventory()->slots[i + folder_offset];
                         crate_.get_inventory()->select_slot(slot, true, true);
                         if (const auto& tt = slot.get_tooltip(); tt) {
@@ -153,7 +154,7 @@ namespace llpp::bots::drops
                 for (size_t i = 0; i < items.size(); i++) {
                     if (!items[i] || *items[i] != priority) { continue; }
 
-                    if (inspect_tooltip(items[i]->get_data())) {
+                    if (inspect_tooltip(*items[i])) {
                         auto& slot = crate_.get_inventory()->slots[i + folder_offset];
                         crate_.get_inventory()->select_slot(slot, true, true);
                         if (const auto& tt = slot.get_tooltip(); tt) {
@@ -176,5 +177,4 @@ namespace llpp::bots::drops
         }
         return res;
     }
-
 }
