@@ -8,6 +8,8 @@
 #include <asapp/interfaces/hud.h>
 #include <asapp/items/items.h>
 
+#include "commands.h"
+
 namespace llpp::bots::farm
 {
     namespace
@@ -205,5 +207,18 @@ namespace llpp::bots::farm
                           + std::chrono::minutes(config_->interval);
 
         return util::get_time_left_until<std::chrono::minutes>(next);
+    }
+
+    std::vector<std::unique_ptr<WoodManager> > create_wood_managers()
+    {
+        register_wood_commands();
+
+        std::vector<std::unique_ptr<WoodManager> > ret;
+        for (auto& [name, config]: config::bots::farm::configs) {
+            if (config.get_ptr()->type == "WOOD") {
+                ret.emplace_back(std::make_unique<WoodManager>(config.get_ptr()));
+            }
+        }
+        return ret;
     }
 }

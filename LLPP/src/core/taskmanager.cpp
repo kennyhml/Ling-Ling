@@ -71,22 +71,19 @@ namespace llpp::core
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
 
-        for (auto& [key, config]: config::bots::farm::configs) {
-            if (config.get_ptr()->type == "METAL") {
-                tasks_.emplace_back(
-                    key, std::make_unique<farm::MetalManager>(config.get_ptr()));
-            } else if (config.get_ptr()->type == "WOOD") {
-                tasks_.emplace_back(
-                    key, std::make_unique<farm::WoodManager>(config.get_ptr()));
-            } else if (config.get_ptr()->type == "OBSIDIAN") {
-                tasks_.emplace_back(
-                    key, std::make_unique<farm::ObsidianManager>(config.get_ptr()));
-            }
+        for (auto& manager: farm::create_metal_managers()) {
+            tasks_.emplace_back("", std::move(manager));
+        }
+        for (auto& manager: farm::create_wood_managers()) {
+            tasks_.emplace_back("", std::move(manager));
+        }
+        for (auto& manager: farm::create_obsidian_managers()) {
+            tasks_.emplace_back("", std::move(manager));
         }
 
         tasks_.emplace_back("FORGES", std::make_unique<forges::ForgeManager>());
 
-        for (auto& manager: drops::create_crate_managers()) {
+        for (auto& manager: drops::create_managers()) {
             tasks_.emplace_back("", std::move(manager));
         }
 

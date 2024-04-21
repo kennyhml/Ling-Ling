@@ -258,7 +258,7 @@ namespace llpp::bots::drops
         asa::core::sleep_for(std::chrono::seconds(config_->render_align_for));
     }
 
-    std::vector<std::unique_ptr<CrateManager> > create_crate_managers()
+    std::vector<std::unique_ptr<CrateManager> > create_managers()
     {
         register_commands();
 

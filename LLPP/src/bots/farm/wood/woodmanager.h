@@ -37,4 +37,6 @@ namespace llpp::bots::farm
 
         std::vector<std::unique_ptr<WoodStation>> stations_;
     };
+
+    std::vector<std::unique_ptr<WoodManager>> create_wood_managers();
 }

@@ -88,10 +88,7 @@ void llpp_main()
     inform_started();
 
     llpp::discord::update_dashboard();
-
     asa::entities::local_player->reset_state();
-
-    llpp::bots::boss::run_brood_if_ready();
 
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
@@ -135,7 +132,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    // llpp::auth::login();
+    llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();

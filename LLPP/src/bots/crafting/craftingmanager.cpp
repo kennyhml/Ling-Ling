@@ -57,9 +57,9 @@ namespace llpp::bots::crafting
     bool CraftingManager::run()
     {
         if (!is_ready_to_run()) { return false; }
+        run_grinding();
         run_spark();
         run_gunpowder();
-        run_grinding();
         run_arb();
 
         return true;

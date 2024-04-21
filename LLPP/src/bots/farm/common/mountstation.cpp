@@ -43,12 +43,7 @@ namespace llpp::bots::farm
     {
         reposition_bed_->complete();
         if (!render_station_) {
-            asa::core::sleep_for(5s);
-            asa::interfaces::console->execute("reconnect");
-            util::await([]() -> bool {
-                return asa::entities::local_player->is_in_connect_screen();
-            }, 1min);
-            asa::core::sleep_for(10s);
+            asa::entities::local_player->reconnect();
         }
 
         const asa::structures::Container vault(get_name() + "::WHIP VAULT", 350);

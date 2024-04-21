@@ -48,4 +48,7 @@ namespace llpp::bots::farm
 
         std::shared_ptr<asa::entities::DinoEntity> anky_;
     };
+
+
+
 }

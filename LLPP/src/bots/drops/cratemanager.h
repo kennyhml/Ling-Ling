@@ -3,10 +3,9 @@
 #include "cratestation.h"
 #include "bed_crate_station.h"
 #include "teleport_crate_station.h"
+#include "dropoffstation.h"
 #include "../../core/istationmanager.h"
 #include <dpp/dpp.h>
-
-#include "dropoffstation.h"
 
 namespace llpp::bots::drops
 {
@@ -63,7 +62,5 @@ namespace llpp::bots::drops
         inline static DropoffStation dropoff_;
     };
 
-    std::vector<std::unique_ptr<CrateManager>> create_crate_managers();
-
-
+    std::vector<std::unique_ptr<CrateManager>> create_managers();
 }

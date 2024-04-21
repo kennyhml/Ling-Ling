@@ -3,13 +3,13 @@
 #include <asapp/core/state.h>
 #include <asapp/interfaces/hud.h>
 
+#include "../common/exceptions.h"
+
 namespace llpp::bots::farm
 {
     MetalStation::MetalStation(std::string t_name, const std::chrono::minutes t_interval,
-                               const bool t_is_first,
                                std::shared_ptr<asa::entities::DinoEntity> t_anky)
-        : TeleportStation(std::move(t_name), t_interval), is_first_(t_is_first),
-          anky_(std::move(t_anky)) {}
+        : TeleportStation(std::move(t_name), t_interval), anky_(std::move(t_anky)) {}
 
     core::StationResult MetalStation::complete()
     {
@@ -18,7 +18,7 @@ namespace llpp::bots::farm
         // was left (default popup disappeared). That way we can start swinging ahead
         // of time and save alot of time while making sure we actually reached the tp
         // afterwards to avoid desyncing.
-        set_unsafe_load(!is_first_);
+        set_unsafe_load(true);
         const bool check_logs = should_check_logs();
         if (!begin(check_logs)) {
             set_completed();
@@ -30,7 +30,11 @@ namespace llpp::bots::farm
 
         harvest_metal();
 
+        const auto walkback_start = std::chrono::system_clock::now();
         while (!asa::interfaces::hud->can_default_teleport()) {
+            if (util::timedout(walkback_start, 30s)) {
+                throw NotOnTeleporterError(get_name());
+            }
             anky_->go_back(200ms);
             util::await([] { return asa::interfaces::hud->can_default_teleport(); }, 5s);
         }

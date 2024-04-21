@@ -34,4 +34,7 @@ namespace llpp::bots::farm
 
         std::vector<std::unique_ptr<ObsidianStation>> stations_;
     };
+
+    std::vector<std::unique_ptr<ObsidianManager>> create_obsidian_managers();
+
 }

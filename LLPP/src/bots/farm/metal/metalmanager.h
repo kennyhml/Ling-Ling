@@ -18,10 +18,7 @@ namespace llpp::bots::farm
         [[nodiscard]] bool is_ready_to_run() override;
 
         [[nodiscard]] std::chrono::minutes get_time_left_until_ready() const override;
-
     private:
-        void register_commands();
-
         FarmConfig* config_;
 
         std::shared_ptr<asa::entities::DinoEntity> anky_;
@@ -36,4 +33,6 @@ namespace llpp::bots::farm
 
         std::vector<std::unique_ptr<MetalStation>> stations_;
     };
+
+    std::vector<std::unique_ptr<MetalManager>> create_metal_managers();
 }

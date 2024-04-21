@@ -4,6 +4,8 @@
 #include <asapp/interfaces/console.h>
 #include <asapp/core/state.h>
 
+#include "commands.h"
+
 namespace llpp::bots::farm
 {
     MetalManager::MetalManager(FarmConfig* t_config)
@@ -23,7 +25,7 @@ namespace llpp::bots::farm
         constexpr std::chrono::minutes cd(0);
         for (int i = 0; i < config_->num_stations; i++) {
             const std::string name = util::add_num_to_prefix(config_->prefix, i + 1);
-            stations_.push_back(std::make_unique<MetalStation>(name, cd, i == 0, anky_));
+            stations_.push_back(std::make_unique<MetalStation>(name, cd, anky_));
         }
     }
 
@@ -76,14 +78,16 @@ namespace llpp::bots::farm
         return util::get_time_left_until<std::chrono::minutes>(next);
     }
 
-    void MetalManager::register_commands()
+    std::vector<std::unique_ptr<MetalManager>> create_metal_managers()
     {
+        register_metal_commands();
 
-
-
-
-
-
-
+        std::vector<std::unique_ptr<MetalManager> > ret;
+        for (auto& [name, config]: config::bots::farm::configs) {
+            if (config.get_ptr()->type == "METAL") {
+                ret.emplace_back(std::make_unique<MetalManager>(config.get_ptr()));
+            }
+        }
+        return ret;
     }
 }

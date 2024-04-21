@@ -209,7 +209,15 @@ add_executable(LLPP WIN32
         LLPP/src/bots/boss/brood/embeds.h
         LLPP/src/bots/boss/common/element_deposit.cpp
         LLPP/src/bots/boss/common/element_deposit.h
+        LLPP/src/bots/farm/common/exceptions.h
+        LLPP/src/bots/farm/metal/commands.cpp
+        LLPP/src/bots/farm/metal/commands.h
+        LLPP/src/bots/farm/wood/commands.cpp
+        LLPP/src/bots/farm/wood/commands.h
+        LLPP/src/bots/farm/obsidian/commands.cpp
+        LLPP/src/bots/farm/obsidian/commands.h
 )
+
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(LLPP PRIVATE dpp::dpp)
 include_directories("${VCPKG_INSTALLED_DIR}/x64-windows/include/dpp")

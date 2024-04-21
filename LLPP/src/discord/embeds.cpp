@@ -83,7 +83,6 @@ namespace llpp::discord
         set_now_timestamp(embed);
 
         dpp::message msg(get_error_channel(), embed);
-        msg.set_content(dpp::utility::role_mention(roles::helper_no_access.get()));
         msg.set_allowed_mentions(false, true, false, false, {}, {});
         return msg;
     }

@@ -8,7 +8,7 @@ namespace llpp::bots::farm
     class MetalStation final : core::TeleportStation
     {
     public:
-        MetalStation(std::string t_name, std::chrono::minutes t_interval, bool t_is_first,
+        MetalStation(std::string t_name, std::chrono::minutes t_interval,
                      std::shared_ptr<asa::entities::DinoEntity> t_anky);
 
         core::StationResult complete() override;
@@ -45,7 +45,6 @@ namespace llpp::bots::farm
         inline static std::chrono::seconds log_cd_{60};
 
         int swing_times_ = 0;
-        bool is_first_;
         std::shared_ptr<asa::entities::DinoEntity> anky_;
     };
 }
