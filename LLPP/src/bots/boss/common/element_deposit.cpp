@@ -22,7 +22,8 @@ namespace llpp::bots::boss
 
             for (int i = 0; i < 360; i += 10) {
                 asa::entities::local_player->turn_right(10);
-                if (asa::entities::local_player->can_sit_down()) {
+                if (util::await(
+                    [] { return asa::entities::local_player->can_sit_down(); }, 100ms)) {
                     return true;
                 }
             }
@@ -91,6 +92,5 @@ namespace llpp::bots::boss
         }
         // we couldnt put the ele into a rex or dedi
         return {false, false, util::get_elapsed<std::chrono::seconds>(start)};
-
     }
 }

@@ -28,6 +28,8 @@ namespace llpp::bots::boss
         core::BedStation whistle_bed("BOSS::WHISTLE", 5min);
 
         core::TeleportStation trans_tp("BOSS::TRANS", 0min);
+        core::TeleportStation kitup_tp("BOSS::KITUP", 0min);
+
 
         std::array artifact_stations{
             ArtifactStation{"HUNTER ARTIFACT", 0min},
@@ -45,7 +47,7 @@ namespace llpp::bots::boss
         bool is_ready()
         {
             return util::timedout(
-                       std::chrono::system_clock::from_time_t(last_brood.get()), 20min)
+                       std::chrono::system_clock::from_time_t(last_brood.get()), 25min)
                    && trans_bed.is_ready();
         }
 
@@ -115,6 +117,15 @@ namespace llpp::bots::boss
             std::cout << "BOSS HAS BEGUN!" << std::endl;
         }
 
+        void whistle_rexes_over()
+        {
+            whistle_bed.complete();
+
+            asa::controls::press(asa::settings::follow_all);
+            asa::core::sleep_for(20s);
+            asa::controls::press(asa::settings::stay_all);
+        }
+
         void complete_bossfight()
         {
             const auto start = std::chrono::system_clock::now();
@@ -147,6 +158,9 @@ namespace llpp::bots::boss
 
         const auto start = std::chrono::system_clock::now();
 
+        kitup_tp.set_default_destination(true);
+        kitup_tp.complete();
+
         collect_required_artifacts();
         start_boss_fight();
         last_brood.set(util::time_t_now());
@@ -177,6 +191,8 @@ namespace llpp::bots::boss
         const dpp::message msg = get_brood_defeated_message(
             fight_time, total_time, ele_image, element_obtained, ele_in_dedi);
         discord::get_bot()->message_create(msg);
+        if (!ele_in_dedi) { asa::entities::local_player->suicide(); }
+        whistle_rexes_over();
         return true;
     }
 }

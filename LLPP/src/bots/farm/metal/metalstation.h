@@ -5,7 +5,7 @@
 
 namespace llpp::bots::farm
 {
-    class MetalStation final : core::TeleportStation
+    class MetalStation final : public core::TeleportStation
     {
     public:
         MetalStation(std::string t_name, std::chrono::minutes t_interval,

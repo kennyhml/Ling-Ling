@@ -1,10 +1,16 @@
 #include "metalmanager.h"
+
+#include <iostream>
+
 #include "../../../common/util.h"
 #include "../../../config/config.h"
 #include <asapp/interfaces/console.h>
 #include <asapp/core/state.h>
 
 #include "commands.h"
+#include "../../../discord/bot.h"
+#include "../../../discord/embeds.h"
+#include "../common/exceptions.h"
 
 namespace llpp::bots::farm
 {
@@ -43,7 +49,22 @@ namespace llpp::bots::farm
         asa::core::sleep_for(15s);
 
         for (const auto& station: stations_) {
-            station->complete();
+            try {
+                station->complete();
+            } catch (const NotOnTeleporterError& e) {
+                std::cerr << e.what() << std::endl;
+                config_->disabled = true;
+                config_->on_changed();
+                const auto msg = discord::create_error_message(
+                    std::format("Fell off the Teleporter at `{}`.", station->get_name()));
+                const_cast<dpp::embed&>(msg.embeds[0]).set_description(std::format(
+                    "`{}` has been automatically disabled."
+                    "\nBring the anky to `{}` and re-enable it.", config_->prefix,
+                    start_tp_.get_name()));
+                discord::get_bot()->message_create(msg);
+                asa::entities::local_player->suicide();
+                return true;
+            }
         }
 
         // Save here already since the metal is now farmed.
@@ -78,7 +99,7 @@ namespace llpp::bots::farm
         return util::get_time_left_until<std::chrono::minutes>(next);
     }
 
-    std::vector<std::unique_ptr<MetalManager>> create_metal_managers()
+    std::vector<std::unique_ptr<MetalManager> > create_metal_managers()
     {
         register_metal_commands();
 

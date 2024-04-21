@@ -50,7 +50,10 @@ namespace llpp::bots::boss
             }
         }
         asa::controls::key_up("w");
-        asa::core::sleep_for(500ms);
+        util::await([&crate] {
+            return !crate.get_inventory()->is_receiving_remote_inventory();
+        }, 10s);
+
         // Take all from the crate until it disappears, just like a loot crate.
         element_image_out = asa::window::screenshot({1193, 227, 574, 200});
         do {

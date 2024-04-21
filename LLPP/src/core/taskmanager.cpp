@@ -4,6 +4,7 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/spawnmap.h>
 
+#include "../bots/boss/brood/brood.h"
 #include "../bots/drops/cratemanager.h"
 #include "../bots/farm/swingbot/farmbot.h"
 #include "../bots/kitchen/cropmanager.h"
@@ -70,6 +71,8 @@ namespace llpp::core
 
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
+
+        tasks_.emplace_back("BOSS", boss::run_brood_if_ready);
 
         for (auto& manager: farm::create_metal_managers()) {
             tasks_.emplace_back("", std::move(manager));
