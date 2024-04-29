@@ -28,9 +28,17 @@ namespace llpp::core
             need_restart = true;
             need_reconnect = true;
         }
-        else if (asa::interfaces::main_menu->is_open()) {
+        else if (asa::interfaces::main_menu->is_open() ||
+                    asa::interfaces::mode_select->is_open() ||
+                    asa::interfaces::server_select->is_open()) {
             std::cout << "\t[-] Kicked to main menu...\n";
             need_reconnect = true;
+        }
+
+        // Not needing restart or to reconnect so return here
+        if(!need_restart && !need_reconnect) {
+            asa::core::set_crash_aware(false);
+            return;
         }
 
         inform_recovery_initiated(need_restart, need_reconnect);
@@ -47,11 +55,15 @@ namespace llpp::core
 
     void reconnect_to_server()
     {
-        asa::interfaces::main_menu->accept_popup();
-        asa::interfaces::main_menu->start();
-        Sleep(1000);
-        asa::interfaces::mode_select->join_game();
-        Sleep(1000);
+        if (asa::interfaces::main_menu->is_open()) {
+            asa::interfaces::main_menu->accept_popup();
+            util::await([] {return asa::interfaces::main_menu->is_open(); }, 30s);
+            asa::interfaces::main_menu->start();
+        }
+        if(util::await([]{return asa::interfaces::mode_select->is_open();}, std::chrono::seconds(5))) {
+            asa::interfaces::mode_select->join_game();
+        }
+
         asa::interfaces::server_select->join_server(config::general::ark::server.get());
 
         while (true) {
@@ -59,6 +71,8 @@ namespace llpp::core
                 is_open()) { break; }
 
             if (asa::interfaces::main_menu->is_open()) {
+                asa::interfaces::mode_select->join_game();
+                Sleep(1000);
                 std::cerr << "[!] Joining failed, trying again\n";
                 return reconnect_to_server();
             }
