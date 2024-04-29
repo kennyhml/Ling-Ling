@@ -74,7 +74,7 @@ void llpp_main()
     auto taskmanager = llpp::core::TaskManager();
     try {
         llpp::discord::init();
-        llpp::discord::reset_dashboard();
+        //llpp::discord::reset_dashboard();
         taskmanager.collect_tasks();
         llpp::bots::farm::register_commands();
         llpp::discord::get_bot()->start(dpp::st_return);
@@ -87,8 +87,11 @@ void llpp_main()
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
     inform_started();
 
-    llpp::discord::update_dashboard();
+    //llpp::discord::update_dashboard();
     asa::entities::local_player->reset_state();
+
+    // Use this to reconnect if not in game
+    llpp::core::recover();
 
     try {
         asa::interfaces::console->execute(llpp::config::general::bot::commands.get());
@@ -99,7 +102,7 @@ void llpp_main()
     while (running) {
         try {
             taskmanager.execute_next();
-            llpp::discord::update_dashboard();
+            //llpp::discord::update_dashboard();
         } catch (asa::core::ShooterGameError& e) {
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
@@ -132,7 +135,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    llpp::auth::login();
+    //llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
