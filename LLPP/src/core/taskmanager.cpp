@@ -3,6 +3,7 @@
 #include <asapp/core/state.h>
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/spawnmap.h>
+#include <asapp/interfaces/tribemanager.h>
 
 #include "../bots/boss/brood/brood.h"
 #include "../bots/drops/cratemanager.h"
@@ -18,6 +19,7 @@
 #include "../bots/farm/obsidian/obsidianmanager.h"
 #include "../bots/farm/wood/woodmanager.h"
 #include "../bots/forges/forgemanager.h"
+#include "../discord/tribelogs/handler.h"
 
 namespace llpp::core
 {
@@ -57,7 +59,10 @@ namespace llpp::core
 
         bool player_state_check()
         {
-            if (player_requires_healing()) { return suicide.complete().success; }
+            if (player_requires_healing()) {
+                std::cout << "[+] Player needs to suicide.\n";
+                return suicide.complete().success;
+            }
             return false;
         }
     }
@@ -72,7 +77,7 @@ namespace llpp::core
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
 
-        tasks_.emplace_back("BOSS", boss::run_brood_if_ready);
+        // tasks_.emplace_back("BOSS", boss::run_brood_if_ready);
 
         for (auto& manager: farm::create_metal_managers()) {
             tasks_.emplace_back("", std::move(manager));

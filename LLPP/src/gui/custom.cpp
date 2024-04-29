@@ -557,20 +557,10 @@ namespace llpp::gui
             }
 
             ImGui::SetCursorPos({10, 45});
-            ImGui::Text("Dashboard Channel:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputText("##dashboard_channel",
-                                 config::discord::channels::dashboard.get_ptr())) {
-                config::discord::channels::dashboard.save();
-            }
-
-            ImGui::SetCursorPos({10, 76});
             ImGui::Text("Error Channel:");
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 73});
+            ImGui::SetCursorPos({150, 45});
             if (ImGui::InputText("##error_channel",
                                  config::discord::channels::error.get_ptr())) {
                 config::discord::channels::error.save();
@@ -731,11 +721,11 @@ namespace llpp::gui
         begin_child("Roles & Channels",
                     ImVec2(475 - state::maintabs_data.width,
                            ImGui::GetWindowHeight() / 2)); {
-            ImGui::SetCursorPos({10, 14});
+            ImGui::SetCursorPos({10, 4});
             ImGui::Text("Logs channel:");
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 11});
+            ImGui::SetCursorPos({150, 1});
             if (ImGui::InputText("##log_channel",
                                  config::discord::channels::logs.get_ptr())) {
                 config::discord::channels::logs.save();
@@ -743,11 +733,11 @@ namespace llpp::gui
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
                 ImGui::SetTooltip("The channel to post regular logs to.");
             }
-            ImGui::SetCursorPos({10, 45});
+            ImGui::SetCursorPos({10, 35});
             ImGui::Text("Alert channel:");
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 42});
+            ImGui::SetCursorPos({150, 32});
             if (ImGui::InputText("##alert_channel",
                                  config::discord::channels::alert.get_ptr())) {
                 config::discord::channels::alert.save();
@@ -757,11 +747,11 @@ namespace llpp::gui
                     "The channel to post alerts to. If empty logs channel is used.");
             }
 
-            ImGui::SetCursorPos({10, 76});
+            ImGui::SetCursorPos({10, 66});
             ImGui::Text("Alert role:");
             ImGui::SameLine();
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
-            ImGui::SetCursorPos({150, 73});
+            ImGui::SetCursorPos({150, 63});
             if (ImGui::InputText("##alert_role",
                                  config::discord::roles::alert.get_ptr())) {
                 config::discord::roles::alert.save();
@@ -770,6 +760,34 @@ namespace llpp::gui
                 ImGui::SetTooltip(
                     "The role to be mentioned for parasaur or tribelog alerts.\n"
                     "If empty, @everyone will always be used.");
+            }
+
+            ImGui::SetCursorPos({10, 97});
+            ImGui::Text("Alert webhook:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 94});
+            if (ImGui::InputText("##alert_webhook",
+                                 config::discord::webhooks::alert.get_ptr())) {
+                config::discord::webhooks::alert.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The webhook to post alerts to. If empty the webhook will be ignored.");
+            }
+
+            ImGui::SetCursorPos({10, 128});
+            ImGui::Text("Alert webhook role:");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.45f);
+            ImGui::SetCursorPos({150, 124});
+            if (ImGui::InputText("##webhook_alert_role",
+                                 config::discord::roles::webhook_alert.get_ptr())) {
+                config::discord::roles::webhook_alert.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The role to be mentioned for alerts sent to the webhook.");
             }
         }
         end_child();
