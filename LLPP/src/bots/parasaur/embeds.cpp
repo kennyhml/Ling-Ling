@@ -16,8 +16,7 @@ namespace llpp::bots::parasaur
 
         embed.set_title(std::format("Enemy detected at '{}'!", where));
         embed.set_description(
-            "An enemy player or dinosaur was detected!\n"
-            "/silence this station if needed.");
+            "An enemy player or dinosaur was detected!");
         embed.set_color(dpp::colors::cyan);
         embed.set_thumbnail(SENSOR_ICON);
 
@@ -31,11 +30,17 @@ namespace llpp::bots::parasaur
         msg.add_file("image.png", file_data, "image/png");
         msg.set_allowed_mentions(false, true, true, false, {}, {});
 
+        // Post to the webhook if one is set
+        if(!config::discord::webhooks::alert.get_ref().empty()) {
+            msg.set_content(dpp::utility::role_mention(config::discord::roles::webhook_alert.get()));
+            dpp::webhook wh(config::discord::webhooks::alert.get());
+            discord::get_bot()->execute_webhook(wh, msg);
+        }
+
         switch (tag_level) {
         case 0:
         {
-            msg.set_content(
-                dpp::utility::role_mention(config::discord::roles::alert.get()));
+            msg.set_content(dpp::utility::role_mention(config::discord::roles::alert.get()));
             break;
         }
         case 1:

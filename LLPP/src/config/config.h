@@ -88,6 +88,7 @@ namespace llpp::config
             inline role helper_no_access(BASE, "helper_no_access", save, "");
 
             inline role alert(BASE, "alert", save, "");
+            inline role webhook_alert(BASE, "webhook_alert", save, "");
         }
 
         namespace channels
@@ -100,6 +101,14 @@ namespace llpp::config
             inline channel error(BASE, "error", save, "");
             inline channel alert(BASE, "alert", save, "");
             inline channel logs(BASE, "logs", save, "");
+        }
+
+        namespace webhooks
+        {
+            inline const std::vector<std::string> BASE{"discord", "webhooks"};
+            using webhook = ManagedVar<std::string>;
+
+            inline webhook alert(BASE, "alert", save, "");
         }
 
         namespace alert_rules

@@ -139,6 +139,13 @@ namespace llpp::discord
         // handle the case where every single event was ignored.
         if (message.embeds.empty()) { return; }
 
+        // Post to the webhook if one is set
+        if(!config::discord::webhooks::alert.get_ref().empty()) {
+            message.set_content(dpp::utility::role_mention(config::discord::roles::webhook_alert.get()));
+            dpp::webhook wh(config::discord::webhooks::alert.get());
+            get_bot()->execute_webhook(wh, message);
+        }
+
         if (can_ping() && message.embeds.size() >= ping_min_events.get()) {
             if (tag_everyone) { message.set_content("@everyone"); } else {
                 const std::string role = config::discord::roles::alert.get();

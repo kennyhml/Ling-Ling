@@ -93,8 +93,12 @@ namespace llpp::bots::parasaur
 
     std::chrono::minutes ParasaurManager::get_time_left_until_ready() const
     {
-        return util::get_time_left_until<std::chrono::minutes>(
-            tp_stations_[0]->get_next_completion());
+        // Find next completion for beds
+        // Find next completion for teleporters
+        // Return the lower of these two numbers
+        // return util::get_time_left_until<std::chrono::minutes>(
+        //    tp_stations_[0]->get_next_completion());
+        return std::chrono::minutes(0);
     }
 
     bool ParasaurManager::go_to_start()
