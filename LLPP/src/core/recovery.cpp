@@ -18,12 +18,12 @@ namespace llpp::core
     {
         const auto start = std::chrono::system_clock::now();
         asa::core::set_crash_aware(true);
-        std::cout << "[+] Recovery sequence initiated, diagnosing cause of crash...\n";
 
         bool need_restart = false;
         bool need_reconnect = false;
 
         if (asa::window::has_crashed_popup()) {
+            std::cout << "[+] Recovery sequence initiated, diagnosing cause of crash...\n";
             std::cout << "\t[-] The game has crashed...\n";
             need_restart = true;
             need_reconnect = true;
@@ -31,6 +31,7 @@ namespace llpp::core
         else if (asa::interfaces::main_menu->is_open() ||
                     asa::interfaces::mode_select->is_open() ||
                     asa::interfaces::server_select->is_open()) {
+            std::cout << "[+] Recovery sequence initiated, diagnosing cause of crash...\n";
             std::cout << "\t[-] Kicked to main menu...\n";
             need_reconnect = true;
         }
