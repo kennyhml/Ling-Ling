@@ -12,6 +12,8 @@ namespace llpp::bots::parasaur
 
     void send_enemy_detected(const std::string& where, int tag_level);
 
+    dpp::message parasaur_station_message(const std::string& real_name, const std::string& search_name);
+
     dpp::message get_summary_message(std::chrono::seconds total_time_taken,
                                      const std::vector<ParasaurStationResult>& stats);
 }

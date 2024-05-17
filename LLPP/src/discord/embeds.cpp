@@ -2,7 +2,6 @@
 #include "icons.h"
 #include "helpers.h"
 #include "../config/config.h"
-#include "../common/util.h"
 #include <asapp/game/settings.h>
 #include <asapp/game/window.h>
 
@@ -20,7 +19,44 @@ namespace llpp::discord
         embed.set_color(dpp::colors::black);
         embed.set_thumbnail(WHIP_ICON);
         embed.add_field("Account: ", config::user::name.get(), true);
-        embed.add_field("Version: ", "v1.7.11", true);
+        embed.add_field("Version: ", "v1.8.1", true);
+        embed.add_field("Server: ", asa::settings::last_session_0.get());
+        set_now_timestamp(embed);
+
+        return {channels::info.get(), embed};
+    }
+
+
+    dpp::message create_stopped_message()
+    {
+        dpp::embed embed;
+        embed.set_title("Ling Ling++ has been stopped!");
+        embed.set_color(dpp::colors::red);
+        embed.set_thumbnail(STAMINADRAIN_ICON);
+        embed.add_field("Server: ", asa::settings::last_session_0.get());
+        set_now_timestamp(embed);
+
+        return {channels::info.get(), embed};
+    }
+
+    dpp::message create_paused_message()
+    {
+        dpp::embed embed;
+        embed.set_title("Ling Ling++ has been paused!");
+        embed.set_color(dpp::colors::black);
+        embed.set_thumbnail(EXHAUSTED_ICON);
+        embed.add_field("Server: ", asa::settings::last_session_0.get());
+        set_now_timestamp(embed);
+
+        return {channels::info.get(), embed};
+    }
+
+    dpp::message create_unpaused_message()
+    {
+        dpp::embed embed;
+        embed.set_title("Ling Ling++ has been unpaused!");
+        embed.set_color(dpp::colors::black);
+        embed.set_thumbnail(GAININGXP_ICON);
         embed.add_field("Server: ", asa::settings::last_session_0.get());
         set_now_timestamp(embed);
 

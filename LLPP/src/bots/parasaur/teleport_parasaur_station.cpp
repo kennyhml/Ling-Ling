@@ -5,6 +5,7 @@
 #include <asapp/entities/localplayer.h>
 #include <asapp/interfaces/hud.h>
 #include <asapp/interfaces/tribemanager.h>
+#include "../../discord/bot.h"
 
 namespace llpp::bots::parasaur
 {
@@ -76,6 +77,9 @@ namespace llpp::bots::parasaur
         config_->last_completed = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
         if (config_->on_changed) { config_->on_changed(); }
+
+        std::cout << "[+] Checked " << real_name_ << " parasaur station at teleporter: " << get_name() << ".\n";
+        discord::get_bot()->message_create(parasaur_station_message(real_name_, get_name()));
 
         return {this, true, get_time_taken<std::chrono::seconds>(), {}};
     }

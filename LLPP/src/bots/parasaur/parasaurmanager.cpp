@@ -37,7 +37,8 @@ namespace llpp::bots::parasaur
 
         for (const auto& station: tp_stations_) {
             if (!station->is_ready()) {
-                results.emplace_back(false, station.get(), station->get_last_alert());
+                results.emplace_back(false, station.get(), station->get_last_alert(),
+                                     station->get_real_name());
                 continue;
             }
             if (!started_teleporters) {
@@ -46,7 +47,8 @@ namespace llpp::bots::parasaur
             }
             any_ran = true;
             station->complete();
-            results.emplace_back(true, station.get(), station->get_last_alert());
+            results.emplace_back(true, station.get(), station->get_last_alert(),
+                                 station->get_real_name());
         }
 
         if (started_teleporters) { spawn_tp_.complete(); }
@@ -55,15 +57,18 @@ namespace llpp::bots::parasaur
             if (station->is_ready()) {
                 any_ran = true;
                 station->complete();
-                results.emplace_back(true, station.get(), station->get_last_alert());
+                results.emplace_back(true, station.get(), station->get_last_alert(),
+                                     station->get_real_name());
             } else {
-                results.emplace_back(false, station.get(), station->get_last_alert());
+                results.emplace_back(false, station.get(), station->get_last_alert(),
+                                     station->get_real_name());
             }
         }
         if (any_ran) {
             const dpp::message summary = get_summary_message(
                 util::get_elapsed<std::chrono::seconds>(start), results);
             discord::get_bot()->message_create(summary);
+            std::cout << "[+] Posted Parasaur Summary to Discord...\n";
         }
         last_completed_ = std::chrono::system_clock::now();
         return any_ran;

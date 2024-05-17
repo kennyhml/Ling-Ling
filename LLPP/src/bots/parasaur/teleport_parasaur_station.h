@@ -9,6 +9,8 @@ namespace llpp::bots::parasaur
     class TeleportParasaurStation final : public core::TeleportStation
     {
     public:
+        [[nodiscard]] std::string get_real_name() const { return real_name_; }
+
         TeleportParasaurStation(std::string t_real_name, ParasaurConfig* t_config);
 
         bool is_ready() override

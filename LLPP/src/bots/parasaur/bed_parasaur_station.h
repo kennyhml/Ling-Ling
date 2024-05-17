@@ -8,6 +8,8 @@ namespace llpp::bots::parasaur
     class BedParasaurStation final : public core::BedStation
     {
     public:
+        [[nodiscard]] std::string get_real_name() const { return real_name_; }
+
         BedParasaurStation(std::string t_real_name, ParasaurConfig* t_config);
 
         core::StationResult complete() override;

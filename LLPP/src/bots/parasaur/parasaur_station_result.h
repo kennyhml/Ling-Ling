@@ -8,5 +8,6 @@ namespace llpp::bots::parasaur
         bool ran{false};
         core::BaseStation* station{nullptr};
         std::chrono::system_clock::time_point last_detection;
+        std::string real_name_;
     };
 }
