@@ -1512,7 +1512,7 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 11});
             if (custom::ClampedInputInt("##forges_count",
-                                        config::bots::forges::num_stations.get_ptr(), 1,
+                                        config::bots::forges::num_stations.get_ptr(), 0,
                                         99)) {
                 config::bots::forges::num_stations.save();
             }
@@ -1522,7 +1522,7 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 42});
             if (custom::ClampedInputInt("##metal_loadups",
-                                        config::bots::forges::metal_loadups.get_ptr(), 1,
+                                        config::bots::forges::metal_loadups.get_ptr(), 0,
                                         10)) {
                 config::bots::forges::metal_loadups.save();
             }
@@ -1532,7 +1532,7 @@ namespace llpp::gui
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({120, 73});
             if (custom::ClampedInputInt("##wood_loadups",
-                                        config::bots::forges::wood_loadups.get_ptr(), 1,
+                                        config::bots::forges::wood_loadups.get_ptr(), 0,
                                         10)) {
                 config::bots::forges::wood_loadups.save();
             }
