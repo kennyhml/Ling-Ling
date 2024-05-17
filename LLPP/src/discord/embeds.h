@@ -11,6 +11,21 @@ namespace llpp::discord
     dpp::message create_started_message();
 
     /**
+     * @brief Creates a message that displays information about ling ling stopping.
+     */
+    dpp::message create_stopped_message();
+
+    /**
+     * @brief Creates a message that displays information about ling ling pausing.
+     */
+    dpp::message create_paused_message();
+
+    /**
+     * @brief Creates a message that displays information about ling ling unpausing.
+     */
+    dpp::message create_unpaused_message();
+
+    /**
      * @brief Creates a message that displays information about a fatal error that has
      * crashed ling ling.
      */

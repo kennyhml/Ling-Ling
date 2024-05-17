@@ -37,4 +37,13 @@ namespace llpp::discord
 
     inline const char* const TRANS_ICON =
             "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/1/18/Tek_Transmitter.png/revision/latest/scale-to-width-down/228?cb=20170131150002";
+
+    inline const char* const EXHAUSTED_ICON =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/8/8f/Exhausted.png/revision/latest?cb=20181217014122";
+
+    inline const char* const GAININGXP_ICON =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/c/c1/Gaining_Exp.png/revision/latest?cb=20160411191502";
+
+    inline const char* const STAMINADRAIN_ICON =
+            "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/0/0d/Stamina_Drain_Reduction.png/revision/latest?cb=20211013151509";
 }

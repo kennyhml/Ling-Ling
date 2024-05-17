@@ -42,11 +42,6 @@ void check_terminated()
 #include <opencv2/core/utils/logger.hpp>
 
 
-void inform_started()
-{
-    llpp::discord::get_bot()->message_create(llpp::discord::create_started_message());
-}
-
 void inform_crashed(const std::exception& why, const std::string& task)
 {
     llpp::discord::get_bot()->message_create(
@@ -85,9 +80,10 @@ void llpp_main()
         std::cerr << "[!] Configuration error " << e.what() << std::endl;
         return;
     } catch (const std::exception& e) { std::cerr << e.what() << "\n"; }
-    inform_started();
 
-    //llpp::discord::update_dashboard();
+    llpp::discord::get_bot()->message_create(llpp::discord::create_started_message());
+
+    //llpp::discord::update_dashboard(); // Dashboard not being maintained anymore
     asa::entities::local_player->reset_state();
 
     // Use this to reconnect if not in game
@@ -162,22 +158,26 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         if ((GetAsyncKeyState(VK_F1) & 0x1) && !running) {
             running = true;
             paused = false;
+            std::cout << "[+] Start signal sent, please give it a few seconds...\n";
             std::thread(llpp_main).detach();
         }
 
         if ((GetAsyncKeyState(VK_F5) & 0x1) && running) {
             if (!paused) {
-                std::cout << "[+] Pause signal sent, please give it a few seconds...\n";
                 paused = true;
+                std::cout << "[+] Pause signal sent, please give it a few seconds...\n";
+                llpp::discord::get_bot()->message_create(llpp::discord::create_paused_message());
             } else {
-                std::cout << "[+] Unpause signal sent, please give it a few seconds...\n";
                 paused = false;
+                std::cout << "[+] Unpause signal sent, please give it a few seconds...\n";
+                llpp::discord::get_bot()->message_create(llpp::discord::create_unpaused_message());
             }
         }
 
         if ((GetAsyncKeyState(VK_F3) & 0x1) && running) {
-            std::cout << "[+] Termination signal sent, please give it a few seconds...\n";
             running = false;
+            std::cout << "[+] Termination signal sent, please give it a few seconds...\n";
+            llpp::discord::get_bot()->message_create(llpp::discord::create_stopped_message());
         }
     }
 
