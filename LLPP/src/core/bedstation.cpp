@@ -8,6 +8,7 @@
 #include <asapp/interfaces/hud.h>
 #include <asapp/interfaces/spawnmap.h>
 #include "../discord/bot.h"
+#include "../config/config.h"
 
 namespace llpp::core
 {
@@ -56,19 +57,24 @@ namespace llpp::core
             return begin();
         } catch (const asa::interfaces::DestinationNotFound& e) {
             std::cerr << e.what() << std::endl;
+            // Don't disable the station - try it again next time
+            //discord::get_bot()->message_create(
+            //    discord::create_station_disabled_message(name_, e.what()));
+            //set_state(State::DISABLED);
             discord::get_bot()->message_create(
-                discord::create_station_disabled_message(name_, e.what()));
-            set_state(State::DISABLED);
+                    discord::create_station_suspended_message(name_, e.what(),
+                                                              std::chrono::minutes(1)));
+            suspend_for(std::chrono::minutes(1));
             return false;
         } catch (const asa::interfaces::DestinationNotReady& e) {
             std::cerr << e.what() << std::endl;
             discord::get_bot()->message_create(
                 discord::create_station_suspended_message(name_, e.what(),
-                                                          std::chrono::minutes(5)));
-            suspend_for(std::chrono::minutes(5));
+                                                          std::chrono::minutes(1)));
+            suspend_for(std::chrono::minutes(1));
             return false;
         }
-        if (check_logs) {
+        if (check_logs && config::discord::channels::info.get().empty()) {
             asa::interfaces::tribe_manager->update_tribelogs(
                 discord::handle_tribelog_events);
             asa::core::sleep_for(std::chrono::seconds(1)); // Give logs time to close.
