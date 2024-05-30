@@ -100,23 +100,23 @@ void llpp_main()
             taskmanager.execute_next();
             //llpp::discord::update_dashboard();
         } catch (asa::core::ShooterGameError& e) {
+            // Game crashed
             llpp::core::inform_crash_detected(e);
             llpp::core::recover();
-        } catch (const TerminatedError&) { break; } catch (const std::exception& e) {
+        } catch (const TerminatedError&) {
+            // Bot stopped with F3
+            break;
+        } catch (const std::exception& e) {
+            // Bot crashed from unhandled exception
             inform_crashed(e, taskmanager.get_previous_task()->get_name());
             std::cout << e.what() << std::endl;
-            running = false;
+            // running = false; // Don't stop - keep trying to do the next task
         }
     }
 
+    llpp::discord::get_bot()->message_create(llpp::discord::create_stopped_message());
     llpp::discord::get_bot()->shutdown();
     std::cout << "[+] Ling Ling++ has terminated!" << std::endl;
-    llpp::discord::get_bot()->message_create(llpp::discord::create_stopped_message());
-
-    asa::core::sleep_for(std::chrono::seconds(60));
-
-    // Try to auto restart
-    asa::controls::press(asa::settings::restart_bot);
 }
 
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,

@@ -19,7 +19,7 @@ namespace llpp::discord
         embed.set_color(dpp::colors::black);
         embed.set_thumbnail(WHIP_ICON);
         embed.add_field("Account: ", config::user::name.get(), true);
-        embed.add_field("Version: ", "v1.8.1", true);
+        embed.add_field("Version: ", "v1.0.0", true);
         embed.add_field("Server: ", asa::settings::last_session_0.get());
         set_now_timestamp(embed);
 

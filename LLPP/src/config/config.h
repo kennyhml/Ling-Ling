@@ -189,6 +189,17 @@ namespace llpp::config
         inline ManagedVar<bool> dont_refert(BASE, "disabled", save, true);
     }
 
+    namespace bots::phoenix
+    {
+        inline const std::vector<std::string> BASE{"bots", "phoenix"};
+
+        inline ManagedVar<std::string> prefix(BASE, "prefix", save, "PHOENIX");
+        inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
+        inline ManagedVar<int> interval(BASE, "interval", save, 1);
+
+        inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
+    }
+
     namespace bots::crafting
     {
         namespace spark

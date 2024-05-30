@@ -47,4 +47,5 @@ namespace llpp::gui
     void draw_bots_crops_tabs();
     void draw_bots_sap_tabs();
     void draw_bots_crafting_tabs();
+    void draw_bots_phoenix_tabs();
 }

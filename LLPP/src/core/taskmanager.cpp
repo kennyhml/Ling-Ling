@@ -10,6 +10,7 @@
 #include "../bots/farm/swingbot/farmbot.h"
 #include "../bots/kitchen/cropmanager.h"
 #include "../bots/kitchen/sapmanager.h"
+#include "../bots/phoenix/phoenixmanager.h"
 #include "../bots/paste/pastemanager.h"
 #include "../bots/crafting/craftingmanager.h"
 #include "../bots/common/suicidestation.h"
@@ -72,6 +73,10 @@ namespace llpp::core
         using namespace llpp::bots;
 
         tasks_.emplace_back("STATE CHECK", player_state_check);
+
+        // Phoenix testing code
+        tasks_.emplace_back("PHOENIX", std::make_unique<phoenix::PhoenixManager>());
+
         tasks_.emplace_back("FARMING", farm::run_while_requested);
 
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());

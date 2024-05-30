@@ -262,7 +262,7 @@ namespace llpp::gui
 
     void render()
     {
-        ImGui::Begin("Ling Ling++ | v1.8.1", &exit,
+        ImGui::Begin("Ling Ling++ | v1.9.0", &exit,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
@@ -366,6 +366,9 @@ namespace llpp::gui
                         break;
                     case FARM:
                         draw_metal_tab();
+                        break;
+                    case PHOENIX:
+                        draw_bots_phoenix_tabs();
                 }
                 ImGui::EndChild();
                 break;

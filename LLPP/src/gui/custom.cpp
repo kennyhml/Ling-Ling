@@ -1543,4 +1543,69 @@ namespace llpp::gui
         }
         end_child();
     }
+
+    void draw_bots_phoenix_tabs()
+    {
+        begin_child("Station Configuration",
+                    ImVec2(475 - state::maintabs_data.width, ImGui::GetWindowHeight())); {
+            ImGui::SetCursorPos({10, 14});
+            ImGui::Text("Station prefix:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 11});
+            if (ImGui::InputText("##phoenix_prefix", config::bots::phoenix::prefix.get_ptr())) {
+                config::bots::phoenix::prefix.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "Specifies the prefix for your phoenix beds. The prefix must "
+                        "be included in your bed name but may not be identical.\n"
+                        "For instance, your bed could be named COOL MYPHOENIX01, while "
+                        "your prefix can still be PHOENIX.");
+            }
+
+            ImGui::SetCursorPos({10, 45});
+            ImGui::Text("Station count:");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 42});
+            if (ImGui::InputInt("##sap_count", config::bots::phoenix::num_stations.get_ptr(),
+                                1, 5)) { config::bots::phoenix::num_stations.save(); }
+            int* num_stations = config::bots::phoenix::num_stations.get_ptr();
+            *num_stations = std::clamp(*num_stations, 1, 999);
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip("The number of phoenix stations you have.");
+            }
+
+            ImGui::SetCursorPos({10, 76});
+            ImGui::Text("Interval (minutes):");
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+            ImGui::SetCursorPos({150, 73});
+            if (ImGui::InputInt("##phoenix_interval", config::bots::phoenix::interval.get_ptr(),
+                                1, 5)) { config::bots::phoenix::interval.save(); }
+            int* interval = config::bots::phoenix::interval.get_ptr();
+            *interval = std::clamp(*interval, 1, 1000);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "The interval to complete the station at (in minutes).");
+            }
+        }
+        end_child();
+
+        ImGui::SameLine();
+        begin_child("Advanced", ImVec2(280, ImGui::GetWindowHeight())); {
+            ImGui::SetCursorPos({10, 11});
+            if (ImGui::Checkbox("Disable station completion",
+                                config::bots::phoenix::disabled.get_ptr())) {
+                config::bots::phoenix::disabled.save();
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImGui::SetTooltip(
+                        "Completely disable the phoenix manager's completion.\n\n"
+                        "Even when disabled, the phoenix manager is created but "
+                        "remains inactive.\n"
+                        "You can toggle its state at runtime or through the " "discord bot.");
+            }
+            end_child();
+        }
+    }
 }
