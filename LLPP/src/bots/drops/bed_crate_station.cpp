@@ -26,6 +26,7 @@ namespace llpp::bots::drops
         is_up_ = await_crate_loaded();
         if (!is_up_) {
             set_completed();
+            std::cout << "[-] Loot crate completed: " << name_ << " (but nothing looted)" << std::endl;
             return {this, false, get_time_taken<std::chrono::seconds>(), {}};
         }
 
@@ -51,12 +52,15 @@ namespace llpp::bots::drops
                                      last_found_up_ + buff_max_wait_, contents);
         }
         discord::get_bot()->message_create(msg);
+        std::cout << "[-] Loot crate completed: " << name_ << std::endl;
         return res;
     }
 
     void BedCrateStation::deposit_items()
     {
         asa::entities::local_player->turn_right();
+        // Look down slightly before accessing the vault in case it is a dedi
+        asa::entities::local_player->turn_down(30);
         asa::entities::local_player->access(vault_);
         asa::entities::local_player->get_inventory()->transfer_all();
         asa::core::sleep_for(std::chrono::seconds(1));

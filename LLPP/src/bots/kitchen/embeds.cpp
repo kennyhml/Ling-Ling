@@ -71,6 +71,9 @@ namespace llpp::bots::kitchen
             embed.set_footer(dpp::embed_footer("Please empty the storage box."));
         }
 
+        // Add timestamp to the footer of the embed
+        embed.set_timestamp(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+
         dpp::message msg(config::discord::channels::info.get(), embed);
 
         if (slots_in_storage > 30) {

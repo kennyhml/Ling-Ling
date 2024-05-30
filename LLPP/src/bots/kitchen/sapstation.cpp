@@ -12,7 +12,7 @@ namespace llpp::bots::kitchen
                            const std::chrono::system_clock::time_point t_last_completed,
                            const std::chrono::minutes t_interval) :
         BedStation(std::move(t_name), t_last_completed, t_interval),
-        storage_box_(name_ + "::STORAGE", 45), tap_(name_ + "::TAP", 1) {}
+        storage_box_(name_ + "::STORAGE", 350), tap_(name_ + "::TAP", 1) {}
 
     core::StationResult SapStation::complete()
     {
@@ -31,6 +31,11 @@ namespace llpp::bots::kitchen
             discord::get_bot()->message_create(discord::create_error_message(e.what()));
         }
         set_completed();
+
+        send_sap_collected({this, success, get_time_taken<std::chrono::seconds>(),
+                {}}, storage_box_slots_);
+        std::cout << "[-] Sap Station completed: " << name_ << std::endl;
+
         return {this, success, get_time_taken<std::chrono::seconds>(), {}};
     }
 
@@ -43,6 +48,7 @@ namespace llpp::bots::kitchen
         }
 
         tap_.get_inventory()->transfer_all();
+        asa::core::sleep_for(std::chrono::seconds(1));
         tap_.get_inventory()->close();
         return true;
     }
@@ -54,11 +60,11 @@ namespace llpp::bots::kitchen
         asa::entities::local_player->access(storage_box_);
 
         asa::entities::local_player->get_inventory()->transfer_all();
-        asa::core::sleep_for(std::chrono::seconds(2));
+        asa::core::sleep_for(std::chrono::seconds(4));
 
         storage_box_slots_ = storage_box_.get_current_slots();
         asa::entities::local_player->get_inventory()->close();
-        asa::core::sleep_for(std::chrono::seconds(1));
+        asa::core::sleep_for(std::chrono::seconds(2));
         asa::entities::local_player->crouch();
     }
 }

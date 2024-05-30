@@ -41,6 +41,7 @@ namespace llpp::bots::paste
         if (obtained == "N/A") {
             embed.set_footer({"Amount of paste collected could not be deduced."});
         }
+        msg.set_timestamp(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         auto msg = dpp::message(config::discord::channels::info.get(), embed);
         discord::get_bot()->message_create(msg);
     }
@@ -73,6 +74,7 @@ namespace llpp::bots::paste
         if (config::bots::paste::mute_pings.get()) {
             msg.set_content("");
         }
+        msg.set_timestamp(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         discord::get_bot()->message_create(msg);
     }
 
