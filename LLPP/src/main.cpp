@@ -111,6 +111,12 @@ void llpp_main()
 
     llpp::discord::get_bot()->shutdown();
     std::cout << "[+] Ling Ling++ has terminated!" << std::endl;
+    llpp::discord::get_bot()->message_create(llpp::discord::create_stopped_message());
+
+    asa::core::sleep_for(std::chrono::seconds(60));
+
+    // Try to auto restart
+    asa::controls::press(asa::settings::restart_bot);
 }
 
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
@@ -131,7 +137,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
         return false;
     }
 
-    //llpp::auth::login();
+    // llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
