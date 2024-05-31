@@ -1,3 +1,4 @@
+#include <iostream>
 #include "phoenixmanager.h"
 
 #include "../../common/util.h"
@@ -8,7 +9,7 @@ namespace llpp::bots::phoenix
 {
     PhoenixManager::PhoenixManager()
     {
-        auto interval = std::chrono::hours(config::bots::phoenix::interval.get());
+        auto interval = std::chrono::duration_cast<std::chrono::minutes>(std::chrono::seconds(config::bots::phoenix::interval.get()));
         for (int i = 0; i < config::bots::phoenix::num_stations.get(); i++) {
             phoenix_stations_.push_back(std::make_unique<PhoenixStation>(
                     util::add_num_to_prefix("PHOENIX", i + 1), interval));
@@ -27,7 +28,6 @@ namespace llpp::bots::phoenix
     bool PhoenixManager::is_ready_to_run()
     {
         if (config::bots::phoenix::disabled.get()) { return false; }
-
         if (!phoenix_stations_.empty()) { return phoenix_stations_[0]->is_ready(); }
         return false;
     }

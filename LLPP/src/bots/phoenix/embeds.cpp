@@ -34,6 +34,9 @@ namespace llpp::bots::phoenix
                           true).add_field(
                 "Next completion:", std::format("<t:{}:R>", next_completion), true);
 
+        // Add timestamp to the footer of the embed
+        embed.set_timestamp(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+
         dpp::message msg(config::discord::channels::info.get(), embed);
 
         discord::get_bot()->message_create(msg);

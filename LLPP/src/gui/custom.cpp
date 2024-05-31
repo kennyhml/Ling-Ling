@@ -1567,7 +1567,7 @@ namespace llpp::gui
             ImGui::Text("Station count:");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 42});
-            if (ImGui::InputInt("##sap_count", config::bots::phoenix::num_stations.get_ptr(),
+            if (ImGui::InputInt("##phoenix_count", config::bots::phoenix::num_stations.get_ptr(),
                                 1, 5)) { config::bots::phoenix::num_stations.save(); }
             int* num_stations = config::bots::phoenix::num_stations.get_ptr();
             *num_stations = std::clamp(*num_stations, 1, 999);
@@ -1577,7 +1577,7 @@ namespace llpp::gui
             }
 
             ImGui::SetCursorPos({10, 76});
-            ImGui::Text("Interval (minutes):");
+            ImGui::Text("Interval (seconds):");
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::SetCursorPos({150, 73});
             if (ImGui::InputInt("##phoenix_interval", config::bots::phoenix::interval.get_ptr(),

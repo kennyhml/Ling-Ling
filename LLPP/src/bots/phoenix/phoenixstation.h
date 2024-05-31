@@ -13,8 +13,6 @@ namespace llpp::bots::phoenix
         core::StationResult complete() override;
 
     private:
-        core::StationResult deposit_pearls();
-
         asa::structures::Container vault_;
         std::array<asa::structures::DedicatedStorage, 6> dedis_;
     };

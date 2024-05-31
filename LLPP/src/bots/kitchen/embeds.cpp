@@ -76,7 +76,7 @@ namespace llpp::bots::kitchen
 
         dpp::message msg(config::discord::channels::info.get(), embed);
 
-        if (slots_in_storage > 30) {
+        if (slots_in_storage > 300) {
             msg.set_content(
                 dpp::utility::role_mention(
                     config::discord::roles::helper_no_access.get()));

@@ -73,12 +73,7 @@ namespace llpp::core
         using namespace llpp::bots;
 
         tasks_.emplace_back("STATE CHECK", player_state_check);
-
-        // Phoenix testing code
-        tasks_.emplace_back("PHOENIX", std::make_unique<phoenix::PhoenixManager>());
-
         tasks_.emplace_back("FARMING", farm::run_while_requested);
-
         tasks_.emplace_back("PARASAURS", std::make_unique<parasaur::ParasaurManager>());
         tasks_.emplace_back("CRAFTING", std::make_unique<crafting::CraftingManager>());
 
@@ -94,8 +89,6 @@ namespace llpp::core
             tasks_.emplace_back("", std::move(manager));
         }
 
-        tasks_.emplace_back("FORGES", std::make_unique<forges::ForgeManager>());
-
         for (auto& manager: drops::create_managers()) {
             tasks_.emplace_back("", std::move(manager));
         }
@@ -103,6 +96,8 @@ namespace llpp::core
         tasks_.emplace_back("PASTE", std::make_unique<paste::PasteManager>());
         tasks_.emplace_back("CROPS", std::make_unique<kitchen::CropManager>());
         tasks_.emplace_back("SAP", std::make_unique<kitchen::SapManager>());
+        tasks_.emplace_back("PHOENIX", std::make_unique<phoenix::PhoenixManager>());
+        tasks_.emplace_back("FORGES", std::make_unique<forges::ForgeManager>());
         has_collected_tasks_ = true;
     }
 

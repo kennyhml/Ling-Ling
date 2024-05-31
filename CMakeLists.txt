@@ -216,6 +216,12 @@ add_executable(LLPP WIN32
         LLPP/src/bots/farm/wood/commands.h
         LLPP/src/bots/farm/obsidian/commands.cpp
         LLPP/src/bots/farm/obsidian/commands.h
+        LLPP/src/bots/phoenix/phoenixmanager.h
+        LLPP/src/bots/phoenix/phoenixstation.h
+        LLPP/src/bots/phoenix/phoenixmanager.cpp
+        LLPP/src/bots/phoenix/phoenixstation.cpp
+        LLPP/src/bots/phoenix/embeds.h
+        LLPP/src/bots/phoenix/embeds.cpp
 )
 
 find_package(dpp CONFIG REQUIRED)
@@ -232,8 +238,8 @@ link_directories(${OpenCV_LIB_DIR})
 # asapp
 include_directories("C:/dev/ASAPP/ASAPP/include")
 target_link_libraries(LLPP PRIVATE
-        $<$<CONFIG:Debug>: "C:/dev/ASAPP/build/debug/asapp.lib">
-        $<$<CONFIG:Release>: "C:/dev/ASAPP/build/release/asapp.lib">
+        $<$<CONFIG:Debug>: "C:/dev/ASAPP/debug/asapp.lib">
+        $<$<CONFIG:Release>: "C:/dev/ASAPP/release/asapp.lib">
 )
 
 # tesseract

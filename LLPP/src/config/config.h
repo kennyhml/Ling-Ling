@@ -195,7 +195,7 @@ namespace llpp::config
 
         inline ManagedVar<std::string> prefix(BASE, "prefix", save, "PHOENIX");
         inline ManagedVar<int> num_stations(BASE, "num_stations", save, 1);
-        inline ManagedVar<int> interval(BASE, "interval", save, 1);
+        inline ManagedVar<int> interval(BASE, "interval", save, 30);
 
         inline ManagedVar<bool> disabled(BASE, "disabled", save, true);
     }
