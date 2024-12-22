@@ -7,7 +7,6 @@
 #include "../../config/config.h"
 #include "../custom/combo_dynamic.h"
 #include "../../../external/imgui/imgui_stdlib.h"
-#include "../../auth/auth.h"
 #include "../custom/clampedint.h"
 
 namespace llpp::gui
@@ -120,8 +119,6 @@ namespace llpp::gui
 
     void draw_metal_tab()
     {
-        if (!std::ranges::contains(authorized, auth::user)) { return; }
-
         const ImVec2 managers_dimensions(425 - state::maintabs_data.width,
                                          ImGui::GetWindowHeight() * 0.33f);
         begin_child("Farm Managers", managers_dimensions); {

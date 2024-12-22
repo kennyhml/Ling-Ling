@@ -5,7 +5,6 @@
 #include "bot.h"
 #include "helpers.h"
 #include "icons.h"
-#include "../auth/auth.h"
 #include "../common/util.h"
 #include "../config/config.h"
 
@@ -66,8 +65,7 @@ namespace llpp::discord
 
             const auto duration = std::chrono::system_clock::now() - session_start;
 
-            embed.add_field("Session Host:", auth::user, true)
-                 .add_field("Session Time:", util::make_counter(duration), true)
+            embed.add_field("Session Time:", util::make_counter(duration), true)
                  .add_field("Session Server:", get_server_info(), true)
                  .add_field("Server Timer", "-:-", true)
                  .add_field("Members Online:", "-/-", true)

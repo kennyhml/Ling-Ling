@@ -21,10 +21,6 @@ add_executable(LLPP WIN32
         LLPP/external/imgui/imstb_rectpack.h
         LLPP/external/imgui/imstb_textedit.h
         LLPP/external/imgui/imstb_truetype.h
-        LLPP/external/keyauth/auth.hpp
-        LLPP/external/keyauth/skStr.h
-        LLPP/src/auth/auth.cpp
-        LLPP/src/auth/auth.h
         LLPP/src/bots/crafting/basepowderstation.cpp
         LLPP/src/bots/crafting/basepowderstation.h
         LLPP/src/bots/crafting/craftingmanager.cpp
@@ -237,10 +233,7 @@ link_directories(${OpenCV_LIB_DIR})
 
 # asapp
 include_directories("C:/dev/ASAPP/ASAPP/include")
-target_link_libraries(LLPP PRIVATE
-        $<$<CONFIG:Debug>: "C:/dev/ASAPP/debug/asapp.lib">
-        $<$<CONFIG:Release>: "C:/dev/ASAPP/release/asapp.lib">
-)
+target_link_libraries(LLPP PRIVATE "C:/dev/ASAPP/build/debug/asapp.lib")
 
 # tesseract
 find_package(Tesseract CONFIG REQUIRED)
@@ -248,9 +241,3 @@ target_link_libraries(LLPP PRIVATE Tesseract::libtesseract)
 
 # d3d9
 target_link_libraries(LLPP PRIVATE d3d9.lib)
-
-# auth
-target_link_libraries(LLPP PRIVATE
-        $<$<CONFIG:Debug>: "C:/dev/LLPP/LLPP/external/keyauth/authd.lib">
-        $<$<CONFIG:Release>: "C:/dev/LLPP/LLPP/external/keyauth/auth.lib">
-)

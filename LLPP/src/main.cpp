@@ -9,7 +9,6 @@
 #include <asapp/items/items.h>
 #include <asapp/structures/tributeable.h>
 #include "bots/farm/swingbot/commands.h"
-#include "auth/auth.h"
 #include "gui/gui.h"
 #include "config/config.h"
 #include "core/recovery.h"
@@ -136,8 +135,6 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev_instance,
     if (freopen_s(&pFile, "CONOUT$", "w", stderr) != 0) {
         return false;
     }
-
-    llpp::auth::login();
 
     llpp::gui::create_window(L"Ling Ling++", L"Meow");
     llpp::gui::create_device();
