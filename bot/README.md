@@ -1,2 +1,0 @@
-# LLPP
-Ling-Ling++
