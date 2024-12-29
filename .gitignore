@@ -34,3 +34,4 @@
 bot/build
 .vs
 dist
+/bot/.idea/

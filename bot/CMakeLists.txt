@@ -3,8 +3,15 @@ project(llpp)
 
 set(CMAKE_CXX_STANDARD 23)
 
+add_compile_options(/utf-8)
+
 add_executable(llpp WIN32
         src/main.cpp
+        src/integrations/discord/commands/config.cpp
+        src/integrations/discord/commands/config.h
+        src/integrations/discord/commands/setup.cpp
+        src/integrations/discord/commands/setup.h
+        src/integrations/discord/commands/common.h
 )
 
 add_dependencies(llpp asapp)
@@ -24,6 +31,3 @@ link_directories(${OpenCV_LIB_DIR})
 # tesseract
 find_package(Tesseract CONFIG REQUIRED)
 target_link_libraries(llpp PRIVATE Tesseract::libtesseract)
-
-# d3d9
-target_link_libraries(llpp PRIVATE d3d9.lib)
