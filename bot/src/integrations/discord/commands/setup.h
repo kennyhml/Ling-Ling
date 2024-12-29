@@ -9,5 +9,5 @@ namespace discord
      *
      * @return The slashcommand and the function to handle the command being triggered.
      */
-    [[nodiscard]] slashcommand_and_callback_t create_setup_command();
+    [[nodiscard]] slashcommand_register_t create_setup_command();
 }
