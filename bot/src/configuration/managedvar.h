@@ -22,6 +22,8 @@ namespace lingling
     // Function to call when the config should be dumped (in its entirety)
     using config_dump_t = std::function<void()>;
 
+    using config_get_t = std::function<json_t&()>;
+
     /**
      * @brief Manages a variable that is synced internally and serialized in a file.
      *
@@ -34,11 +36,12 @@ namespace lingling
     class managed_var
     {
     public:
-        managed_var(std::string t_key, json_t& t_data, config_dump_t t_dump,
-                    T t_default_value, json_traits<T> t_traits = {})
+        managed_var(std::string t_key, config_get_t t_get,
+                    config_dump_t t_dump = dump_config, T t_default_value = T(),
+                    json_traits<T> t_traits = {})
             : key_(std::move(t_key)), json_traits_(std::move(t_traits)),
-              dump_(std::move(t_dump)), default_(std::move(t_default_value)),
-              data_(get_or_create(t_data)) {}
+              dump_(std::move(t_dump)), get_(std::move(t_get)),
+              default_(std::move(t_default_value)) {}
 
         // Allow implicit casting to the managed type
         [[nodiscard]] operator T() { return get(); }
@@ -53,7 +56,7 @@ namespace lingling
         T get()
         {
             if (!loaded_) {
-                value_ = json_traits_.from_json(data_);
+                value_ = json_traits_.from_json(get_or_create());
                 loaded_ = true;
             }
             return value_;
@@ -104,7 +107,7 @@ namespace lingling
          */
         void sync_to_obj(const bool with_dump = true)
         {
-            data_ = json_traits_.to_json(value_);
+            get_or_create() = json_traits_.to_json(value_);
             if (with_dump) { dump_(); }
         }
 
@@ -119,33 +122,31 @@ namespace lingling
 
     private:
         /**
-         * @brief Wrapper to get the reference to the json object that is being handled
+         * @brief Wrapper to get the pointer to the json object that is being handled
          * or create it with the default value if it does not yet exist.
-         *
-         * @param data The json data reference that the desired reference exists in.
-         *
-         * @remark The key, json traits and default value must be initialized.
-         *
-         * @return Reference to the json object that this managed_var manages.
          */
-        json_t& get_or_create(json_t& data)
+        json_t& get_or_create()
         {
+            if (data_) { return *data_; }
             try {
-                return data.at(key_);
+                data_ = &get_().at(key_);
             } catch (const json_t::out_of_range&) {
                 // Add the key to the json with the default value if it didnt exist
-                return data[key_] = json_traits_.to_json(default_);
+                get_()[key_] = json_traits_.to_json(default_);
+                data_ = &get_().at(key_);
             }
+            return *data_;
         }
 
         std::string key_;
 
         json_traits<T> json_traits_;
         config_dump_t dump_;
+        config_get_t get_;
 
         T value_;
         T default_;
-        json_t& data_;
+        json_t* data_ = nullptr;
         bool loaded_ = false;
     };
 }

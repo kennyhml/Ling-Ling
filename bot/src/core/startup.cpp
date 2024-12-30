@@ -1,6 +1,7 @@
 #include "startup.h"
 
 #include "asa/core/logging.h"
+#include "configuration/validate.h"
 
 namespace lingling
 {
@@ -24,5 +25,7 @@ namespace lingling
     {
         asa::get_logger()->info("Performing startup..");
         for (const auto& fn: get_deferred()) { fn(); }
+
+        validate_config_integrity();
     }
 }

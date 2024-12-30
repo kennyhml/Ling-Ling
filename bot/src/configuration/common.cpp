@@ -19,12 +19,17 @@ namespace lingling
 
         const auto path = static_cast<char*>(malloc(required_size * sizeof(char)));
         getenv_s(&required_size, path, required_size, "ProgramData");
-        return std::filesystem::path(path) / "config.json";
+        return std::filesystem::path(path) / "Ling-Ling\\config.json";
     }
 
     json_t& get_config_data()
     {
         static json_t data = utility::read(get_config_path());
         return data;
+    }
+
+    void dump_config()
+    {
+        utility::dump(get_config_data(), get_config_path());
     }
 }

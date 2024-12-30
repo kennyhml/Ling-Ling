@@ -1,12 +1,11 @@
 #include "setup.h"
 
+#include "integrations/discord/config.h"
+
 namespace lingling::discord
 {
     namespace
     {
-        // TODO: Get from config
-        constexpr auto guild_id = dpp::snowflake(1117391295808282725);
-
         // Permissions to be able to view the channel
         constexpr dpp::permission VIEW_CHANNEL = dpp::permission()
                                                  .add(dpp::p_view_channel)

@@ -20,4 +20,9 @@ namespace lingling
      * @return A static reference to the data loaded from the json file.
      */
     [[nodiscard]] json_t& get_config_data();
+
+    /**
+     * @brief Dumps the configuration data in static storage into the config file.
+     */
+    void dump_config();
 }
