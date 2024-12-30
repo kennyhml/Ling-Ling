@@ -19,5 +19,5 @@ namespace lingling
      *
      * @return A static reference to the data loaded from the json file.
      */
-    [[nodiscard]] json_t& load_config_data();
+    [[nodiscard]] json_t& get_config_data();
 }

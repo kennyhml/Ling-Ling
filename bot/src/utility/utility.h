@@ -1,7 +1,8 @@
 #pragma once
 #include <functional>
+#include <nlohmann/json.hpp>
 
-namespace utility
+namespace lingling::utility
 {
     /**
      * @brief Struct to run a piece of code when the static initialization phase begins.

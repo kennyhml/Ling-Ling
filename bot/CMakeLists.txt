@@ -17,9 +17,17 @@ add_executable(llpp WIN32
         src/configuration/validate.h
         src/configuration/managedvar.h
         src/configuration/common.h
-        src/utility.h
+        src/utility/utility.h
         src/configuration/exceptions.h
         src/core/exceptions.h
+        src/integrations/discord/config.cpp
+        src/integrations/discord/config.h
+        src/integrations/discord/discord.cpp
+        src/integrations/discord/discord.h
+        src/configuration/common.cpp
+        src/utility/utility.cpp
+        src/core/startup.cpp
+        src/core/startup.h
 )
 
 add_dependencies(llpp asapp)

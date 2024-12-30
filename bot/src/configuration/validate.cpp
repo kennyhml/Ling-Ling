@@ -1,5 +1,5 @@
 #include "validate.h"
-#include "utility.h"
+#include "utility/utility.h"
 #include "exceptions.h"
 
 #include <set>
@@ -19,6 +19,7 @@ namespace lingling
             throw duplicate_category_callback(category);
         }
         validation_callbacks.emplace(category, std::move(fn));
+        asa::get_logger()->debug("Validation callback attached for '{}'.", category);
     }
 
     void validate_config_integrity()
@@ -34,7 +35,7 @@ namespace lingling
             utility::dump(json_t(), get_config_path());
         }
 
-        json_t& data = load_config_data();
+        json_t& data = get_config_data();
         bool patches = false;
         std::set<std::string> called;
         for (const auto& [k, v]: data.items()) {
@@ -47,6 +48,7 @@ namespace lingling
             patches |= validation_callbacks.at(k)(v);
             called.emplace(k);
         }
+        asa::get_logger()->info("First validation complete. Check for missing entries..");
 
         // Its possible a category didnt exist in the file and needs to be created now.
         // In that case it hasnt been called in the previous validation
@@ -59,6 +61,7 @@ namespace lingling
                 patches |= v(data.at(k));
             }
         }
+        asa::get_logger()->info("Configuration validated (patches: {}).", patches);
 
         // If any changes were made to the data during the validation process, dump them
         // so we dont have to perform them again on next startup (duh).
