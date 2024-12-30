@@ -12,6 +12,10 @@ add_executable(llpp WIN32
         src/integrations/discord/commands/setup.cpp
         src/integrations/discord/commands/setup.h
         src/integrations/discord/commands/common.h
+        src/integrations/webhook/webhook.h
+        src/configuration/validate.cpp
+        src/configuration/validate.h
+        src/configuration/managedvar.h
 )
 
 add_dependencies(llpp asapp)
