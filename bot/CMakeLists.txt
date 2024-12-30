@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_compile_options(/utf-8)
 
-add_executable(llpp WIN32
+add_executable(llpp
         src/main.cpp
         src/integrations/discord/commands/config.cpp
         src/integrations/discord/commands/config.h

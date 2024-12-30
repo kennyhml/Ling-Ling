@@ -2,6 +2,7 @@
 
 #include "asa/core/logging.h"
 #include "configuration/validate.h"
+#include "integrations/discord/discord.h"
 
 namespace lingling
 {
@@ -27,5 +28,6 @@ namespace lingling
         for (const auto& fn: get_deferred()) { fn(); }
 
         validate_config_integrity();
+        discord::startup();
     }
 }
