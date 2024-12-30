@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 
-namespace discord
+namespace lingling::discord
 {
     /**
      * @brief Creates the /setup command group designed to handle the setup of a

@@ -1,6 +1,6 @@
 #include "setup.h"
 
-namespace discord
+namespace lingling::discord
 {
     namespace
     {

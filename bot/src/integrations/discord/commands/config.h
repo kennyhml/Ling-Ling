@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 
-namespace discord
+namespace lingling::discord
 {
     /**
      * @brief Creates the /config command group designed to to allow the user to change

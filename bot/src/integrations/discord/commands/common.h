@@ -1,7 +1,7 @@
 #pragma once
 #include <dpp/dpp.h>
 
-namespace discord
+namespace lingling::discord
 {
     // Function type to handle a slashcommand event
     using command_callback_t = std::function<void(dpp::cluster*,

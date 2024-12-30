@@ -16,10 +16,15 @@ add_executable(llpp WIN32
         src/configuration/validate.cpp
         src/configuration/validate.h
         src/configuration/managedvar.h
+        src/configuration/common.h
+        src/utility.h
+        src/configuration/exceptions.h
+        src/core/exceptions.h
 )
 
 add_dependencies(llpp asapp)
 target_link_libraries(llpp PRIVATE asapp)
+target_include_directories(llpp PRIVATE src)
 
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(llpp PRIVATE dpp::dpp)

@@ -1,10 +1,8 @@
 #pragma once
-#include <nlohmann/json.hpp>
+#include "common.h"
 
-namespace config
+namespace lingling
 {
-    using json_t = nlohmann::ordered_json;
-
     /**
      * @brief JSON traits to implement serialization between custom config objects and
      * their json serialized form to enable conversion back and forth.
