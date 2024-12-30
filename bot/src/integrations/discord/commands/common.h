@@ -13,11 +13,14 @@ namespace discord
     // Callback function to attach a subcommand with a callback to handle it being triggered
     using command_create_t = std::function<command_callback_t(dpp::slashcommand&)>;
 
+    // Alias for dpp confirmation callback lambda input
+    using conf_t = const dpp::confirmation_callback_t&;
+
     /**
      * @brief Helper function to try get a variant from a command value.
      */
     template<typename T>
-    [[nodiscard]] T try_get(const dpp::command_value& value)
+    [[nodiscard]] T tget(const dpp::command_value& value)
     {
         try {
             return std::get<T>(value);
