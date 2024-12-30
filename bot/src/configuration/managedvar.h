@@ -42,9 +42,18 @@ namespace config
               dump_(std::move(t_dump)), default_(std::move(t_default_value)),
               data_(get_or_create(t_data)) {}
 
+        // Allow implicit casting to the managed type
+        [[nodiscard]] operator T() { return get(); }
+
+        /**
+         * @brief Get the value of this variable.
+         *
+         * @remark If you need a reload from the object, call @link sync_from_obj \endlink first.
+         *
+         * @return The value of the variable.
+         */
         T get()
         {
-            auto str = data_.dump(4);
             if (!loaded_) {
                 value_ = json_traits_.from_json(data_);
                 loaded_ = true;
@@ -52,37 +61,75 @@ namespace config
             return value_;
         }
 
+        /**
+         * @brief Gets a pointer to this variable.
+         *
+         * @remark If you need a reload from the object, call @link sync_to_obj \endlink first.
+         *
+         * @return A pointer to the variable.
+         */
         T* get_ptr()
         {
             get();
             return &value_;
         }
 
+        /**
+         * @brief Gets a reference to this variable.
+         *
+         * @remark If you need a reload from the object, call @link sync_to_obj \endlink first.
+         *
+         * @return A reference to the variable.
+         */
         T& get_ref()
         {
             get();
             return value_;
         }
 
+        /**
+         * @brief Sets the value of this variable.
+         *
+         * @param new_value The new value of the variable.
+         * @param dump Whether to dump the data to the file after setting the new value.
+         */
         void set(const T& new_value, const bool dump = true)
         {
             value_ = new_value;
-            if (dump) { sync_to_file(); }
+            sync_to_obj(dump);
         }
 
-        void sync_to_file()
+        /**
+         * @brief Syncs the value of this variable to the json object.
+         *
+         * @param with_dump Whether to dump the data to the json file after syncing it.
+         */
+        void sync_to_obj(const bool with_dump = true)
         {
             data_ = json_traits_.to_json(value_);
-            dump_();
+            if (with_dump) { dump_(); }
         }
 
-        void sync_from_file()
+        /**
+         * @brief Syncs the value of this variable from the json object.
+         */
+        void sync_from_obj()
         {
             loaded_ = false;
             get();
         }
 
     private:
+        /**
+         * @brief Wrapper to get the reference to the json object that is being handled
+         * or create it with the default value if it does not yet exist.
+         *
+         * @param data The json data reference that the desired reference exists in.
+         *
+         * @remark The key, json traits and default value must be initialized.
+         *
+         * @return Reference to the json object that this managed_var manages.
+         */
         json_t& get_or_create(json_t& data)
         {
             try {
