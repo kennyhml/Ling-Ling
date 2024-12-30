@@ -9,5 +9,5 @@ namespace discord
      *
      * @return The slashcommand and the function to handle the command being triggered.
      */
-    [[nodiscard]] slashcommand_register_t create_setup_command();
+    [[nodiscard]] command_register_t create_setup_command(const dpp::snowflake& app_id);
 }

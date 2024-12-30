@@ -11,7 +11,7 @@ namespace discord
      *
      * @return The slashcommand and the function to handle the command being triggered.
      */
-    [[nodiscard]] slashcommand_register_t create_config_command();
+    [[nodiscard]] command_register_t create_config_command(const dpp::snowflake& app_id);
 
     /**
      * @brief Attaches a listener to the /config slashcommand being built, individual

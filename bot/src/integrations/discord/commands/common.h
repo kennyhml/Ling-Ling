@@ -3,12 +3,26 @@
 
 namespace discord
 {
-    // Callback function type for a slashcommand event
-    using slashcommand_callback_t = std::function<void(const dpp::slashcommand_t&)>;
+    // Function type to handle a slashcommand event
+    using command_callback_t = std::function<void(dpp::cluster*,
+                                                  const dpp::slashcommand_t&)>;
 
     // Slashcommand and the callback to handle the command being triggered
-    using slashcommand_register_t = std::pair<dpp::slashcommand, slashcommand_callback_t>;
+    using command_register_t = std::pair<dpp::slashcommand, command_callback_t>;
 
     // Callback function to attach a subcommand with a callback to handle it being triggered
-    using command_create_t = std::function<slashcommand_callback_t(dpp::slashcommand&)>;
+    using command_create_t = std::function<command_callback_t(dpp::slashcommand&)>;
+
+    /**
+     * @brief Helper function to try get a variant from a command value.
+     */
+    template<typename T>
+    [[nodiscard]] T try_get(const dpp::command_value& value)
+    {
+        try {
+            return std::get<T>(value);
+        } catch (const std::bad_variant_access&) {
+            return T();
+        }
+    }
 }
