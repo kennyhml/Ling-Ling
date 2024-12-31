@@ -18,9 +18,13 @@ namespace lingling
 
     enum class task_state
     {
-        TASK_ENABLED,  // The task is enabled and allowed to execute (default)
-        TASK_DISABLED, // The task is disabled, it should not execute
-        TASK_SUSPENDED // The task is temporarily suspended, it should not execute
+        STATE_UNCHECKED, // The state of the task has not been checked.
+        STATE_ENQUEUED,  // The task is enabled and in the queue waiting for execution
+        STATE_COOLDOWN,  // The task is on cooldown from its previous completion
+        STATE_WAITING,   // The task is waiting to be picked up by the task queue
+        STATE_EXECUTING, // The task is currently being executed.
+        STATE_DISABLED,  // The task is disabled, it should not execute
+        STATE_SUSPENDED  // The task is temporarily suspended, it should not execute
     };
 
     struct task_result
@@ -44,7 +48,7 @@ namespace lingling
         }
     };
 
-    using task_execution_callback_t = std::function<void(const task_result&)>;
+    using task_completion_callback_t = std::function<void(const task_result&)>;
 
     /**
      * @brief Abstract task base class that any task must implement in order to be
@@ -91,7 +95,7 @@ namespace lingling
          * @remark As subclasses are unable to override the completion callback type, they
          * must cast the task result to the required concrete implementation.
          */
-        void add_executed_listener(task_execution_callback_t callback);
+        void add_executed_listener(task_completion_callback_t callback);
 
         /**
          * @brief Sets the task to the given priority, this may not take effect in the
@@ -145,12 +149,12 @@ namespace lingling
         std::string description_;
 
         task_priority priority_;
-        task_state state_ = task_state::TASK_ENABLED;
+        task_state state_ = task_state::STATE_UNCHECKED;
         task_result last_result_;
 
         std::chrono::system_clock::time_point last_completion_;
         std::chrono::system_clock::time_point suspension_start_;
 
-        std::vector<task_execution_callback_t> callbacks_;
+        std::vector<task_completion_callback_t> callbacks_;
     };
 }

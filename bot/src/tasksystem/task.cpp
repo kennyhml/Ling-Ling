@@ -7,7 +7,7 @@ namespace lingling
         : module_(std::move(t_module)), id_(std::move(t_id)),
           description_(std::move(t_description)), priority_(t_priority) {}
 
-    void task::add_executed_listener(task_execution_callback_t callback)
+    void task::add_executed_listener(task_completion_callback_t callback)
     {
         callbacks_.push_back(std::move(callback));
     }

@@ -6,9 +6,9 @@
 #include <dpp/dpp.h>
 
 #include "asa/core/logging.h"
-#include "configuration/validate.h"
 #include "core/startup.h"
 #include "tasksystem/persistenttask.h"
+#include "tasksystem/queue.h"
 
 struct test : lingling::persistent_task
 {
@@ -32,14 +32,20 @@ int main()
     setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
     asa::setup_logger();
 
-    test t("test", "myid", "This is a description", lingling::task_priority::PRIORITY_MEDIUM, 30min);
 
-    t.execute();
-    t.dump_data();
-
-    return 1;
+    auto t1 = std::make_shared<test>("", "t1", "", lingling::task_priority::PRIORITY_LOW);
 
     lingling::startup();
+
+
+    lingling::register_task_enqueue_lookup_callback([&t1] () -> std::shared_ptr<test> {
+        if (t1->get_state() != lingling::task_state::STATE_ENQUEUED) {
+            return t1;
+        }
+        return nullptr;
+    });
+    lingling::start_queue_handler_thread();
+
     Sleep(100000);
 
     return EXIT_SUCCESS;

@@ -46,7 +46,7 @@ namespace lingling
 
     void persistent_task::from_json(const json_t& data)
     {
-        state_ = data.value("state", task_state::TASK_ENABLED);
+        state_ = data.value("state", task_state::STATE_UNCHECKED);
         last_completion_ = asa::utility::from_t(data.value("last_completion", 0));
         suspension_start_ = asa::utility::from_t(data.value("suspension_start", 0));
     }
