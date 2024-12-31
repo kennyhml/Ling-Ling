@@ -4,8 +4,7 @@
 namespace lingling::discord
 {
     // Function type to handle a slashcommand event
-    using command_callback_t = std::function<void(dpp::cluster*,
-                                                  const dpp::slashcommand_t&)>;
+    using command_callback_t = std::function<void(const dpp::slashcommand_t&)>;
 
     // Slashcommand and the callback to handle the command being triggered
     using command_register_t = std::pair<dpp::slashcommand, command_callback_t>;

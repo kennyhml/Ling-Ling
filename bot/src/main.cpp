@@ -16,7 +16,7 @@ int main()
     asa::setup_logger();
 
     lingling::startup();
-    Sleep(3000);
+    Sleep(100000);
 
     return EXIT_SUCCESS;
 }

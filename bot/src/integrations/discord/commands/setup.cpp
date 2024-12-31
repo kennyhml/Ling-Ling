@@ -1,6 +1,7 @@
 #include "setup.h"
 
 #include "integrations/discord/config.h"
+#include "integrations/discord/discord.h"
 
 namespace lingling::discord
 {
@@ -103,15 +104,14 @@ namespace lingling::discord
         /**
          * @brief Performs the actual creation of category and channels.
          */
-        void channel_setup_impl(dpp::cluster* bot, const dpp::slashcommand_t& event,
-                                const std::string& id)
+        void channel_setup_impl(const dpp::slashcommand_t& event, const std::string& id)
         {
             const auto access = tget<std::string>(event.get_parameter("access-role"));
 
             // Create the category and, in the callback confirmation, create the rest of
             // the channels in it. This is because we need the category ID to set as parent
             // in the other channels.
-            bot->channel_create(make_category(id, access), [=](conf_t callback) {
+            get_bot()->channel_create(make_category(id, access), [=](conf_t callback) {
                 if (callback.is_error()) {
                     return event.edit_original_response({
                         "Setup failed - category could not be created."
@@ -121,9 +121,9 @@ namespace lingling::discord
                 const auto logs = tget<std::string>(event.get_parameter("tribelog-role"));
 
                 // Create the channels without waiting for one another
-                bot->channel_create(make_dashboard(category.id));
-                bot->channel_create(make_tribelog(category.id, logs));
-                bot->channel_create(make_alerts(category.id, logs), [=](conf_t) {
+                get_bot()->channel_create(make_dashboard(category.id));
+                get_bot()->channel_create(make_tribelog(category.id, logs));
+                get_bot()->channel_create(make_alerts(category.id, logs), [=](conf_t) {
                     event.edit_original_response({"Channel setup completed!"});
                 });
             });
@@ -137,7 +137,7 @@ namespace lingling::discord
          * @remark After all channels are checked and no duplicate was found, control is
          * passed onto the actual channel & category setup implementation.
          */
-        void setup_if_needed(dpp::cluster* bot, const dpp::slashcommand_t& event)
+        void setup_if_needed(const dpp::slashcommand_t& event)
         {
             // Set the ID to the default or attach the identifier if supplied.
             auto id = tget<std::string>(event.get_parameter("identifier"));
@@ -152,7 +152,7 @@ namespace lingling::discord
             const auto pending = std::make_shared<size_t>(guild->channels.size());
             const auto stop = std::make_shared<bool>(false);
             for (const dpp::snowflake& channel: guild->channels) {
-                bot->channel_get(channel, [=](conf_t cb) {
+                get_bot()->channel_get(channel, [=](conf_t cb) {
                     if (*stop) { return; }
 
                     if (!cb.is_error() && cb.get<dpp::channel>().name == id) {
@@ -162,7 +162,7 @@ namespace lingling::discord
                     }
 
                     // Check if this was the last channel to be checked
-                    if (--*pending == 0) { channel_setup_impl(bot, event, id); }
+                    if (--*pending == 0) { channel_setup_impl(event, id); }
                 });
             }
         }
@@ -173,16 +173,16 @@ namespace lingling::discord
          *
          * @remark If the category already exists, the command is denied.
          */
-        void handle_setup_command(dpp::cluster* bot, const dpp::slashcommand_t& event)
+        void handle_setup_command(const dpp::slashcommand_t& event)
         {
-            event.thinking(false, [event, bot](conf_t) {
+            event.thinking(false, [event](conf_t) {
                 // We need to get the guilds channels to check if the category already exists
-                bot->guild_get(guild_id, [=](conf_t callback) {
+                get_bot()->guild_get(guild_id, [=](conf_t callback) {
                     if (callback.is_error()) {
                         event.edit_original_response({"Setup failed - guild not found."});
                         return;
                     }
-                    setup_if_needed(bot, event);
+                    setup_if_needed(event);
                 });
             });
         }

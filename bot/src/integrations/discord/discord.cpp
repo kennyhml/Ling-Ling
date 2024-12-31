@@ -2,17 +2,26 @@
 #include "config.h"
 #include "utility/utility.h"
 #include "commands/common.h"
+#include "commands/setup.h"
 
 #include <iostream>
 #include <asa/core/state.h>
 #include <asa/core/logging.h>
 
+
 namespace lingling::discord
 {
     namespace
     {
+        // Pointer to the dpp::cluster that will later serve as the bot instance.
         std::shared_ptr<dpp::cluster> bot = nullptr;
 
+        // Slashcommand names mapped to the function to call to handle them, e.g
+        // the "setup" command would map to a handle_setup_command function.
+        // Subcommands are something the command group has to handle internally.
+        std::map<std::string, command_callback_t> command_handlers;
+
+        // Setup message to display when the bot is launched without or with an invalid token
         const auto SETUP_MESSAGE =
                 "\n======================================================================================\n"
                 "\033[1;34mWelcome to the Ling-Ling++ Discord Bot Setup!\033[0m\n"
@@ -26,6 +35,26 @@ namespace lingling::discord
                 "\n======================================================================================\n";
 
         /**
+         * @brief Gathers the slashcommands from the command components and registers their
+         * command handlers to the map.
+         *
+         * @param app_id The app id of the bot to register the commands to.
+         *
+         * @return A list of slashcommands the bot should register in the guild.
+         */
+        [[nodiscard]] std::vector<dpp::slashcommand> gather(const dpp::snowflake& app_id)
+        {
+            std::vector<dpp::slashcommand> ret;
+
+            // Setup commands
+            const auto [cmd, callback] = create_setup_command(app_id);
+            ret.push_back(cmd);
+            command_handlers.emplace(cmd.name, callback);
+
+            return ret;
+        }
+
+        /**
          * @brief Launches the discord bot with the given token.
          *
          * @param token The token to use to launch the bot.
@@ -36,10 +65,23 @@ namespace lingling::discord
         {
             bot = std::make_shared<dpp::cluster>(token);
 
-            // route the logging to our spdlog logger instead.
+            // Route the logging to our spdlog logger instead.
             bot->on_log([](const dpp::log_t& log) {
                 asa::get_logger()->log(
                     static_cast<spdlog::level::level_enum>(log.severity), log.message);
+            });
+
+            // Register the slash commands in the guild when ready, global commands can
+            // only be registered every few hours so making it guild specific is required.
+            bot->on_ready([](const dpp::ready_t&) {
+                if (dpp::run_once<struct register_bot_commands>()) {
+                    bot->guild_bulk_command_create(gather(bot->me.id), guild_id);
+                }
+            });
+
+            // Reroute the slashcommand to the components that registered the command.
+            bot->on_slashcommand([](const dpp::slashcommand_t& event) {
+                command_handlers.at(event.command.get_command_name())(event);
             });
 
             try {
@@ -59,6 +101,7 @@ namespace lingling::discord
          */
         bool do_first_startup()
         {
+            // Required for colors in the terminal
             utility::enable_virtual_terminal_processing();
 
             if (!bot_token.get().empty() && !guild_id.get().empty()) {
@@ -96,7 +139,7 @@ namespace lingling::discord
                 }
 
                 const auto guilds = callback.get<dpp::guild_map>();
-                if (guilds.empty() || guilds.size() > 1) {
+                if (guilds.size() != 1) {
                     asa::get_logger()->error(
                         "Bot must be in exactly one guild, not {}!", guilds.size()
                     );
@@ -113,7 +156,6 @@ namespace lingling::discord
 
             // Wait for the callback to finish, we cannot proceed until it has.
             while (pending) { asa::checked_sleep(100ms); }
-
             if (!valid) {
                 asa::get_logger()->info("Press enter to try again..");
                 std::cin.get();
