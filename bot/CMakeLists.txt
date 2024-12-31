@@ -30,6 +30,8 @@ add_executable(llpp
         src/core/startup.h
         src/tasksystem/task.cpp
         src/tasksystem/task.h
+        src/tasksystem/persistenttask.h
+        src/tasksystem/persistenttask.cpp
 )
 
 add_dependencies(llpp asapp)
