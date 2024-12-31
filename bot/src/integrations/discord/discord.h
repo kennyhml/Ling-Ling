@@ -12,7 +12,9 @@ namespace lingling::discord
 
     [[nodiscard]] std::shared_ptr<dpp::cluster> get_bot();
 
-    inline run_on_startup on_startup([] {
+    // Initialize the discord bot on late startup, has to happen in the late phase because
+    // the configuration is only validated / created in the phase before.
+    inline run_on_startup on_startup(startup_time::STARTUP_LATE, [] {
         initialize_discord_bot();
-    }, false);
+    });
 }
