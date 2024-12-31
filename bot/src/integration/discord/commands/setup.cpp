@@ -1,7 +1,7 @@
 #include "setup.h"
 
-#include "integrations/discord/config.h"
-#include "integrations/discord/discord.h"
+#include "integration/discord/config.h"
+#include "integration/discord/discord.h"
 
 namespace lingling::discord
 {

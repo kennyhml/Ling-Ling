@@ -7,12 +7,12 @@ add_compile_options(/utf-8)
 
 add_executable(llpp
         src/main.cpp
-        src/integrations/discord/commands/config.cpp
-        src/integrations/discord/commands/config.h
-        src/integrations/discord/commands/setup.cpp
-        src/integrations/discord/commands/setup.h
-        src/integrations/discord/commands/common.h
-        src/integrations/webhook/webhook.h
+        src/integration/discord/commands/config.cpp
+        src/integration/discord/commands/config.h
+        src/integration/discord/commands/setup.cpp
+        src/integration/discord/commands/setup.h
+        src/integration/discord/commands/common.h
+        src/integration/webhook/webhook.h
         src/configuration/validate.cpp
         src/configuration/validate.h
         src/configuration/managedvar.h
@@ -20,14 +20,16 @@ add_executable(llpp
         src/utility/utility.h
         src/configuration/exceptions.h
         src/core/exceptions.h
-        src/integrations/discord/config.cpp
-        src/integrations/discord/config.h
-        src/integrations/discord/discord.cpp
-        src/integrations/discord/discord.h
+        src/integration/discord/config.cpp
+        src/integration/discord/config.h
+        src/integration/discord/discord.cpp
+        src/integration/discord/discord.h
         src/configuration/common.cpp
         src/utility/utility.cpp
         src/core/startup.cpp
         src/core/startup.h
+        src/tasksystem/task.cpp
+        src/tasksystem/task.h
 )
 
 add_dependencies(llpp asapp)
