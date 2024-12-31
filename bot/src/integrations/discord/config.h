@@ -52,7 +52,7 @@ namespace lingling::discord
     inline managed_var<dpp::snowflake> dashboard{"dashboard", get_channel_config};
 
     // Attach the config validation strategy on startup
-    inline run_on_startup on_startup([] {
+    inline run_on_startup startup_register_validation([] {
         add_config_validation("discord", validate_discord_config);
     });
 }

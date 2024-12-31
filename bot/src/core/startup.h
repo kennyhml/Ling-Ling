@@ -7,7 +7,7 @@ namespace lingling
      * @brief Adds a function to be called at startup, this may be used to register callbacks
      * on initialization performing all actions until the project reaches the startup phase.
      */
-    void defer_to_startup(const std::function<void()>&);
+    void defer_to_startup(const std::function<void()>&, bool early_startup = true);
 
     /**
      * @brief Helper struct to register a deferred startup callback when static the
@@ -16,7 +16,11 @@ namespace lingling
      */
     struct run_on_startup final
     {
-        explicit run_on_startup(const std::function<void()>& fn) { defer_to_startup(fn); }
+        explicit run_on_startup(const std::function<void()>& fn,
+                                const bool early_startup = true)
+        {
+            defer_to_startup(fn, early_startup);
+        }
     };
 
     /**

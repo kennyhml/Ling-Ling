@@ -31,4 +31,7 @@ namespace lingling::utility
      * @return The ordered json data of the file.
      */
     [[nodiscard]] nlohmann::ordered_json read(const std::filesystem::path& file);
+
+    void enable_virtual_terminal_processing();
 }
+
