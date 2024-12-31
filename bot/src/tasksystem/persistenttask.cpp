@@ -6,7 +6,7 @@
 
 namespace lingling
 {
-    std::filesystem::path get_task_data_path()
+    std::filesystem::path get_persistent_task_data_path()
     {
         // try to see if the file exists locally first.
         std::filesystem::path local = std::filesystem::current_path() / "data/data.json";
@@ -26,7 +26,7 @@ namespace lingling
 
     json_t& get_persistent_task_data()
     {
-        const auto path = get_task_data_path();
+        const auto path = get_persistent_task_data_path();
         if (!exists(path)) {
             create_directories(path.parent_path());
             utility::dump(json_t(), path);
@@ -38,11 +38,10 @@ namespace lingling
 
     persistent_task::persistent_task(const std::string& t_module, const std::string& t_id,
                                      const std::string& t_description,
-                                     const task_priority t_priority,
-                                     const std::chrono::minutes t_max_persistence)
+                                     const task_priority t_priority)
         : task(t_module, t_id, t_description, t_priority)
     {
-        load_from_saved(t_max_persistence);
+        load_from_saved();
     }
 
     void persistent_task::from_json(const json_t& data)
@@ -61,12 +60,12 @@ namespace lingling
         return ret;
     }
 
-    void persistent_task::dump_data() const
+    void persistent_task::dump() const
     {
         json_t data = to_json();
         data["dumped"] = std::time(nullptr);
         get_persistent_task_data()[module_][id_] = data;
-        utility::dump(get_persistent_task_data(), get_task_data_path());
+        utility::dump(get_persistent_task_data(), get_persistent_task_data_path());
     }
 
     json_t persistent_task::get_saved_data() const
@@ -74,15 +73,9 @@ namespace lingling
         return get_persistent_task_data()[module_][id_];
     }
 
-    void persistent_task::load_from_saved(const std::chrono::minutes max_persistence)
+    void persistent_task::load_from_saved()
     {
-        json_t data = get_saved_data();
-        if (data.empty()) { return; }
-        try {
-            const time_t dumped = data.at("dumped");
-            if (!asa::utility::timedout(dumped, max_persistence)) {
-                from_json(data);
-            }
-        } catch (const json_t::out_of_range&) {}
+        const json_t data = get_saved_data();
+        if (!data.empty()) { from_json(data); }
     }
 }
