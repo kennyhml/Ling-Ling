@@ -132,9 +132,26 @@ namespace lingling
         {
             const auto interaction = event.command.get_command_interaction();
             const auto subcommand = interaction.options[0].options[0];
+            const bool get = subcommand.name == "get";
 
-            auto test = std::get<dpp::snowflake>(event.get_parameter("channel"));
-            return event.reply(dpp::utility::channel_mention(test));
+            const auto var = std::get<std::string>(event.get_parameter("variable"));
+            const auto ch = discord::tget<dpp::snowflake>(event.get_parameter("channel"));
+
+            if (var == "q_channel") {
+                if (get) {
+                    return event.reply(dpp::utility::channel_mention(q_channel));
+                }
+                if (ch.empty()) {
+                    return event.reply("A channel must be provided");
+                }
+                const auto prev = q_channel.get();
+                q_channel.set(ch);
+                event.reply(std::format("**Task Queue Channel** changed from {} to {}.",
+                                        dpp::utility::channel_mention(prev),
+                                        dpp::utility::channel_mention(ch)));
+            } else {
+                event.reply(std::format("Variable {} is unknown!", var));
+            }
         }
     }
 
