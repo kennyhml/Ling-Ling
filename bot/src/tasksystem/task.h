@@ -21,7 +21,7 @@ namespace lingling
         STATE_UNCHECKED, // The state of the task has not been checked.
         STATE_ENQUEUED,  // The task is enabled and in the queue waiting for execution
         STATE_COOLDOWN,  // The task is on cooldown from its previous completion
-        STATE_WAITING,   // The task is waiting to be picked up by the task queue
+        STATE_QUEUEABLE, // The task is waiting to be picked up by the task queue
         STATE_EXECUTING, // The task is currently being executed.
         STATE_DISABLED,  // The task is disabled, it should not execute
         STATE_SUSPENDED  // The task is temporarily suspended, it should not execute

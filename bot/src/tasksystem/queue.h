@@ -11,9 +11,9 @@ namespace lingling
     // have the same priority, the inserted task is at the very end of them
     using task_queue_t = std::deque<std::shared_ptr<task> >;
 
-    // Callback for modules to check if any of their tasks are ready to be enqueued
-    // into the task list to be executed in the near future.
-    using task_enqueue_lookup_callback_t = std::function<std::shared_ptr<task>()>;
+    // Callback for modules to check if any of their tasks are ready to be put into
+    // the task queue
+    using task_provider_t = std::function<std::vector<std::shared_ptr<task> >()>;
 
     // Callback for task queue being updated, a task was either changed, removed or
     // added.
@@ -43,31 +43,49 @@ namespace lingling
     /**
      * @brief Adds the provided task to the task queue, it is inserted at the appropriate
      * position based on it's priority value.
+     *
+     * @param enqueue The Task to insert into the queue.
+     * @param no_update If true, the queue update event will not be triggered.
      */
-    void enqueue_task(const std::shared_ptr<task>& new_task);
+    void enqueue_task(const std::shared_ptr<task>& enqueue, bool no_update = false);
 
     /**
      * @brief Erases the provided task from the task queue.
+     *
+     * @param dequeue The Task to remove from the queue.
+     * @param no_update If true, the queue update event will not be triggered.
      */
-    void dequeue_task(const std::shared_ptr<task>& erase_task);
+    void dequeue_task(const std::shared_ptr<task>& dequeue, bool no_update = false);
 
     /**
-    * @brief Registers a callback to be called when the task queue looks for a new
-    * task to insert into the queue. The callback may return a task to enqueue or
-    * nullptr in case it has no task available to push.
+    * @brief Adds a listener to be called when the task queue looks for new tasks to
+    * insert into the queue. The callback returns a list of all tasks to be enqueued.
+    *
+    * @param provider The function that will be called periodically and may return a
+    * number of tasks to be enqueued.
     */
-    void add_task_enqueue_lookup_listener(task_enqueue_lookup_callback_t);
+    void add_task_queue_task_provider(task_provider_t provider);
 
     /**
-     * @brief Registers a listener to be called when the task queue is updated, the event
-     * will trigger because a task was either changed, dequeued or enqueued.
+     * @brief Adds a listener to be called when the task queue is updated, the event
+     * will trigger when a task was either changed, dequeued or enqueued.
+     *
+     * @param listener The function that will be called when the task queue changes.
      */
-    void add_task_queue_updated_listener(task_queue_updated_callback_t);
+    void add_task_queue_updated_listener(task_queue_updated_callback_t listener);
 
     /**
      * @brief Starts the queue handler thread responsible for managing the task queue, i.e
      * calling out to the modules to fetch any ready tasks to populate the queue with and
      * reacting to other changes within the queue.
      */
-    void start_queue_handler_thread();
+    void start_task_queue_manager_thread();
+
+    /**
+     * @brief Terminates the queue handler thead in a safe manner, once terminated the
+     * attached task providers will no longer be called until the handler is restarted.
+     *
+     * @param clear Whether to clear the task queue of the remaining tasks.
+     */
+    void terminate_task_queue_manager_thread(bool clear = true);
 }
