@@ -36,9 +36,9 @@ namespace lingling
     /**
      * @brief Gets the entire task queue without popping any of them.
      *
-     * @return A constant reference to the current task queue.
+     * @return A copy of the current task queue.
      */
-    const task_queue_t& get_all_tasks_in_queue();
+    task_queue_t get_all_tasks_in_queue();
 
     /**
      * @brief Adds the provided task to the task queue, it is inserted at the appropriate
@@ -70,12 +70,4 @@ namespace lingling
      * reacting to other changes within the queue.
      */
     void start_queue_handler_thread();
-
-    /**
-    * @brief Gets a string view of the taskqueue to visualize the current state of the
-    * queue. The string is formatted using ANSI colors.
-    *
-    * @return A string visualizing the current queue.
-    */
-    const std::string& get_taskqueue_view();
 }

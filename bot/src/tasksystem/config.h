@@ -1,22 +1,7 @@
 #pragma once
 #include "configuration/common.h"
 #include "configuration/managedvar.h"
-#include <dpp/dpp.h>
-
-template<>
-struct lingling::json_traits<dpp::snowflake>
-{
-    using to_json_t = std::function<json_t(const dpp::snowflake&)>;
-    using from_json_t = std::function<dpp::snowflake(const json_t&)>;
-
-    to_json_t to_json = [](const dpp::snowflake& value) {
-        return json_t(value.str());
-    };
-
-    from_json_t from_json = [](const json_t& json) {
-        return dpp::snowflake(json.get<std::string>());
-    };
-};
+#include "discord/config.h"
 
 namespace lingling
 {
