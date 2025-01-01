@@ -60,4 +60,12 @@ namespace lingling
      * reacting to other changes within the queue.
      */
     void start_queue_handler_thread();
+
+    /**
+    * @brief Gets a string view of the taskqueue to visualize the current state of the
+    * queue. The string is formatted using ANSI colors.
+    *
+    * @return A string visualizing the current queue.
+    */
+    const std::string& get_taskqueue_view();
 }

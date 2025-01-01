@@ -164,6 +164,18 @@ namespace lingling::discord
         }
     }
 
+    void module_initialize()
+    {
+        // Add the basic discord config validation to the early startup, it must happen
+        // ahead of the validation which happens in the step after.
+        defer_to_startup(startup_time::STARTUP_EARLY, [] {
+            add_config_validation("discord", validate_discord_config);
+        });
+
+        // Initialize the discord bot in the last phase of the startup.
+        defer_to_startup(startup_time::STARTUP_LATE, initialize_discord_bot);
+    }
+
     void initialize_discord_bot()
     {
         // The first startup already starts the bot as part of validating the token,

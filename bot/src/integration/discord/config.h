@@ -1,10 +1,9 @@
 #pragma once
-#include <snowflake.h>
-
 #include "configuration/common.h"
 #include "configuration/managedvar.h"
 #include "configuration/validate.h"
-#include "core/startup.h"
+
+#include <snowflake.h>
 
 template<>
 struct lingling::json_traits<dpp::snowflake>
@@ -50,10 +49,4 @@ namespace lingling::discord
     inline managed_var<dpp::snowflake> category{"category", get_channel_config};
     inline managed_var<dpp::snowflake> comands{"commands", get_channel_config};
     inline managed_var<dpp::snowflake> dashboard{"dashboard", get_channel_config};
-
-    // Attach the config validation strategy on early startup, the strategy is needed in the
-    // phase afterwards so it must be registered in the earliest possible phase.
-    inline run_on_startup startup_register_validation(startup_time::STARTUP_EARLY, [] {
-        add_config_validation("discord", validate_discord_config);
-    });
 }

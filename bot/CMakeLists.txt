@@ -34,6 +34,8 @@ add_executable(llpp
         src/tasksystem/persistenttask.cpp
         src/tasksystem/queue.h
         src/tasksystem/queue.cpp
+        src/integration/discord/format.cpp
+        src/integration/discord/format.h
 )
 
 add_dependencies(llpp asapp)

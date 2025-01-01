@@ -7,7 +7,7 @@ namespace lingling
     std::filesystem::path get_config_path()
     {
         // try to see if the file exists locally first.
-        std::filesystem::path local = std::filesystem::current_path() / "config.json";
+        std::filesystem::path local = std::filesystem::current_path() / "data\\config.json";
         if (exists(local)) { return local; }
 
         // File doesnt exist locally, should be in ProgramData then.

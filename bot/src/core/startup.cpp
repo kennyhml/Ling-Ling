@@ -17,7 +17,7 @@ namespace lingling
         }
     }
 
-    void defer_to_startup(const std::function<void()>& fn, const startup_time time)
+    void defer_to_startup(const startup_time time, const std::function<void()>& fn)
     {
         get_deferred(time).push_back(fn);
     }
@@ -25,13 +25,19 @@ namespace lingling
     void startup()
     {
         asa::get_logger()->info("Performing startup phase 1/3..");
-        for (const auto& fn: get_deferred(startup_time::STARTUP_EARLY)) { fn(); }
+        const auto& early_deferred = get_deferred(startup_time::STARTUP_EARLY);
+        for (size_t i = 0; i < early_deferred.size(); ++i) {
+            early_deferred[i]();
+        }
 
         asa::get_logger()->info("Performing startup phase 1/2..");
         validate_config_integrity();
 
         asa::get_logger()->info("Performing startup phase 3/3..");
-        for (const auto& fn: get_deferred(startup_time::STARTUP_LATE)) { fn(); }
+        const auto& late_deferred = get_deferred(startup_time::STARTUP_LATE);
+        for (size_t i = 0; i < late_deferred.size(); ++i) {
+            late_deferred[i]();
+        }
         asa::get_logger()->info("Startup completed.");
     }
 }
