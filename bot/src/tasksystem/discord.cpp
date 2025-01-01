@@ -77,6 +77,7 @@ namespace lingling
             auto ret = table(rows);
 
             // Set the channel ID, the table function doesnt know that!
+            ret[0].content.insert(0, std::format("**Updated <t:{}:R>**.", time(nullptr)));
             for (auto& msg: ret) { msg.channel_id = q_channel; }
             return ret;
         }

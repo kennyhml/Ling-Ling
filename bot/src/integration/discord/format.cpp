@@ -65,7 +65,7 @@ namespace lingling::discord
             // Messages can have max 2000 characters, so due to the "```" characters we
             // still need at the end, we cannot exceed 1997 characters. In this case
             // we wrap up the current message and continue on a new one.
-            if (msg_size + dpp::utility::utf8len(row) > 1997) {
+            if (msg_size + dpp::utility::utf8len(row) > 1950) {
                 messages.back().content += "```";
                 messages.emplace_back("```ansi\n" + row);
             } else {

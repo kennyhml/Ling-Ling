@@ -12,9 +12,10 @@ namespace lingling
         constexpr auto TASK_READINESS_FETCH_INTERVAL = 5s;
 
         std::vector<task_enqueue_lookup_callback_t> callbacks;
+        std::vector<task_queue_updated_callback_t> update_listeners;
+
         std::deque<std::shared_ptr<task> > task_queue;
         std::mutex queue_mutex;
-
     }
 
     std::shared_ptr<task> get_next_task_in_queue()
@@ -57,6 +58,7 @@ namespace lingling
             if ((*it)->get_priority() < new_task->get_priority()) {
                 task_queue.insert(it, new_task);
                 new_task->set_state(task_state::STATE_ENQUEUED);
+                for (const auto& fn : update_listeners) { fn(); }
                 return;
             }
         }
@@ -65,6 +67,7 @@ namespace lingling
         // had a higher priority, in either case it is fine to add it to the back.
         task_queue.emplace_back(new_task);
         new_task->set_state(task_state::STATE_ENQUEUED);
+        for (const auto& fn : update_listeners) { fn(); }
     }
 
     void dequeue_task(const std::shared_ptr<task>& erase_task)
@@ -81,6 +84,11 @@ namespace lingling
     void add_task_enqueue_lookup_listener(task_enqueue_lookup_callback_t fn)
     {
         callbacks.push_back(std::move(fn));
+    }
+
+    void add_task_queue_updated_listener(task_queue_updated_callback_t fn)
+    {
+        update_listeners.push_back(std::move(fn));
     }
 
     void start_queue_handler_thread()
