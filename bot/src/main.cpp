@@ -35,54 +35,7 @@ int main()
 
     lingling::startup();
 
-    auto t1 = std::make_shared<test>("Gacha Tower", "Gacha33-34", "Feed Kekk (Seeds).", lingling::task_priority::PRIORITY_LOW);
-    auto t2 = std::make_shared<test>("Gacha Tower", "Gacha01-02", "Feed Gacha (Seeds).", lingling::task_priority::PRIORITY_HIGH);
-    auto t3 = std::make_shared<test>("Gacha Tower", "Gacha10-11", "Feed Kekk (Seeds).", lingling::task_priority::PRIORITY_HIGH);
-    auto t4 = std::make_shared<test>("Gacha Tower", "Gacha40-41", "Feed Gacha (Seeds).", lingling::task_priority::PRIORITY_MEDIUM);
-    auto t5 = std::make_shared<test>("Gacha Tower", "Gacha42-43", "Feed Gacha (Seeds).", lingling::task_priority::PRIORITY_MEDIUM);
-    auto t6 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Feed Gacha (Seeds).", lingling::task_priority::PRIORITY_LOW);
-    auto t7 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t8 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t9 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t10 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t11 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t12 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t13 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t14 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
-    auto t15 = std::make_shared<test>("Gacha Tower", "Gacha44-45", "Wake up piggy and wish him a happy new year.", lingling::task_priority::PRIORITY_CRITICAL);
 
-    t1->set_state(lingling::task_state::STATE_WAITING);
-    t2->set_state(lingling::task_state::STATE_WAITING);
-    t3->set_state(lingling::task_state::STATE_WAITING);
-    t4->set_state(lingling::task_state::STATE_WAITING);
-    t5->set_state(lingling::task_state::STATE_WAITING);
-    t6->set_state(lingling::task_state::STATE_WAITING);
-    t7->set_state(lingling::task_state::STATE_WAITING);
-    t8->set_state(lingling::task_state::STATE_WAITING);
-    t9->set_state(lingling::task_state::STATE_WAITING);
-    t10->set_state(lingling::task_state::STATE_WAITING);
-    t11->set_state(lingling::task_state::STATE_WAITING);
-    t12->set_state(lingling::task_state::STATE_WAITING);
-    t13->set_state(lingling::task_state::STATE_WAITING);
-    t14->set_state(lingling::task_state::STATE_WAITING);
-    t15->set_state(lingling::task_state::STATE_WAITING);
-
-    lingling::enqueue_task(t1);
-    lingling::enqueue_task(t2);
-    lingling::enqueue_task(t3);
-    lingling::enqueue_task(t4);
-    lingling::enqueue_task(t5);
-    lingling::enqueue_task(t6);
-    lingling::enqueue_task(t7);
-    lingling::enqueue_task(t8);
-    lingling::enqueue_task(t9);
-    lingling::enqueue_task(t10);
-    lingling::enqueue_task(t11);
-    lingling::enqueue_task(t12);
-    lingling::enqueue_task(t13);
-    lingling::enqueue_task(t14);
-    lingling::enqueue_task(t15);
-    lingling::update_task_queue_channel();
     Sleep(100000);
 
     return EXIT_SUCCESS;
