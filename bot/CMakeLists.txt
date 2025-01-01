@@ -36,11 +36,18 @@ add_executable(llpp
         src/tasksystem/queue.cpp
         src/integration/discord/format.cpp
         src/integration/discord/format.h
+        src/tasksystem/discord.h
+        src/tasksystem/tasksystem.h
+        src/tasksystem/config.h
+        src/tasksystem/config.cpp
+        src/tasksystem/discord.cpp
+        src/tasksystem/tasksystem.cpp
 )
 
 add_dependencies(llpp asapp)
 target_link_libraries(llpp PRIVATE asapp)
 target_include_directories(llpp PRIVATE src)
+target_include_directories(llpp PRIVATE src/integration)
 
 find_package(dpp CONFIG REQUIRED)
 target_link_libraries(llpp PRIVATE dpp::dpp)

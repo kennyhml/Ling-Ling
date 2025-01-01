@@ -96,7 +96,7 @@ namespace lingling
         });
     }
 
-    void register_task_enqueue_lookup_callback(task_enqueue_lookup_callback_t fn)
+    void add_task_enqueue_lookup_listener(task_enqueue_lookup_callback_t fn)
     {
         callbacks.push_back(std::move(fn));
     }

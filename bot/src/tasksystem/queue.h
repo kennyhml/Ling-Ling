@@ -15,6 +15,10 @@ namespace lingling
     // into the task list to be executed in the near future.
     using task_enqueue_lookup_callback_t = std::function<std::shared_ptr<task>()>;
 
+    // Callback for task queue being updated, a task was either changed, removed or
+    // added.
+    using task_queue_updated_callback_t = std::function<void()>;
+
     /**
      * @brief Gets the upcoming task and pops it from the queue.
      *
@@ -52,7 +56,13 @@ namespace lingling
     * task to insert into the queue. The callback may return a task to enqueue or
     * nullptr in case it has no task available to push.
     */
-    void register_task_enqueue_lookup_callback(task_enqueue_lookup_callback_t);
+    void add_task_enqueue_lookup_listener(task_enqueue_lookup_callback_t);
+
+    /**
+     * @brief Registers a listener to be called when the task queue is updated, the event
+     * will trigger because a task was either changed, dequeued or enqueued.
+     */
+    void add_task_queue_updated_listener(task_queue_updated_callback_t);
 
     /**
      * @brief Starts the queue handler thread responsible for managing the task queue, i.e

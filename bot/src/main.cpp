@@ -68,7 +68,7 @@ int main()
     lingling::enqueue_task(t10);
     lingling::get_taskqueue_view();
 
-    lingling::register_task_enqueue_lookup_callback([&t1] () -> std::shared_ptr<test> {
+    lingling::add_task_enqueue_lookup_listener([&t1] () -> std::shared_ptr<test> {
         if (t1->get_state() != lingling::task_state::STATE_ENQUEUED) {
             return t1;
         }
