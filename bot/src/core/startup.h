@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <functional>
 
 namespace lingling
@@ -35,4 +36,9 @@ namespace lingling
      * and boots the integrations.
      */
     void startup();
+
+    /**
+     * @brief Gets the point of time where the application startup occurred.
+     */
+    std::chrono::system_clock::time_point get_startup_time();
 }

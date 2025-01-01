@@ -1,19 +1,10 @@
 #pragma once
-#include <functional>
+#include <message.h>
 #include <nlohmann/json.hpp>
 
 namespace lingling::utility
 {
-    /**
-     * @brief Struct to run a piece of code when the static initialization phase begins.
-     *
-     * This could, for example, be used to register callbacks from a module without having
-     * to explicitly call / know that module.
-     */
-    struct run_on_initialize final
-    {
-        explicit run_on_initialize(const std::function<void()>& fn) { fn(); }
-    };
+    std::vector<dpp::message> extract_messages_sorted(const dpp::message_map&);
 
     /**
      * @brief Writes the given json data to the given file.
@@ -33,5 +24,6 @@ namespace lingling::utility
     [[nodiscard]] nlohmann::ordered_json read(const std::filesystem::path& file);
 
     void enable_virtual_terminal_processing();
-}
 
+    std::string make_counter(std::chrono::system_clock::duration duration);
+}

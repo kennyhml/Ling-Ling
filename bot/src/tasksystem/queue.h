@@ -17,7 +17,7 @@ namespace lingling
 
     // Callback for task queue being updated, a task was either changed, removed or
     // added.
-    using task_queue_updated_callback_t = std::function<void()>;
+    using task_queue_update_listener_t = std::function<void()>;
 
     /**
      * @brief Gets the upcoming task and pops it from the queue.
@@ -72,7 +72,7 @@ namespace lingling
      *
      * @param listener The function that will be called when the task queue changes.
      */
-    void add_task_queue_updated_listener(task_queue_updated_callback_t listener);
+    void add_task_queue_updated_listener(task_queue_update_listener_t listener);
 
     /**
      * @brief Starts the queue handler thread responsible for managing the task queue, i.e

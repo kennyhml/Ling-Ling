@@ -1,4 +1,5 @@
 #include "queue.h"
+
 #include <asa/core/managedthread.h>
 #include <asa/core/state.h>
 #include <asa/core/logging.h>
@@ -12,7 +13,7 @@ namespace lingling
         constexpr auto THREAD_IDENTIFIER = "Task Queue Manager";
 
         std::vector<task_provider_t> task_providers;
-        std::vector<task_queue_updated_callback_t> update_listeners;
+        std::vector<task_queue_update_listener_t> update_listeners;
 
         std::deque<std::shared_ptr<task> > task_queue;
         std::mutex queue_mutex;
@@ -137,7 +138,7 @@ namespace lingling
         task_providers.push_back(std::move(provider));
     }
 
-    void add_task_queue_updated_listener(task_queue_updated_callback_t listener)
+    void add_task_queue_updated_listener(task_queue_update_listener_t listener)
     {
         update_listeners.push_back(std::move(listener));
     }

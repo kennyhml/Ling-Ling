@@ -15,6 +15,8 @@ namespace lingling
             static std::vector<std::function<void()> > deferred_late;
             return when == startup_time::STARTUP_EARLY ? deferred_early : deferred_late;
         }
+
+        std::chrono::system_clock::time_point startup_timestamp;
     }
 
     void defer_to_startup(const startup_time time, const std::function<void()>& fn)
@@ -24,6 +26,7 @@ namespace lingling
 
     void startup()
     {
+        startup_timestamp = std::chrono::system_clock::now();
         asa::get_logger()->info("Performing startup phase 1/3..");
         const auto& early_deferred = get_deferred(startup_time::STARTUP_EARLY);
         for (size_t i = 0; i < early_deferred.size(); ++i) {
@@ -39,5 +42,10 @@ namespace lingling
             late_deferred[i]();
         }
         asa::get_logger()->info("Startup completed.");
+    }
+
+    std::chrono::system_clock::time_point get_startup_time()
+    {
+        return startup_timestamp;
     }
 }

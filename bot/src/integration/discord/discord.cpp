@@ -8,6 +8,7 @@
 #include <asa/core/state.h>
 #include <asa/core/logging.h>
 
+#include "dashboard.h"
 #include "commands/config.h"
 
 
@@ -83,6 +84,8 @@ namespace lingling::discord
                 if (dpp::run_once<struct register_bot_commands>()) {
                     bot->guild_bulk_command_create(gather(bot->me.id), guild_id);
                 }
+                bot->start_timer([](const dpp::timer&) { update_dashboard(); }, 10);
+
             });
 
             // Reroute the slashcommand to the components that registered the command.
