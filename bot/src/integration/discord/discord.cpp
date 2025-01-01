@@ -8,6 +8,8 @@
 #include <asa/core/state.h>
 #include <asa/core/logging.h>
 
+#include "commands/config.h"
+
 
 namespace lingling::discord
 {
@@ -50,6 +52,10 @@ namespace lingling::discord
             const auto [cmd, callback] = create_setup_command(app_id);
             ret.push_back(cmd);
             command_handlers.emplace(cmd.name, callback);
+
+            const auto [cmd2, callback2] = create_config_command(app_id);
+            ret.push_back(cmd2);
+            command_handlers.emplace(cmd2.name, callback2);
 
             return ret;
         }

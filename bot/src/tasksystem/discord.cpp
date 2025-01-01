@@ -11,6 +11,11 @@ namespace lingling
 {
     namespace
     {
+        const std::vector<dpp::command_option_choice> CONFIG_CHOICES
+        {
+            {"Task Queue Channel", "q_channel"}
+        };
+
         discord::ansi_color prio_color(const task_priority priority)
         {
             switch (priority) {
@@ -105,7 +110,7 @@ namespace lingling
                 for (const auto& msg: msg_old) {
                     discord::get_bot()->message_delete(msg.id, msg.channel_id);
                 }
-                for (const auto& msg : msg_new) {
+                for (const auto& msg: msg_new) {
                     discord::get_bot()->message_create(msg);
                 }
                 return;
@@ -122,6 +127,15 @@ namespace lingling
                 discord::get_bot()->message_delete(msg_old[i].id, msg_old[i].channel_id);
             }
         }
+
+        void handle_config_command(const dpp::slashcommand_t& event)
+        {
+            const auto interaction = event.command.get_command_interaction();
+            const auto subcommand = interaction.options[0].options[0];
+
+            auto test = std::get<dpp::snowflake>(event.get_parameter("channel"));
+            return event.reply(dpp::utility::channel_mention(test));
+        }
     }
 
     void update_task_queue_channel()
@@ -134,8 +148,32 @@ namespace lingling
         discord::get_bot()->messages_get(q_channel, 0, 0, 0, 100, update_impl);
     }
 
-    discord::command_callback_t add_slashcommand_subgroup(dpp::slashcommand&)
+    discord::command_callback_t add_slashcommand_subgroup(dpp::slashcommand& command)
     {
-        return nullptr;
+        dpp::command_option command_group(dpp::co_sub_command_group,
+                                          "tasksystem",
+                                          "Provides control over Ling-Lings Tasksystem.");
+
+        dpp::command_option set_command(dpp::co_sub_command, "set",
+                                        "Change a variable in the tasksystem configuration.");
+
+        dpp::command_option get_command(dpp::co_sub_command, "get",
+                                        "Get the value of a variable in the tasksystem configuration.");
+
+        dpp::command_option value(dpp::co_string, "variable",
+                                  "The variable you want to change.", true);
+        for (const auto& choice: CONFIG_CHOICES) { value.add_choice(choice); }
+
+        set_command.add_option(value);
+        get_command.add_option(value);
+
+        set_command.add_option({
+            dpp::co_string, "value", "The new value of the variable.", false
+        }).add_option({
+            dpp::co_channel, "channel", "The new channel of the variable.", false
+        });
+
+        command.add_option(command_group.add_option(set_command).add_option(get_command));
+        return handle_config_command;
     }
 }
