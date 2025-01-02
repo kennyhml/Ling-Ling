@@ -10,7 +10,7 @@ namespace lingling
     namespace
     {
         constexpr auto TASK_READINESS_FETCH_INTERVAL = 5s;
-        constexpr auto THREAD_IDENTIFIER = "Task Queue Manager";
+        constexpr auto THREAD_IDENTIFIER = "Task Queue";
 
         std::vector<task_provider_t> task_providers;
         std::vector<task_queue_update_listener_t> update_listeners;
@@ -156,5 +156,10 @@ namespace lingling
             task_queue.clear();
             dispatch_update_listeners();
         }
+    }
+
+    std::string get_task_queue_manager_thread_identifier()
+    {
+        return THREAD_IDENTIFIER;
     }
 }

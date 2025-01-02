@@ -18,6 +18,13 @@ namespace lingling::discord
     void update_dashboard();
 
     /**
+     * @brief Adds a listener to be informed when a dashboard is created to update the
+     * current dashboard in the channel, the functions receive the embed by reference and
+     * may add their own fields / data to it.
+     */
+    void add_dashboard_creation_listener(dashboard_create_listener_t, int32_t position);
+
+    /**
      * @brief Formats the given value according to the field formatting convention.
      *
      * @param value The value to format.
@@ -25,15 +32,4 @@ namespace lingling::discord
      * @return The proper format for the embed field, e.g ">>> **my_value123**".
      */
     std::string fmt_field(const std::string& value);
-
-    /**
-     * @brief Adds a listener to be informed when a dashboard is created to update the
-     * current dashboard in the channel, the functions receive the embed by reference and
-     * may add their own fields / data to it.
-     */
-    void add_dashboard_creation_listener(dashboard_create_listener_t);
-
-
-
-
 }

@@ -2,6 +2,7 @@
 
 #include "queue.h"
 #include "configuration/validate.h"
+#include "discord/dashboard.h"
 #include "discord/commands/config.h"
 
 namespace lingling

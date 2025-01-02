@@ -88,4 +88,9 @@ namespace lingling
      * @param clear Whether to clear the task queue of the remaining tasks.
      */
     void terminate_task_queue_manager_thread(bool clear = true);
+
+    /**
+     * @brief Gets the unique identifier of the task queue manager thread.
+     */
+    std::string get_task_queue_manager_thread_identifier();
 }

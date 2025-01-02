@@ -9,11 +9,13 @@
 #include <asa/core/logging.h>
 #include <asa/utility.h>
 
+#include "asa/core/managedthread.h"
+
 namespace lingling::discord
 {
     namespace
     {
-        std::vector<dashboard_create_listener_t> creation_listeners;
+        std::vector<std::pair<dashboard_create_listener_t, int32_t> > creation_listeners;
 
         constexpr auto EMBED_DESCRIPTION =
                 "Dynamically updates to reflect the real-time status of the bot.";
@@ -38,6 +40,35 @@ namespace lingling::discord
             }
         }
 
+        [[nodiscard]] std::string get_active_threads()
+        {
+            // Make sure we copy the array so we dont run into issues related to threading
+            const auto threads = asa::get_all_threads();
+
+            std::string result;
+            for (const auto& [name, thread]: threads) {
+                std::string state;
+                switch (thread->get_state()) {
+                    case asa::managed_thread::READY:
+                        state = ":blue_circle:";
+                        break;
+                    case asa::managed_thread::RUNNING:
+                        state = ":green_circle:";
+                        break;
+                    case asa::managed_thread::PAUSED:
+                        state = ":yellow_circle:";
+                        break;
+                    case asa::managed_thread::TERMINATED:
+                        state = ":red_circle:";
+                        break;
+                    default:
+                        state = ":question:";
+                }
+                result += std::format("{} {}\n", state, name);
+            }
+            return result.empty() ? "`None Active`" : result;
+        }
+
         [[nodiscard]] dpp::embed create_dashboard()
         {
             dpp::embed embed;
@@ -53,11 +84,14 @@ namespace lingling::discord
             embed.add_field("Application Status:", fmt_field(get_app_state_repr()), true)
                  .add_field("Application Host:", fmt_field(user_name.get()), true)
                  .add_field("Application Startup:", fmt_field(launch_timestamp), true)
+                 .add_field("Managed Threads:", fmt_field(get_active_threads()), true)
                  .set_footer({"Last Updated"})
                  .set_timestamp(time(nullptr));
 
             // Creation listeners can add their own fields to the embed, passed by reference.
-            for (const auto& listener: creation_listeners) { listener(embed); }
+            for (const auto& listener: std::ranges::views::keys(creation_listeners)) {
+                listener(embed);
+            }
             return embed;
         }
 
@@ -106,5 +140,16 @@ namespace lingling::discord
     std::string fmt_field(const std::string& value)
     {
         return std::format(">>> **{}**", value);
+    }
+
+    void add_dashboard_creation_listener(dashboard_create_listener_t fn,
+                                         const int32_t position)
+    {
+        creation_listeners.emplace_back(std::move(fn), position);
+
+        // Sort them by position in ascending order.
+        std::ranges::sort(creation_listeners, [](const auto& p1, const auto& p2) {
+            return p1.second < p2.second;
+        });
     }
 }
