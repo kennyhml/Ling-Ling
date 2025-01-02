@@ -149,4 +149,7 @@ namespace lingling
         json_t* data_ = nullptr;
         bool loaded_ = false;
     };
+
+    template<typename T>
+    using managed_var_table_t = std::unordered_map<std::string, managed_var<T>&>;
 }

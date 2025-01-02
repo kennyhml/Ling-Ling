@@ -48,6 +48,7 @@ add_executable(llpp
         src/core/state.h
         src/core/config.cpp
         src/core/config.h
+        src/integration/discord/commands/common.cpp
 )
 
 add_dependencies(llpp asapp)
