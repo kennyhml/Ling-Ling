@@ -1,7 +1,15 @@
 #pragma once
+#include "configuration/managedvar.h"
 #include <dpp/dpp.h>
 
-#include "configuration/managedvar.h"
+template<>
+struct std::formatter<dpp::snowflake> : std::formatter<std::string>
+{
+    auto format(const dpp::snowflake& id, std::format_context& ctx) const
+    {
+        return std::formatter<std::string>::format(id.str(), ctx);
+    }
+};
 
 namespace lingling::discord
 {
@@ -68,7 +76,13 @@ namespace lingling::discord
     {
         // Check for "get" command.
         if (event.command.get_command_interaction().options[0].options[0].name == "get") {
-            event.reply(std::format("**{}:** {}", name, variable.get()));
+            if (param == "channel") {
+                // Add a tag for the channel
+                event.reply(std::format("**{}:** {}", name,
+                                        dpp::utility::channel_mention(variable.get())));
+            } else {
+                event.reply(std::format("**{}:** {}", name, variable.get()));
+            }
             return;
         }
 
@@ -80,9 +94,20 @@ namespace lingling::discord
 
         const auto prev = variable.get();
         variable.set(value);
+
         if (prev.empty()) {
-            event.reply(std::format("**{}** set to `{}`.", name, value));
+            if (param == "channel") {
+                event.reply(std::format("**{}** set to {}.",
+                                        name, dpp::utility::channel_mention(value)));
+            } else {
+                event.reply(std::format("**{}** set to `{}`.", name, value));
+            }
         }
-        event.reply(std::format("**{}** changed from `{}` to `{}`.", name, prev, value));
+        if (param == "channel") {
+            event.reply(std::format("**{}** changed from {} to {}.", name,
+                dpp::utility::channel_mention(prev), dpp::utility::channel_mention(value)));
+        } else {
+            event.reply(std::format("**{}** changed from `{}` to `{}`.", name, prev, value));
+        }
     }
 }

@@ -11,9 +11,13 @@ namespace lingling
 {
     namespace
     {
-        const std::vector<dpp::command_option_choice> CONFIG_CHOICES
+        const std::vector<discord::discord_configurable> CONFIG_CHOICES
         {
-            {"Task Queue Channel", "q_channel"}
+            {"Task Queue Channel", "channel", dpp::co_channel, "The new channel."},
+        };
+
+        const managed_var_table_t<dpp::snowflake> channel_vars = {
+            {"Task Queue Channel", q_channel},
         };
 
         discord::ansi_color prio_color(const task_priority priority)
@@ -131,27 +135,11 @@ namespace lingling
 
         void handle_config_command(const dpp::slashcommand_t& event)
         {
-            const auto interaction = event.command.get_command_interaction();
-            const auto subcommand = interaction.options[0].options[0];
-            const bool get = subcommand.name == "get";
-
-            const auto var = std::get<std::string>(event.get_parameter("variable"));
-            const auto ch = discord::tget<dpp::snowflake>(event.get_parameter("channel"));
-
-            if (var == "q_channel") {
-                if (get) {
-                    return event.reply(dpp::utility::channel_mention(q_channel));
-                }
-                if (ch.empty()) {
-                    return event.reply("A channel must be provided");
-                }
-                const auto prev = q_channel.get();
-                q_channel.set(ch);
-                event.reply(std::format("**Task Queue Channel** changed from {} to {}.",
-                                        dpp::utility::channel_mention(prev),
-                                        dpp::utility::channel_mention(ch)));
+            const auto var = discord::tget<std::string>(event.get_parameter("variable"));
+            if (channel_vars.contains(var)) {
+                discord::handle_change(event, var, "channel", channel_vars.at(var));
             } else {
-                event.reply(std::format("Variable {} is unknown!", var));
+                event.reply(std::format("Variable `{}` is unknown!", var));
             }
         }
     }
@@ -166,32 +154,19 @@ namespace lingling
         discord::get_bot()->messages_get(q_channel, 0, 0, 0, 100, update_impl);
     }
 
-    discord::command_callback_t add_slashcommand_subgroup(dpp::slashcommand& command)
+    discord::command_callback_t add_config_tasksystem_command_group(
+        dpp::slashcommand& command)
     {
-        dpp::command_option command_group(dpp::co_sub_command_group,
-                                          "tasksystem",
-                                          "Provides control over Ling-Lings Tasksystem.");
+        dpp::command_option group(dpp::co_sub_command_group, "tasksystem",
+                                  "Provides control over Ling-Lings Tasksystem.");
 
-        dpp::command_option set_command(dpp::co_sub_command, "set",
-                                        "Change a variable in the tasksystem configuration.");
+        group.add_option(discord::create_config_ctrl_command("set", CONFIG_CHOICES,
+            "Change a variable in the tasksystem configuration."));
 
-        dpp::command_option get_command(dpp::co_sub_command, "get",
-                                        "Get the value of a variable in the tasksystem configuration.");
+        group.add_option(discord::create_config_ctrl_command("get", CONFIG_CHOICES,
+            "Get the value of a variable in the tasksystem configuration.", false));
 
-        dpp::command_option value(dpp::co_string, "variable",
-                                  "The variable you want to change.", true);
-        for (const auto& choice: CONFIG_CHOICES) { value.add_choice(choice); }
-
-        set_command.add_option(value);
-        get_command.add_option(value);
-
-        set_command.add_option({
-            dpp::co_string, "value", "The new value of the variable.", false
-        }).add_option({
-            dpp::co_channel, "channel", "The new channel of the variable.", false
-        });
-
-        command.add_option(command_group.add_option(set_command).add_option(get_command));
+        command.add_option(group);
         return handle_config_command;
     }
 }

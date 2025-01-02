@@ -4,6 +4,9 @@
 
 namespace lingling
 {
+    /**
+     * @brief Registers the core configuration listeners.
+     */
     void init_core_config();
 
     /**
@@ -33,7 +36,7 @@ namespace lingling
      *
      * @return The function to handle the /config core commands being invoked.
      */
-    discord::command_callback_t add_core_config_command(dpp::slashcommand&);
+    discord::command_callback_t add_core_config_command_group(dpp::slashcommand&);
 
     // core configuration of the project needed by nearly all components
     inline managed_var<std::string> user_name{"user_name", get_core_config};

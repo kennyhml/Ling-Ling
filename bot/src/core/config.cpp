@@ -51,7 +51,7 @@ namespace lingling
     void init_core_config()
     {
         add_config_validation("core", validate_core_config);
-        discord::add_config_command_create_listener(add_core_config_command);
+        discord::add_config_command_create_listener(add_core_config_command_group);
     }
 
     bool validate_core_config(json_t& json)
@@ -83,7 +83,7 @@ namespace lingling
         asa::get_logger()->info("User name set to: '{}'.", user_name.get());
     }
 
-    discord::command_callback_t add_core_config_command(dpp::slashcommand& command)
+    discord::command_callback_t add_core_config_command_group(dpp::slashcommand& command)
     {
         dpp::command_option group(dpp::co_sub_command_group, "core",
                                   "Provides control over Ling-Lings core configurations.");
