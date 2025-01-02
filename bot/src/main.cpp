@@ -10,6 +10,7 @@
 #include "tasksystem/discord.h"
 #include "tasksystem/persistenttask.h"
 #include "tasksystem/queue.h"
+#include "integration/discord/commands/tribelogrole.h"
 
 struct test : lingling::persistent_task
 {
@@ -32,7 +33,7 @@ int main()
 {
     setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
     asa::setup_logger();
-
+    lingling::discord::listener();
     lingling::startup();
 
 

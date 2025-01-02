@@ -7,6 +7,9 @@ namespace lingling::discord
 {
     namespace
     {
+        std::vector<command_create_t> command_creation_listeners;
+        std::map<std::string, command_callback_t> role_group_callbacks;
+
         // Permissions to be able to view the channel
         constexpr dpp::permission VIEW_CHANNEL = dpp::permission()
                                                  .add(dpp::p_view_channel)
@@ -157,7 +160,7 @@ namespace lingling::discord
 
                     if (!cb.is_error() && cb.get<dpp::channel>().name == id) {
                         event.edit_original_response(
-                            std::format("Setup failed - `{}` already exists!", id));
+                            { std::format("Setup failed - `{}` already exists!", id) });
                         *stop = true;
                     }
 
@@ -175,6 +178,10 @@ namespace lingling::discord
          */
         void handle_setup_command(const dpp::slashcommand_t& event)
         {
+            const auto interaction = event.command.get_command_interaction();
+            const auto group = interaction.options[0];
+
+            role_group_callbacks.at(group.name)(event);
             event.thinking(false, [event](conf_t) {
                 // We need to get the guilds channels to check if the category already exists
                 get_bot()->guild_get(guild_id, [=](conf_t callback) {
@@ -193,22 +200,36 @@ namespace lingling::discord
         dpp::slashcommand cmd("setup", "Setup the bot channels in your discord.", app_id);
 
         cmd.add_option(dpp::command_option(
-               dpp::co_string, "identifier",
-               "Unique identifier for the category in case there are multiple, for example the server number."
-           ))
-           .add_option(dpp::command_option(
-               dpp::co_role, "access-role",
-               "The role members need to have to be able to see the category & channels (everyone if not specified)."
-           ))
-           .add_option(dpp::command_option(
-               dpp::co_role, "command-role",
-               "The role members need to have to be able to use bot commands (same as access-role if not specified)."
-           ))
-           .add_option(dpp::command_option(
-               dpp::co_role, "tribelog-role",
-               "The role members need to have to be able to see the tribelog (same as access-role if not specified)."
-           ));
+            dpp::co_string, "identifier",
+            "Unique identifier for the category in case there are multiple, for example the server number."
+        ))
+            .add_option(dpp::command_option(
+                dpp::co_role, "access-role",
+                "The role members need to have to be able to see the category & channels (everyone if not specified)."
+            ))
+            .add_option(dpp::command_option(
+                dpp::co_role, "command-role",
+                "The role members need to have to be able to use bot commands (same as access-role if not specified)."
+            ));
 
-        return {cmd, handle_setup_command};
+        for (const auto& fn : command_creation_listeners) {
+            const auto callback = fn(cmd);
+            role_group_callbacks[cmd.options.back().name] = callback;
+        }
+        return { cmd, handle_setup_command };
+    }
+
+    void add_setup_command_create_listener(command_create_t callback)
+    {
+        command_creation_listeners.push_back(std::move(callback));
+    }
+
+    discord::command_callback_t triberole(dpp::slashcommand& cmd)
+    {
+        dpp::command_option tribe_role(dpp::co_role, "tribelog-role",
+            "The role members need to have to be able to see the tribelogs (same as access-role if not specified)."
+        );
+        cmd.add_option(tribe_role);
+        return handle_setup_command;
     }
 }
