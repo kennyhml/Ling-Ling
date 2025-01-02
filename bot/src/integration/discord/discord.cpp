@@ -3,14 +3,12 @@
 #include "utility/utility.h"
 #include "commands/common.h"
 #include "commands/setup.h"
+#include "dashboard.h"
+#include "commands/config.h"
 
 #include <iostream>
 #include <asa/core/state.h>
 #include <asa/core/logging.h>
-
-#include "dashboard.h"
-#include "commands/config.h"
-
 
 namespace lingling::discord
 {

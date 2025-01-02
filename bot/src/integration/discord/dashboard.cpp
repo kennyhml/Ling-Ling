@@ -3,6 +3,8 @@
 #include "discord.h"
 #include "commands/common.h"
 #include "utility/utility.h"
+#include "core/state.h"
+#include "core/config.h"
 
 #include <asa/core/logging.h>
 #include <asa/utility.h>
@@ -11,31 +13,51 @@ namespace lingling::discord
 {
     namespace
     {
+        std::vector<dashboard_create_listener_t> creation_listeners;
+
         constexpr auto EMBED_DESCRIPTION =
                 "Dynamically updates to reflect the real-time status of the bot.";
 
-        constexpr auto TRANS_URL =
-                "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/1/18/Tek_Transmitter.png";
+        constexpr auto HLNA_ICON_URL =
+                "https://ark.wiki.gg/images/3/30/Mini-HLNA_Skin.png";
 
+
+        [[nodiscard]] std::string get_app_state_repr()
+        {
+            switch (get_application_state()) {
+                case app_state::APP_STATE_ONLINE:
+                    return ":blue_circle: - Online";
+                case app_state::APP_STATE_PAUSED:
+                    return ":yellow_circle: - Paused";
+                case app_state::APP_STATE_OFFLINE:
+                    return ":red_circle: - Offline";
+                case app_state::APP_STATE_RUNNING:
+                    return ":green_circle: - Running";
+                default:
+                    return "???";
+            }
+        }
 
         [[nodiscard]] dpp::embed create_dashboard()
         {
             dpp::embed embed;
 
-            embed.set_title("Ling-Ling++ Dashboard")
+            embed.set_title("Ling Ling++ Dashboard")
                  .set_color(dpp::colors::black)
-                 .set_thumbnail(TRANS_URL)
+                 .set_thumbnail(HLNA_ICON_URL)
                  .set_description(EMBED_DESCRIPTION);
 
-            const auto startup = std::chrono::system_clock::to_time_t(get_startup_time());
+            const std::string launch_timestamp = std::format(
+                "<t:{}:R>", std::chrono::system_clock::to_time_t(get_startup_time()));
 
-            embed.add_field("Application Host:", ">>> **Herbert 123**", true)
-                 .add_field("Application Status:", ">>> **:green_circle: Running**", true)
-                 .add_field("Application Startup:",
-                            std::format(">>> **<t:{}:R>**", startup), true)
-
+            embed.add_field("Application Status:", fmt_field(get_app_state_repr()), true)
+                 .add_field("Application Host:", fmt_field(user_name.get()), true)
+                 .add_field("Application Startup:", fmt_field(launch_timestamp), true)
                  .set_footer({"Last Updated"})
                  .set_timestamp(time(nullptr));
+
+            // Creation listeners can add their own fields to the embed, passed by reference.
+            for (const auto& listener: creation_listeners) { listener(embed); }
             return embed;
         }
 
@@ -79,5 +101,10 @@ namespace lingling::discord
         }
 
         get_bot()->messages_get(dashboard, 0, 0, 0, 100, update_impl);
+    }
+
+    std::string fmt_field(const std::string& value)
+    {
+        return std::format(">>> **{}**", value);
     }
 }

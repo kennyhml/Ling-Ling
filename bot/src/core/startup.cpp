@@ -3,6 +3,8 @@
 
 #include <asa/core/logging.h>
 
+#include "config.h"
+
 namespace lingling
 {
     namespace
@@ -27,15 +29,21 @@ namespace lingling
     void startup()
     {
         startup_timestamp = std::chrono::system_clock::now();
+
+        // STARTUP 1/3
         asa::get_logger()->info("Performing startup phase 1/3..");
         const auto& early_deferred = get_deferred(startup_time::STARTUP_EARLY);
         for (size_t i = 0; i < early_deferred.size(); ++i) {
             early_deferred[i]();
         }
+        add_config_validation("core", validate_core_config);
 
+        // STARTUP 2/3
         asa::get_logger()->info("Performing startup phase 1/2..");
         validate_config_integrity();
+        ensure_user_name_provided();
 
+        // STARTUP 3/3
         asa::get_logger()->info("Performing startup phase 3/3..");
         const auto& late_deferred = get_deferred(startup_time::STARTUP_LATE);
         for (size_t i = 0; i < late_deferred.size(); ++i) {

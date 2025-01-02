@@ -44,6 +44,10 @@ add_executable(llpp
         src/tasksystem/tasksystem.cpp
         src/integration/discord/dashboard.cpp
         src/integration/discord/dashboard.h
+        src/core/state.cpp
+        src/core/state.h
+        src/core/config.cpp
+        src/core/config.h
 )
 
 add_dependencies(llpp asapp)
