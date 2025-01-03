@@ -15,6 +15,8 @@ namespace lingling::discord
      */
     void initialize_discord_bot();
 
+    void update_command_list();
+
     /**
      * @brief Gets a shared pointer to the dpp::cluster serving as the bot. May be nullptr
      * if the bot is not initialized.

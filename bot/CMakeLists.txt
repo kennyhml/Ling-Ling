@@ -51,6 +51,14 @@ add_executable(llpp
         src/integration/discord/commands/common.cpp
         src/tasksystem/executor.cpp
         src/tasksystem/executor.h
+        src/modules/gacha/config.cpp
+        src/modules/gacha/config.h
+        src/modules/gacha/discord.cpp
+        src/modules/gacha/discord.h
+        src/modules/gacha/tasks/feeding_task.h
+        src/modules/gacha/tasks/collection_task.h
+        src/modules/gacha/gacha.cpp
+        src/modules/gacha/gacha.h
 )
 
 add_dependencies(llpp asapp)

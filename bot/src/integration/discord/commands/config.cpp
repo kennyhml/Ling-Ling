@@ -1,6 +1,5 @@
 #include "config.h"
 
-
 namespace lingling::discord
 {
     namespace
@@ -21,6 +20,7 @@ namespace lingling::discord
     command_register_t create_config_command(const dpp::snowflake& app_id)
     {
         dpp::slashcommand cmd("config", "Read/Modify Ling-Lings configuration.", app_id);
+        subcommand_group_callbacks.clear();
 
         for (const auto& fn: command_creation_listeners) {
             const auto callback = fn(cmd);

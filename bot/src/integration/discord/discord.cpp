@@ -80,7 +80,7 @@ namespace lingling::discord
             // only be registered every few hours so making it guild specific is required.
             bot->on_ready([](const dpp::ready_t&) {
                 if (dpp::run_once<struct register_bot_commands>()) {
-                    bot->guild_bulk_command_create(gather(bot->me.id), guild_id);
+                    update_command_list();
                 }
                 bot->start_timer([](const dpp::timer&) { update_dashboard(); }, 10);
 
@@ -195,6 +195,11 @@ namespace lingling::discord
             }
         }
         get_guild();
+    }
+
+    void update_command_list()
+    {
+        bot->guild_bulk_command_create(gather(bot->me.id), guild_id);
     }
 
     std::shared_ptr<dpp::cluster> get_bot()
