@@ -19,4 +19,12 @@ namespace lingling
      * @return The function to will handle the /config tasksystem command being invoked.
      */
     discord::command_callback_t add_config_tasksystem_command_group(dpp::slashcommand&);
+
+    /**
+     * @brief Adds the tasksystem fields to the provided dashboard. Serves as callback for
+     * the dashboard creation to attach the tasksystem fields.
+     *
+     * @param dashboard The dashboard (reference) to add the fields to.
+     */
+    void add_dashboard_tasksystem_fields(dpp::embed& dashboard);
 }

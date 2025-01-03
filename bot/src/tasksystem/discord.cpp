@@ -7,6 +7,9 @@
 #include <magic_enum.hpp>
 #include <asa/core/logging.h>
 
+#include "executor.h"
+#include "discord/dashboard.h"
+
 namespace lingling
 {
     namespace
@@ -168,5 +171,22 @@ namespace lingling
 
         command.add_option(group);
         return handle_config_command;
+    }
+
+    void add_dashboard_tasksystem_fields(dpp::embed& dashboard)
+    {
+        std::shared_ptr<task> task = get_active_task();
+
+        std::string task_repr = "`None Active`";
+        std::string task_info = "`Not Available`";
+
+        if (task) {
+            task_repr = std::format(":tools: {}\n:gear: {}", task->get_id(), task->get_module());
+            task_info = std::format(
+                "<t:{}:R>\nProgress: 90%", std::chrono::system_clock::to_time_t(task->get_start_time()));
+        }
+
+        dashboard.add_field("Executing Task:", discord::fmt_field(task_repr), true)
+                 .add_field("Task Start Time:", discord::fmt_field(task_info), true);
     }
 }

@@ -17,5 +17,7 @@ namespace lingling
 
         // Update the discord task queue when the task queue is updated
         add_task_queue_updated_listener(update_task_queue_channel);
+
+        discord::add_dashboard_creation_listener(add_dashboard_tasksystem_fields, 0);
     }
 }

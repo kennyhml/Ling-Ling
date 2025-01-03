@@ -7,6 +7,11 @@ namespace lingling
         : module_(std::move(t_module)), id_(std::move(t_id)),
           description_(std::move(t_description)), priority_(t_priority) {}
 
+    std::chrono::system_clock::time_point task::get_start_time() const
+    {
+        return last_started_;
+    }
+
     void task::add_executed_listener(task_completion_callback_t callback)
     {
         callbacks_.push_back(std::move(callback));

@@ -89,6 +89,11 @@ namespace lingling
         [[nodiscard]] const std::string& get_description() const { return description_; }
 
         /**
+         * @brief Gets the timestamp the task was last started.
+         */
+        [[nodiscard]] std::chrono::system_clock::time_point get_start_time() const;
+
+        /**
          * @brief Registers a callback to be called when the task was executed. It is to
          * be called at the end of the task execution, regardless of failure or success.
          *
@@ -153,6 +158,7 @@ namespace lingling
         task_result last_result_;
 
         std::chrono::system_clock::time_point last_completion_;
+        std::chrono::system_clock::time_point last_started_;
         std::chrono::system_clock::time_point suspension_start_;
 
         std::vector<task_completion_callback_t> callbacks_;

@@ -9,7 +9,7 @@ namespace lingling
 {
     namespace
     {
-        constexpr auto EXECUTOR_THREAD_IDENTIFIER = "Task Executor";
+        constexpr auto EXECUTOR_THREAD_IDENTIFIER = "Task Runner";
         std::shared_ptr<task> active_task = nullptr;
 
         void executor_impl()
