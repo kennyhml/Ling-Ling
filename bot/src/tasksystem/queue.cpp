@@ -145,6 +145,7 @@ namespace lingling
 
     void start_task_queue_manager_thread()
     {
+        // Dont need to add logging here since the called functions log plenty.
         asa::register_thread(THREAD_IDENTIFIER, continuous_task_fetch);
         asa::get_thread(THREAD_IDENTIFIER)->start();
     }

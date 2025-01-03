@@ -13,8 +13,7 @@ namespace lingling
 
     /**
     * @brief Sets the state of the application to the provided state. This has no effect
-    * on the application itself, i.e if you wish to terminate the application you must do
-    * so through the @link terminate_application \endlink function.
+    * on the application itself.
     *
     * @param state The new state of the application.
     */
@@ -28,6 +27,27 @@ namespace lingling
     [[nodiscard]] app_state get_application_state();
 
     /**
+     * @brief Starts all managed threads required to run the application.
+     *
+     * @remark If the application is already running, this has no effect.
+     */
+    void start_application();
+
+    /**
+     * @brief Starts all managed threads required to run the application.
+     *
+     * @remark If the application is already running, this has no effect.
+     */
+    void pause_application();
+
+    /**
+   * @brief Starts all managed threads required to run the application.
+   *
+   * @remark If the application is already running, this has no effect.
+   */
+    void resume_application();
+
+    /**
      * @brief Terminates all managed threads running in the current application.
      * The state is set to "online" upon termination.
      *
@@ -36,9 +56,11 @@ namespace lingling
     void terminate_application();
 
     /**
-     * @brief Starts all managed threads required to run the application.
+     * @brief Checks for a keypress by the user to change the state of the application.
      *
-     * @remark If the application is already running, this has no effect.
+     * F1 - Start
+     * F3 - Stop
+     * F5 - Pause
      */
-    void start_application();
+    void check_for_user_keyboard_input_action();
 }
