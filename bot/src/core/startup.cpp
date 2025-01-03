@@ -40,7 +40,7 @@ namespace lingling
         }
 
         // STARTUP 2/3
-        asa::get_logger()->info("Performing startup phase 1/2..");
+        asa::get_logger()->info("Performing startup phase 2/3..");
         validate_config_integrity();
         ensure_user_name_provided();
 
