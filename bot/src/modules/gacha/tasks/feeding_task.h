@@ -1,5 +1,6 @@
 #pragma once
 #include "configuration/managedvar.h"
+#include "tasksystem/persistenttask.h"
 
 namespace lingling::gacha
 {
@@ -20,6 +21,17 @@ namespace lingling::gacha
     {
         // The item the gacha should be set to produce
         produce_item_type produce;
+    };
+
+
+    class feeding_task : public persistent_task
+    {
+
+
+
+
+
+
     };
 }
 

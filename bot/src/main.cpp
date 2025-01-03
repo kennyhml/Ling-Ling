@@ -8,8 +8,10 @@
 #include "asa/core/managedthread.h"
 #include "asa/core/state.h"
 #include "asa/game/window.h"
+#include "asa/items/items.h"
 #include "core/startup.h"
 #include "core/state.h"
+#include "modules/gacha/stations/seedstation.h"
 #include "tasksystem/persistenttask.h"
 #include "tasksystem/queue.h"
 
@@ -39,7 +41,28 @@ int main()
     setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
     asa::setup_logger();
 
+
+    asa::checked_sleep(3s);
+    asa::get_window_handle();
+    asa::load_items();
+    asa::load_game_settings("F:/SteamLibrary/steamapps/common/ARK Survival Ascended");
+
+    asa::set_window_focus();
+
+    auto station = lingling::gacha::seedstation("test", std::make_shared<asa::teleporter>("test"));
+    station.set_seeding_flags(lingling::gacha::SEEDING_RESTOCK_FOR_NEXT);
+    station.complete();
+
+    asa::checked_sleep(10s);
+
+    station.set_seeding_flags(lingling::gacha::SEEDING_NO_BERRY_TRANSFER);
+    station.complete();
+    return 1;
+
     lingling::startup();
+
+
+
 
     // Fake task provider for testing purposes, alwasy provides a task
     lingling::add_task_queue_task_provider(

@@ -59,6 +59,18 @@ add_executable(llpp
         src/modules/gacha/tasks/collection_task.h
         src/modules/gacha/gacha.cpp
         src/modules/gacha/gacha.h
+        src/modules/gacha/taskprovider.cpp
+        src/modules/gacha/taskprovider.h
+        src/modules/gacha/stations/seedstation.h
+        src/modules/gacha/stations/berrystation.h
+        src/modules/gacha/stations/collectstation.h
+        src/core/teleportstation.h
+        src/core/bedstation.h
+        src/core/bedstation.cpp
+        src/core/teleportstation.cpp
+        src/modules/gacha/stations/feedstation.h
+        src/modules/gacha/stations/feedstation.cpp
+        src/modules/gacha/stations/seedstation.cpp
 )
 
 add_dependencies(llpp asapp)

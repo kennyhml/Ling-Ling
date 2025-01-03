@@ -12,6 +12,10 @@ namespace lingling::gacha
 
         void assert_preset_exists(const std::string& preset, const bool should_exist)
         {
+            if (preset.empty()) {
+                throw lingling_error(std::format("No preset name provided."));
+            }
+
             if (tower_presets.contains(preset) == should_exist) { return; }
             if (should_exist) {
                 throw lingling_error(std::format("Preset `{}` does not exist!", preset));
@@ -36,10 +40,10 @@ namespace lingling::gacha
 
         for (auto& [k, v]: json.at("presets").items()) {
             ret |= patch_json(k, v, tower_schema);
-            for (auto& task : v.at("feeding_task_configs")) {
+            for (auto& task: v.at("feeding_task_configs")) {
                 ret |= patch_json("tasks", task, feed_schema);
             }
-            tower_presets[k] = std::make_shared<managed_var<tower_preset>>(k, get);
+            tower_presets[k] = std::make_shared<managed_var<tower_preset> >(k, get);
         }
         return ret;
     }
@@ -79,7 +83,8 @@ namespace lingling::gacha
         data.erase(preset);
         tower_presets.erase(preset);
 
-        tower_presets[new_name] = std::make_shared<managed_var<tower_preset>>(new_name, get);
+        tower_presets[new_name] = std::make_shared<managed_var<tower_preset> >(
+            new_name, get);
         tower_presets.at(new_name)->sync_from_obj();
         tower_presets.at(new_name)->sync_to_obj();
     }
@@ -99,6 +104,5 @@ namespace lingling::gacha
             throw lingling_error(std::format("Preset `{}` does not exist!", *preset));
         }
         return presets;
-
     }
 }
